@@ -85,6 +85,10 @@ class RowResult:
     ci: Interval
     n_images: int
     by_control_source: dict[str, float] = field(default_factory=dict)
+    #: ``sample_id -> held-out score``, averaged over the seeds that tested it.
+    #: P10's verified-removed-pairs AUROC restricts this row to the pairs the
+    #: verifier confirmed, so the per-sample scores have to survive the run.
+    scores_by_sample: dict[str, float] = field(default_factory=dict)
 
     def line(self) -> str:
         return (
@@ -170,7 +174,7 @@ def train_one(
                 per_sample[int(i)].append(float(s))
 
     # P5: aggregate the tile row per image by the maximum tile score
-    labels, scores, image_ids = [], [], []
+    labels, scores, image_ids, sample_ids = [], [], [], []
     for i, sample in enumerate(test_samples):
         vals = per_sample.get(i)
         if not vals:
@@ -178,11 +182,12 @@ def train_one(
         labels.append(sample.label)
         scores.append(max(vals) if row.aggregate == "max_tile" else float(np.mean(vals)))
         image_ids.append(sample.image_id)
+        sample_ids.append(sample.sample_id)
 
     del model
     if device == "cuda":
         torch.cuda.empty_cache()
-    return np.array(labels), np.array(scores), image_ids
+    return np.array(labels), np.array(scores), image_ids, sample_ids
 
 
 def run_row(
@@ -205,9 +210,10 @@ def run_row(
     pooled_images: list[str] = []
     sources: dict[str, tuple[list[int], list[float]]] = defaultdict(lambda: ([], []))
 
+    sample_scores: dict[str, list[float]] = defaultdict(list)
     for seed in seeds:
         train_s, test_s = split_by_image(samples, seed=seed)
-        labels, scores, image_ids = train_one(
+        labels, scores, image_ids, sample_ids = train_one(
             train_s,
             test_s,
             row,
@@ -227,6 +233,8 @@ def run_row(
             src = by_id[image_id].control_source or "unknown"
             sources[src][0].append(int(label))
             sources[src][1].append(float(score))
+        for sample_id, score in zip(sample_ids, scores):
+            sample_scores[sample_id].append(float(score))
 
     labels = np.concatenate(pooled_labels) if pooled_labels else np.array([])
     scores = np.concatenate(pooled_scores) if pooled_scores else np.array([])
@@ -243,4 +251,5 @@ def run_row(
         by_control_source={
             src: auroc(np.array(ls), np.array(ss)) for src, (ls, ss) in sources.items()
         },
+        scores_by_sample={k: float(np.mean(v)) for k, v in sample_scores.items()},
     )

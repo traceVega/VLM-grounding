@@ -7,6 +7,7 @@ Stages, each resumable and each writing its own store:
     python -m idea91.run_k1 checks      # B4a: ladders and nulls, pre-freeze
     python -m idea91.run_k1 freeze      # B0a: bind P1 to P7 (needs a sign-off)
     python -m idea91.run_k1 rows        # B4b: the classifiers that see a real REMOVE
+    python -m idea91.run_k1 verify      # P10 removal success (needs the judge served)
     python -m idea91.run_k1 report      # tables/k1.md
     python -m idea91.run_k1 status      # what exists so far
 
@@ -493,12 +494,56 @@ def frequency_check(limit: int = 200) -> dict[str, tuple[float, float]]:
     return {"big_lama": (float(np.mean(inside_all)), float(np.mean(outside_all)))}
 
 
+def verifier_path() -> Path:
+    return paths.DATA_ROOT / "k1_removal_success.json"
+
+
+def stage_verify(args) -> None:
+    """P10's K1 removal success: the class-label question on both K1 classes.
+
+    Needs the edit verifier served (``shared/judges/serve.sh edit_verifier``).
+    Every answer is cached, so an interrupted pass resumes for free.
+    """
+    import json
+    from dataclasses import asdict
+
+    from idea91.gate import removal_success as RS
+
+    holes = tuple(h.strip() for h in args.hole_types.split(",") if h.strip())
+    result = RS.run(
+        load_index(),
+        image_dir(),
+        paths.EDITS_ROOT,
+        set_name=SET_NAME,
+        limit=args.limit,
+        hole_types=holes,
+    )
+    verifier_path().write_text(
+        json.dumps([asdict(r) for r in result.rows], indent=2), encoding="utf-8"
+    )
+    print(f"\n{len(result.rows)} answers -> {verifier_path()}")
+    for (klass, source), interval in sorted(result.by_class_and_source().items()):
+        print(f"  {klass:12s} {source:22s} removal success {interval.point:.3f} (n={interval.n})")
+
+
+def load_verifier_rows() -> list:
+    import json
+
+    from idea91.gate.removal_success import VerifierRow
+
+    if not verifier_path().is_file():
+        return []
+    data = json.loads(verifier_path().read_text(encoding="utf-8"))
+    return [VerifierRow(**{k: v for k, v in row.items() if k != "removed"}) for row in data]
+
+
 def stage_report(args) -> None:
     """B5: tables/k1.md -- the verdict, its conditions, and every row behind it."""
     import json
 
-    from idea91.analysis.k1 import K1Tables, verdict_from_results
+    from idea91.analysis.k1 import CONTRAST_OBJ, K1Tables, verdict_from_results
     from idea91.gate.run import summarise_checks
+    from idea91.gate.verdict import GATE_ROW_NAMES
 
     results = load_row_results()
     if not results:
@@ -537,9 +582,30 @@ def stage_report(args) -> None:
         gate_resolution_note=gate_resolution_note(checks) if checks else "",
     )
 
+    verifier_rows = load_verifier_rows()
+    removal, verified_pairs = {}, {}
+    if verifier_rows:
+        from idea91.gate.removal_success import RemovalSuccess, auroc_on_verified_pairs
+
+        removal = RemovalSuccess(verifier_rows).by_class_and_source()
+        # P10 reports the verified-pairs AUROC of the gate, so it is read off the
+        # gating row that carries the verdict -- the argmax of P7's maximum, not
+        # an arbitrary row.
+        gating = [
+            r
+            for r in results
+            if r.contrast == CONTRAST_OBJ and r.scores_by_sample and r.row in GATE_ROW_NAMES
+        ]
+        if gating:
+            best = max(gating, key=lambda r: r.auroc_mean)
+            verified_pairs = auroc_on_verified_pairs(best.scores_by_sample, verifier_rows)
+            print(f"verified-pairs AUROC read off {best.row} ({best.hole_type})")
+
     tables = K1Tables(
         results=results,
         verdict=verdict,
+        removal_success=removal,
+        auroc_verified_pairs=verified_pairs,
         frequency_check=frequency_check() if args.frequency_check else {},
         counts=count_summary(),
         editor="big_lama",
@@ -601,7 +667,7 @@ def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument(
         "stage",
-        choices=["instances", "edits", "checks", "freeze", "rows", "report", "status"],
+        choices=["instances", "edits", "checks", "freeze", "rows", "verify", "report", "status"],
     )
     ap.add_argument("--limit", type=int, default=None, help="only the first N pool images")
     ap.add_argument("--shard", type=int, default=5_000, help="rows per shard")
@@ -632,6 +698,8 @@ def main() -> None:
         stage_freeze(args)
     elif args.stage == "rows":
         stage_rows(args)
+    elif args.stage == "verify":
+        stage_verify(args)
     elif args.stage == "report":
         stage_report(args)
     else:
