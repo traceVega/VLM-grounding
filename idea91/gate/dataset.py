@@ -34,7 +34,13 @@ IMAGENET_STD = (0.229, 0.224, 0.225)
 
 @dataclass
 class GateSample:
-    """One edited image, its label, and everything needed to compose it."""
+    """One edited image, its label, and everything needed to compose it.
+
+    ``damage`` carries the check-1a ladders.  A ladder is not a separate bank:
+    it is the stored edit re-encoded on the way in, either whole
+    (``("global", q)``) or inside the dilated hole only (``("local", q)``), so a
+    ladder costs no disk and always measures the bank it is run against.
+    """
 
     sample_id: str
     image_id: str  # the source image: the split and the per-image AUROC key
@@ -45,14 +51,37 @@ class GateSample:
     hole_box: Box | None = None
     control_source: str | None = None
     hole_area_bin: str | None = None
+    hole_rle: str | None = None
+    damage: tuple[str, int] | None = None
+
+    def hole(self) -> np.ndarray | None:
+        """The dilated hole, decoded on demand (only the local ladder needs it)."""
+        if self.hole_rle is None:
+            return None
+        from idea91.masks import decode_rle
+
+        return decode_rle(self.hole_rle)
 
     def compose(self, edits_root: Path) -> np.ndarray:
         original = read_image(self.original_path)
-        return load_edited(
+        image = load_edited(
             original,
             {"window_xyxy_px": list(self.window_xyxy), "window_path": str(self.window_path)},
             edits_root,
         )
+        if self.damage is None:
+            return image
+        from idea91.gate.ladders import jpeg_reencode, local_jpeg
+
+        kind, quality = self.damage
+        if kind == "global":
+            return jpeg_reencode(image, quality)
+        if kind == "local":
+            hole = self.hole()
+            if hole is None:
+                raise ValueError(f"{self.sample_id}: the local ladder needs hole_rle")
+            return local_jpeg(image, hole, quality)
+        raise ValueError(f"unknown damage kind {kind!r}")
 
 
 def to_tensor(image: np.ndarray) -> torch.Tensor:
