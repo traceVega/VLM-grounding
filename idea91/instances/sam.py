@@ -106,6 +106,13 @@ class Sam3Segmenter(Segmenter):
                 ) from exc
         return self._processor, self._model
 
+    @staticmethod
+    def _model_dtype(model):
+        try:
+            return next(model.parameters()).dtype
+        except (AttributeError, StopIteration, TypeError):
+            return None  # an injected fake in the tests
+
     def _predict(self, image: np.ndarray, **prompt) -> list[dict]:
         """One forward pass, post-processed to original-resolution instances."""
         import torch
@@ -113,7 +120,18 @@ class Sam3Segmenter(Segmenter):
         processor, model = self._load()
         height, width = image.shape[:2]
         inputs = processor(images=image, return_tensors="pt", **prompt)
-        inputs = {k: (v.to(self.device) if hasattr(v, "to") else v) for k, v in inputs.items()}
+        dtype = self._model_dtype(model)
+
+        def to_device(value):
+            if not hasattr(value, "to"):
+                return value
+            # box coordinates arrive as float32 and meet bf16 weights in the
+            # geometry encoder; text prompts are integer ids and never hit this
+            if dtype is not None and getattr(value, "is_floating_point", None) and value.is_floating_point():
+                return value.to(self.device, dtype)
+            return value.to(self.device)
+
+        inputs = {k: to_device(v) for k, v in inputs.items()}
         with torch.inference_mode():
             outputs = model(**inputs)
         return processor.post_process_instance_segmentation(
@@ -150,8 +168,12 @@ class Sam3Segmenter(Segmenter):
         """
         result = self._predict(
             image,
+            # boxes nest [image][box][xyxy]; labels nest only [image][box].  The
+            # type hint on Sam3Processor.__call__ says three levels for labels,
+            # but its validator rejects that at runtime -- verified on the real
+            # processor, not read off the signature.
             input_boxes=[[[float(v) for v in box]]],
-            input_boxes_labels=[[[1]]],
+            input_boxes_labels=[[1]],
         )[0]
         masks, scores = result["masks"], result["scores"]
         if len(masks) == 0:

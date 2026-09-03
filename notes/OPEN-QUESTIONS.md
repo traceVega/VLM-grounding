@@ -27,16 +27,14 @@ read off the processor and confirmed on the dev slice, not assumed: the whole
 box-mapping path depends on it. `PIN_REQUIRED` in
 `configs/models/qwen3vl-8b-instruct.yaml`. **Blocks B8.**
 
-### Q-4. SAM 3 access -- PARTLY RESOLVED 2026-09-03
-Access to the gated repository was approved on Hugging Face. Two things remain
-before the weights are on the machine: **a token in WSL** (there is no
-`~/.cache/huggingface/token` and `HF_TOKEN` is unset, so every file request
-returns `GatedRepoError: 401`), and **the licence text read** for design O7,
-which governs anything released from the edit bank. The pin is `facebook/sam3`
-at `3c879f39826c...` (DEVIATIONS D-16); download is 3.44 GB of safetensors plus
-configs. Class-agnostic masks still come from SAM 2 (O6): transformers'
-`Sam3Processor` takes text or box prompts only, with no generate-everything
-call. **Unblocks B3 and B6 once the token is in place.**
+### Q-4. SAM 3 access -- RESOLVED 2026-09-03
+Access approved, token in place, weights downloaded and the adapter verified
+against them: concept prompt IoU 0.99, an absent concept returns zero instances
+(which is what P13's T_HEAD selection relies on), box prompt IoU 0.99,
+box-to-mask IoU 0.97, ~0.2 s per prompt, peak 2.13 GB VRAM. Pin is
+`facebook/sam3` at `3c879f39826c...` (DEVIATIONS D-16). Still outstanding under
+design O7: **read the licence text** before anything derived from the bank is
+released. Class-agnostic masks stay with SAM 2 (Q-10).
 
 ## Not blocking, but to settle before the K1 freeze
 

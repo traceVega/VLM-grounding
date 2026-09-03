@@ -154,3 +154,13 @@ a box prompt -- exactly the two capabilities design 4.3 needs. The adapter was
 first written against a hypothetical standalone `sam3` package; it now uses the
 transformers classes, and both adapters accept injected processor/model objects
 so the tensor plumbing is unit-tested without the gated weights.
+
+### D-18. Two SAM 3 call conventions found by running it, not by reading it
+
+`Sam3Processor.__call__` types `input_boxes_labels` as three levels
+(`list[list[list[int]]]`), but its own validator rejects three and requires two
+(`[image][box]`). And box coordinates arrive as float32 while the model runs in
+bfloat16, so the geometry encoder raises `mat1 and mat2 must have the same
+dtype`; the adapter casts floating-point inputs to the model dtype. Text prompts
+hit neither path, which is why the concept prompt worked before the box prompt
+did. Both are covered by tests.

@@ -172,7 +172,9 @@ def test_sam3_box_prompt_takes_the_highest_scoring_instance(world):
 
     assert np.array_equal(mask, cat)  # the 0.88 one, not the first
     assert processor.calls[0]["input_boxes"] == [[list(box)]]
-    assert processor.calls[0]["input_boxes_labels"] == [[[1]]]
+    # labels nest [image][box] -- two levels, not three; the processor's own
+    # validator rejects three, whatever the type hint says
+    assert processor.calls[0]["input_boxes_labels"] == [[1]]
 
 
 def test_sam3_box_prompt_returns_an_empty_mask_when_nothing_is_found():
