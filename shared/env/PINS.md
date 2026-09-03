@@ -16,6 +16,7 @@ Last updated 2026-09-02.
 | Python | 3.12.13 (uv-managed, `~/vlmg-env`) | DEVIATIONS D-1 |
 | torch | 2.14.0+cu130 | Blackwell wheels from the pytorch cu130 index |
 | timm | 1.0.29 | P6 classifiers |
+| kornia | 0.8.3 | imported by LaMa's `spatial_transform` module; the generator itself does not use it |
 | transformers | 5.16.1 | ships `Sam3Model`/`Sam3Processor` natively |
 | numpy / pyarrow / pandas | 2.5.2 / 25.0.1 / 3.0.5 | |
 | opencv-python-headless | 5.0.0.93 | window, compositing, JPEG ladders |
@@ -25,12 +26,14 @@ Last updated 2026-09-02.
 
 ## Editing stack
 
+LaMa generator code is vendored at `advimman/lama@786f5936` under `idea91/edits/vendor/` (Apache-2.0); see that directory's `NOTICE.md`.
+
 | Item | Source | Revision | sha256 | Status |
 |---|---|---|---|---|
 | SAM 3 | HF `facebook/sam3` | `3c879f39826c281e95690f02c7821c4de09afae7` | per-file, in the HF cache | **downloaded and verified 2026-09-03.** `Sam3Model` + `Sam3Processor` from transformers 5.16.1 (the repo config declares `Sam3VideoModel`, but `Sam3Model` loads the same weights for the image path). 3.44 GB safetensors; `sam3.pt` excluded. Measured: concept prompt IoU 0.99 on a synthetic target, 0 instances for an absent concept, box prompt IoU 0.99, ~0.2 s per prompt, **peak 2.13 GB VRAM**. Licence tag `other`; design O7 still wants the text read before anything derived is released |
 | SAM 3.1 | HF `facebook/sam3.1` | `daa63191845a41281374e725f4c9e51c7a824460` | -- | **not pinned**: ships only `sam3.1_multiplex.pt` (3.50 GB), no `model.safetensors`, so `Sam3Model.from_pretrained` cannot read it. See DEVIATIONS D-16 |
 | SAM 2.1 checkpoint | `~/sam2_ckpts/sam2.1_hiera_large.pt` | on disk | PIN_REQUIRED (compute at first use) | the design's O6 fallback for class-agnostic masks and its SAM 3 contingency; 898,083,611 bytes |
-| big-LaMa (TorchScript `big-lama.pt`) | PIN_REQUIRED | PIN_REQUIRED | PIN_REQUIRED | `VLMG_LAMA_PT` points at it; `idea91/edits/inpaint.py` hashes it into every index row |
+| big-LaMa | `big-lama.zip` from the URL in the upstream README (`huggingface.co/smartywu/big-lama`) | archive sha256 `f1b358ca24093b93a106183b98a3dea6e8ed09f3b43ea7251eb2c81e7b4575f6` | `best.ckpt` sha256 `fccb7adffd53ec0974ee5503c3731c2c2f1e7e07856fd9228cdcc0b46fd5d423` | **downloaded and verified 2026-09-03.** Apache-2.0. FFC-ResNet, 51.1 M params, loaded from the original Lightning checkpoint (no TorchScript). Measured: 0.029 s per 512x512 fill after load, **0.45 GB VRAM**. `VLMG_LAMA_DIR` points at the unpacked `big-lama` directory; the checkpoint sha256 goes into every index row |
 | OpenCV Telea | opencv 5.0.0.93 | -- | -- | **not kill-grade**; pipeline exercise and a known-dirty editor for the gate |
 
 ## Models under test and judges

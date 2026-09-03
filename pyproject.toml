@@ -26,6 +26,7 @@ gpu = [
     "transformers>=4.57",
     "accelerate>=1.0",
     "safetensors",
+    "kornia>=0.8",  # imported by the vendored LaMa module graph
 ]
 dev = [
     "pytest>=8.3",

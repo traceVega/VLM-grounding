@@ -194,3 +194,30 @@ are fixed by SPEC Section 3 and have no room for them, so they are written to
 `prepared/openimages_pool/attribution.csv`, which must travel with the K1 bank if
 it is ever released. `pool.parquet` beside it carries the per-image class labels
 and boxes the instance pass prompts with.
+
+### D-21. LaMa's generator is vendored, not installed, and loaded from the original checkpoint
+
+`inpaint.py` first assumed a TorchScript `big-lama.pt`. The released artefact is
+`big-lama.zip`: a hydra `config.yaml` and a PyTorch Lightning `best.ckpt`.
+Rather than install `pytorch-lightning`, `hydra-core` and `webdataset` beside
+torch 2.14 for code paths that only matter during training, the generator's
+import closure (six files, ~28 KB) is vendored verbatim at
+`advimman/lama@786f5936` under `idea91/edits/vendor/`, with `utils.py` reduced to
+the one function `ffc.py` imports. The checkpoint is unpickled behind a
+meta-path finder that stubs the training packages the pickle names, since the
+only thing wanted from it is `state_dict['generator.*']`, and the config's
+`${a.b.c}` interpolations are resolved by a 20-line resolver instead of
+omegaconf. `kornia` *is* installed: LaMa's `spatial_transform` imports it at
+module level, though the big-LaMa generator config does not use the wrapper.
+
+Verified against the real weights: FFC-ResNet, 51.1 M parameters, 0.029 s per
+512x512 fill after load, 0.45 GB VRAM, and the in-mask compositing assert holds
+on a real edit.
+
+### D-22. big-LaMa is Apache-2.0, so the K1 bank stays releasable
+
+The licence was an open question, because a non-commercial or share-alike clause
+on the editor would have undercut P1's reason for using CC-BY images at all. The
+upstream repository is Apache-2.0 and its README states no separate terms for the
+weights, whose download URL the README itself gives. Recorded in
+`data/LICENSES.md` with the date read.

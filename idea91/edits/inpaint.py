@@ -73,10 +73,12 @@ class TeleaInpainter(Inpainter):
 
 
 class LamaInpainter(Inpainter):
-    """big-LaMa via TorchScript (``big-lama.pt``), the pinned editor of P2.
+    """big-LaMa from its released checkpoint, the pinned editor of P2.
 
-    Weights are pinned by sha256 in ``shared/env/PINS.md``; the file is not in
-    the repository.  Set ``VLMG_LAMA_PT`` or pass ``weights=``.
+    Point ``VLMG_LAMA_DIR`` (or ``model_dir=``) at the unpacked ``big-lama``
+    directory -- the one holding ``config.yaml`` and ``models/best.ckpt``.  The
+    weights are pinned by sha256 in ``shared/env/PINS.md`` and the generator
+    definition is vendored (``vendor/NOTICE.md``); neither is in this repository.
     """
 
     name = "big_lama"
@@ -84,17 +86,20 @@ class LamaInpainter(Inpainter):
 
     def __init__(
         self,
-        weights: str | Path | None = None,
+        model_dir: str | Path | None = None,
         device: str = "cuda",
         pad_multiple: int = 8,
     ) -> None:
         import os
 
-        self.weights_path = Path(weights or os.environ.get("VLMG_LAMA_PT", "")).expanduser()
-        if not self.weights_path.is_file():
+        self.model_dir = Path(
+            model_dir or os.environ.get("VLMG_LAMA_DIR", "")
+        ).expanduser()
+        if not (self.model_dir / "models" / "best.ckpt").is_file():
             raise FileNotFoundError(
-                "big-LaMa TorchScript weights not found. Download big-lama.pt, record its "
-                "sha256 in shared/env/PINS.md, and set VLMG_LAMA_PT to its path."
+                f"no big-LaMa checkpoint under {self.model_dir or '<unset>'}. Unpack "
+                "big-lama.zip and set VLMG_LAMA_DIR to the big-lama directory (the one "
+                "with config.yaml and models/best.ckpt)."
             )
         self.device = device
         self.pad_multiple = pad_multiple
@@ -102,9 +107,14 @@ class LamaInpainter(Inpainter):
         self._sha = ""
 
     @property
+    def checkpoint_path(self) -> Path:
+        return self.model_dir / "models" / "best.ckpt"
+
+    @property
     def weights_sha256(self) -> str:
+        """Hashed once and written into every index row (design 4.3)."""
         if not self._sha:
-            self._sha = sha256_file(self.weights_path)
+            self._sha = sha256_file(self.checkpoint_path)
         return self._sha
 
     @property
@@ -113,26 +123,24 @@ class LamaInpainter(Inpainter):
 
     def _load(self):
         if self._model is None:
-            import torch
+            from idea91.edits.lama import build_generator, read_checkpoint
 
-            self._model = torch.jit.load(str(self.weights_path), map_location=self.device)
-            self._model.eval()
+            self._model = build_generator(read_checkpoint(self.model_dir), self.device)
         return self._model
 
     def fill(self, image: np.ndarray, mask: np.ndarray) -> np.ndarray:
-        import torch
+        from idea91.edits.lama import infer
 
         model = self._load()
         h, w = image.shape[:2]
         ph, pw = (-h) % self.pad_multiple, (-w) % self.pad_multiple
         img = np.pad(image, ((0, ph), (0, pw), (0, 0)), mode="reflect") if (ph or pw) else image
-        m = np.pad(mask.astype(np.uint8), ((0, ph), (0, pw))) if (ph or pw) else mask.astype(np.uint8)
-
-        with torch.inference_mode():
-            t_img = torch.from_numpy(img).permute(2, 0, 1).float().div_(255.0)[None].to(self.device)
-            t_m = torch.from_numpy((m > 0).astype(np.float32))[None, None].to(self.device)
-            out = model(t_img, t_m)
-            out = out[0].permute(1, 2, 0).mul_(255.0).clamp_(0, 255).to("cpu", torch.uint8).numpy()
+        m = (
+            np.pad(mask.astype(np.uint8), ((0, ph), (0, pw)))
+            if (ph or pw)
+            else mask.astype(np.uint8)
+        )
+        out = infer(model, img, m, self.device)
         return np.ascontiguousarray(out[:h, :w])
 
 

@@ -211,10 +211,12 @@ EXTRA_LICENCE_ROWS: tuple[dict[str, str], ...] = (
         "used_by": "instances (P1, P8, P9)",
     },
     {
-        "name": "big-LaMa",
-        "licence": "PIN_REQUIRED",
-        "allowed": "read before any bank is released",
-        "used_by": "the editor (P2)",
+        "name": "big-LaMa (code and weights)",
+        "licence": "Apache License 2.0 (advimman/lama; the repository LICENSE covers the "
+        "release, and the README states no separate weights terms) -- read 2026-09-03",
+        "allowed": "evaluate, publish numbers, release derivatives; no non-commercial or "
+        "share-alike clause, so the CC-BY K1 bank stays releasable under P1",
+        "used_by": "the editor (P2); generator code vendored at 786f5936",
     },
     {
         "name": "Alibaba Model Studio (Qwen3-VL-235B-Instruct)",

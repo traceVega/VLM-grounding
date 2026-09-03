@@ -31,7 +31,7 @@ idea91/
                  nounphrase.py (head noun + phrases), build.py (K1/K2 scenes)
   frontier/      (empty: P17 API client is not written yet)
 configs/         models/*.yaml (SPEC Section 1), prompts/*.txt (versioned, hashed)
-tests/           177 tests, 4 of them marked `gpu`
+tests/           200 tests, 7 of them marked `gpu`
 ```
 
 ## Environment
@@ -82,7 +82,7 @@ wsl -d Ubuntu -e bash -lc 'cd /mnt/d/Dev/ArcNova/auto-research/VLM-grounding && 
 
 | Step | Deliverable | State |
 |---|---|---|
-| B1 | `shared/env`, `PINS.md`, runtime | **partial** -- runtime and probe done; SAM 3, big-LaMa, vLLM and judge weights unpinned (gated / not downloaded) |
+| B1 | `shared/env`, `PINS.md`, runtime | **SAM 3 and big-LaMa done and verified on the card**; vLLM build and judge weights still unpinned |
 | B2 | `shared/data`: pools, benchmarks, `LICENSES.md` | **written, not run** -- registry, licence renderer, `items.parquet` builder and the download plan are done and tested; each set's annotation adapter waits for its data, and every unpinned locator is refused rather than guessed |
 | B3 | `idea91/instances`, `idea91/edits` for the K1 pool | **written, not run** -- edits and the K1/K2 scene builders are done and tested against a fake segmenter; the SAM 3 adapter runs on transformers' `Sam3Model`/`Sam3Processor` with its plumbing unit-tested against fakes, and SAM 2 is wired as the design's contingency, which stamps `kill_grade=False` on everything it makes. Waiting on an HF token |
 | B4a | gate ladders and nulls on the 1b pairs | **logic done** -- ladder operators, floors and verdicts written and tested; not yet run on a real bank |
@@ -99,19 +99,18 @@ wsl -d Ubuntu -e bash -lc 'cd /mnt/d/Dev/ArcNova/auto-research/VLM-grounding && 
 
 ## What blocks the first real run
 
-1. **A Hugging Face token in WSL.** SAM 3 access is approved, but there is no
-   `~/.cache/huggingface/token` and `HF_TOKEN` is unset, so `facebook/sam3`
-   returns `GatedRepoError: 401`. `hf auth login` (or `HF_TOKEN`) then
-   3.44 GB of safetensors. The pin is `facebook/sam3` at `3c879f39826c...`; SAM
-   3.1 ships no safetensors and cannot be loaded by transformers (D-16).
-2. **big-LaMa weights** -- `VLMG_LAMA_PT` points at `big-lama.pt`; until then the
-   only inpainter is OpenCV Telea, which is marked not kill-grade.
+1. ~~SAM 3~~ **done 2026-09-03.** `facebook/sam3` @ `3c879f39826c`, downloaded
+   and verified: concept prompt IoU 0.99, absent concept returns nothing, box
+   prompt IoU 0.99, ~0.2 s per prompt, 2.13 GB VRAM.
+2. ~~big-LaMa weights~~ **done 2026-09-03.** Apache-2.0, downloaded, generator
+   vendored at `advimman/lama@786f5936`, verified: 0.029 s per 512x512 fill,
+   0.45 GB VRAM. Set `VLMG_LAMA_DIR` to the unpacked `big-lama` directory.
 3. **GroundingME's instruction and null-box literal**, and Molmo2's native
    pointing instruction and abstention (OPEN-QUESTIONS Q-1, Q-2). Both prompts
    are `UNVERIFIED` and refused by a kill run.
 4. **Qwen3-VL's coordinate convention** (Q-3).
-5. **Downloads**: OpenImages subset (K1 pool), GroundingME, COCO train2014,
-   COCO-Search18. About 60 GB core, 883 GB free on the ext4 volume.
+5. **Downloads still outstanding**: the 10,000 K1 pool images (~3 GB, pinned and
+   selected, awaiting a go), GroundingME, COCO train2014, COCO-Search18.
 
 Resolved since: the repository exists (branch `main`), so the freeze points have
 something to tag and manifests carry a real `code_sha`.
