@@ -30,8 +30,11 @@ idea91/
   instances/     backend.py (capability contract), sam.py (SAM 3 pin + SAM 2 contingency),
                  nounphrase.py (head noun + phrases), build.py (K1/K2 scenes)
   frontier/      (empty: P17 API client is not written yet)
+  human/         tasks.py (P11 draw + rendering), app.py (local annotation UI),
+                 agreement.py (Fleiss/Cohen kappa, check 3), build_tasks.py
+  run_k1.py      pipeline driver: instances | edits | status
 configs/         models/*.yaml (SPEC Section 1), prompts/*.txt (versioned, hashed)
-tests/           200 tests, 7 of them marked `gpu`
+tests/           251 tests, 9 of them marked `gpu`
 ```
 
 ## Environment
@@ -121,3 +124,33 @@ something to tag and manifests carry a real `code_sha`.
 Today 13.2 GB is fetchable (COCO train2014 and the 2017 annotations) and 44.2 GB
 is blocked on unread licences or unpinned locators; 879 GB free on the volume.
 `--yes` executes only the ready steps.
+
+
+## Human annotation (P11)
+
+The K2 images are research-licensed and must not be published, so the annotation
+UI is local and dependency-free, binds to `127.0.0.1`, and refuses any other
+host without `--i-understand-the-licence`.
+
+```bash
+# build a task set from an existing edit bank
+python -m idea91.human.build_tasks --out ~/vlmg-data/human/pilot --limit 10
+# one process per annotator, each on its own port
+python -m idea91.human.app --tasks ~/vlmg-data/human/pilot --annotator A1
+```
+
+What the annotator sees is fixed by P11 and enforced in code: the edit window at
+2x the hole, the full image, the head noun -- and never the original, never the
+condition, never another annotator's label. The task file carries no operator and
+no verifier answer, so a leak would have to be deliberate; the answer key is
+written beside it as `KEY_do_not_show_annotators.csv` and is never served. Item
+order is shuffled per annotator so position carries no signal either.
+
+Keys `1` gone, `2` traces, `3` still there, `0` unsure, `Backspace` to undo.
+Labels are written through to `human_labels.csv` on every press, in the columns
+design Section 5 specifies.
+
+`idea91.human.agreement` computes what P11 asks for: human-human Fleiss kappa
+(3-way, binarised, and per stratum) and human-versus-V1 Cohen kappa, with
+acceptance check 3's verdict -- which is what decides whether verifier-clean or
+human-clean carries the K2 headline.
