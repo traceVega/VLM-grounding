@@ -16,6 +16,7 @@ Last updated 2026-09-02.
 | Python | 3.12.13 (uv-managed, `~/vlmg-env`) | DEVIATIONS D-1 |
 | torch | 2.14.0+cu130 | Blackwell wheels from the pytorch cu130 index |
 | timm | 1.0.29 | P6 classifiers |
+| transformers | 5.16.1 | ships `Sam3Model`/`Sam3Processor` natively |
 | numpy / pyarrow / pandas | 2.5.2 / 25.0.1 / 3.0.5 | |
 | opencv-python-headless | 5.0.0.93 | window, compositing, JPEG ladders |
 | scikit-image / scipy | 0.26.0 / 1.18.1 | |
@@ -26,8 +27,8 @@ Last updated 2026-09-02.
 
 | Item | Source | Revision | sha256 | Status |
 |---|---|---|---|---|
-| SAM 3 (repo) | PIN_REQUIRED | PIN_REQUIRED | -- | gated; design O7 (licence text behind the gate) |
-| SAM 3 checkpoint | PIN_REQUIRED | PIN_REQUIRED | PIN_REQUIRED | gated |
+| SAM 3 | HF `facebook/sam3` | `3c879f39826c281e95690f02c7821c4de09afae7` | per-file, on download | **gated=manual**; loaded through transformers (`Sam3Model` / `Sam3Processor`), no separate `sam3` package. `model.safetensors` 3.44 GB (+ `sam3.pt` 3.45 GB, the original format, not needed). Licence tag `other`; design O7 still wants the text read before anything derived is released |
+| SAM 3.1 | HF `facebook/sam3.1` | `daa63191845a41281374e725f4c9e51c7a824460` | -- | **not pinned**: ships only `sam3.1_multiplex.pt` (3.50 GB), no `model.safetensors`, so `Sam3Model.from_pretrained` cannot read it. See DEVIATIONS D-16 |
 | SAM 2.1 checkpoint | `~/sam2_ckpts/sam2.1_hiera_large.pt` | on disk | PIN_REQUIRED (compute at first use) | the design's O6 fallback for class-agnostic masks and its SAM 3 contingency; 898,083,611 bytes |
 | big-LaMa (TorchScript `big-lama.pt`) | PIN_REQUIRED | PIN_REQUIRED | PIN_REQUIRED | `VLMG_LAMA_PT` points at it; `idea91/edits/inpaint.py` hashes it into every index row |
 | OpenCV Telea | opencv 5.0.0.93 | -- | -- | **not kill-grade**; pipeline exercise and a known-dirty editor for the gate |

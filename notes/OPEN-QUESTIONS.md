@@ -27,12 +27,16 @@ read off the processor and confirmed on the dev slice, not assumed: the whole
 box-mapping path depends on it. `PIN_REQUIRED` in
 `configs/models/qwen3vl-8b-instruct.yaml`. **Blocks B8.**
 
-### Q-4. SAM 3 access (design 4.1, E91-0 day one)
-The checkpoint is gated and its licence text is behind the gate (design O7). The
-host already has `sam2.1_hiera_large.pt`, which is the design's own contingency
-("K1 can start with SAM 2 masks prompted by the OpenImages ground-truth boxes,
-labelled as such"). **Blocks B3 in its pinned form; a labelled-as-such SAM 2 run
-can start.**
+### Q-4. SAM 3 access -- PARTLY RESOLVED 2026-09-03
+Access to the gated repository was approved on Hugging Face. Two things remain
+before the weights are on the machine: **a token in WSL** (there is no
+`~/.cache/huggingface/token` and `HF_TOKEN` is unset, so every file request
+returns `GatedRepoError: 401`), and **the licence text read** for design O7,
+which governs anything released from the edit bank. The pin is `facebook/sam3`
+at `3c879f39826c...` (DEVIATIONS D-16); download is 3.44 GB of safetensors plus
+configs. Class-agnostic masks still come from SAM 2 (O6): transformers'
+`Sam3Processor` takes text or box prompts only, with no generate-everything
+call. **Unblocks B3 and B6 once the token is in place.**
 
 ## Not blocking, but to settle before the K1 freeze
 
@@ -52,6 +56,14 @@ budget (gate classifiers 4 to 6 h) assumes something. `TileDataset` draws one
 tile per image per epoch at train time and uses every tile at eval, so an epoch
 is one pass over images. If the pool turns out to hold large images, the train
 sampler is the knob, and the choice belongs in the frozen text.
+
+### Q-10. SAM 3 has no generic-object mode (closes half of design O6)
+`Sam3Processor.__call__` accepts `text` and `input_boxes` only, and the model's
+outputs post-process through `post_process_instance_segmentation`; there is no
+generate-everything entry point in transformers 5.16.1. So the class-agnostic
+masks of P1/P3 come from SAM 2's automatic mask generator, which is the
+fallback design O6 already names. Worth confirming against the SAM 3 card once
+the gate is open, in case the released model exposes one another way.
 
 ### Q-8. Which forensic detector (P6)
 "TruFor if its weights are obtainable under research terms, else an RGB-domain

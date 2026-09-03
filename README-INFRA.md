@@ -31,7 +31,7 @@ idea91/
                  nounphrase.py (head noun + phrases), build.py (K1/K2 scenes)
   frontier/      (empty: P17 API client is not written yet)
 configs/         models/*.yaml (SPEC Section 1), prompts/*.txt (versioned, hashed)
-tests/           172 tests, 4 of them marked `gpu`
+tests/           177 tests, 4 of them marked `gpu`
 ```
 
 ## Environment
@@ -84,12 +84,12 @@ wsl -d Ubuntu -e bash -lc 'cd /mnt/d/Dev/ArcNova/auto-research/VLM-grounding && 
 |---|---|---|
 | B1 | `shared/env`, `PINS.md`, runtime | **partial** -- runtime and probe done; SAM 3, big-LaMa, vLLM and judge weights unpinned (gated / not downloaded) |
 | B2 | `shared/data`: pools, benchmarks, `LICENSES.md` | **written, not run** -- registry, licence renderer, `items.parquet` builder and the download plan are done and tested; each set's annotation adapter waits for its data, and every unpinned locator is refused rather than guessed |
-| B3 | `idea91/instances`, `idea91/edits` for the K1 pool | **written, not run** -- edits and the K1/K2 scene builders are done and tested against a fake segmenter; SAM 3 is the pin and SAM 2 is wired as the design's contingency, which stamps `kill_grade=False` on everything it makes |
+| B3 | `idea91/instances`, `idea91/edits` for the K1 pool | **written, not run** -- edits and the K1/K2 scene builders are done and tested against a fake segmenter; the SAM 3 adapter runs on transformers' `Sam3Model`/`Sam3Processor` with its plumbing unit-tested against fakes, and SAM 2 is wired as the design's contingency, which stamps `kill_grade=False` on everything it makes. Waiting on an HF token |
 | B4a | gate ladders and nulls on the 1b pairs | **logic done** -- ladder operators, floors and verdicts written and tested; not yet run on a real bank |
 | B0a | K1 freeze | blocked on B2/B3 |
 | B4b | gate classifiers, adversaries, removal-success rows | **classifiers done** (trained end to end on the card in the smoke test); adversary and removal-success wiring pending |
 | B5 | K1 full run | blocked |
-| B6 | K2 instances and edits | blocked on SAM 3 |
+| B6 | K2 instances and edits | blocked on an HF token, then the GroundingME adapter |
 | B7 | `shared/judges` and the verifier | **service and rules done**, weights unpinned |
 | B8 | harness additions, Molmo2 path, parity run | **contract done** (configs, prompts, manifests); the backends and parsers are not written |
 | B9 | relations, analysis, human-check project | **relations and analysis done**; the Label Studio project is not set up |
@@ -99,10 +99,11 @@ wsl -d Ubuntu -e bash -lc 'cd /mnt/d/Dev/ArcNova/auto-research/VLM-grounding && 
 
 ## What blocks the first real run
 
-1. **SAM 3 access** (design 4.1, E91-0 day one) -- gated checkpoint and a licence
-   text behind the gate (O7). The host already has `sam2.1_hiera_large.pt`, which
-   is the design's own contingency: K1 can start on SAM 2 masks prompted by the
-   OpenImages boxes, labelled as such.
+1. **A Hugging Face token in WSL.** SAM 3 access is approved, but there is no
+   `~/.cache/huggingface/token` and `HF_TOKEN` is unset, so `facebook/sam3`
+   returns `GatedRepoError: 401`. `hf auth login` (or `HF_TOKEN`) then
+   3.44 GB of safetensors. The pin is `facebook/sam3` at `3c879f39826c...`; SAM
+   3.1 ships no safetensors and cannot be loaded by transformers (D-16).
 2. **big-LaMa weights** -- `VLMG_LAMA_PT` points at `big-lama.pt`; until then the
    only inpainter is OpenCV Telea, which is marked not kill-grade.
 3. **GroundingME's instruction and null-box literal**, and Molmo2's native

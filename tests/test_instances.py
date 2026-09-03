@@ -81,18 +81,116 @@ def test_sam2_declares_no_concept_mode_and_says_what_to_do():
 
 
 def test_sam3_is_the_pinned_backend_and_reports_the_gate():
-    seg = Sam3Segmenter(checkpoint="/nonexistent")
+    seg = Sam3Segmenter()
     assert seg.is_pinned_backend is True and seg.supports_concept is True
     assert seg.supports_generic is False  # design O6, until the release is read
     with pytest.raises(SegmenterUnsupported, match="design O6"):
         seg.generic(np.zeros((4, 4, 3), np.uint8))
-    with pytest.raises(FileNotFoundError, match="gated"):
-        seg._load()
+    assert seg.describe()["hf_path"] == "facebook/sam3"
+    assert len(seg.revision) == 40  # a commit SHA, never a branch name
+
+
+def test_sam3_pins_the_release_that_transformers_can_load():
+    """facebook/sam3.1 is newer but ships no safetensors (DEVIATIONS D-16)."""
+    from idea91.instances.sam import SAM3_HF_PATH, SAM3_REVISION
+
+    assert SAM3_HF_PATH == "facebook/sam3"
+    assert SAM3_REVISION == "3c879f39826c281e95690f02c7821c4de09afae7"
+
+
+# --- SAM 3 tensor plumbing, exercised without the gated weights --------------
+
+
+class FakeTensor:
+    """Just enough of the torch surface the adapter touches."""
+
+    def __init__(self, array):
+        self.array = np.asarray(array)
+
+    def to(self, *_a, **_k):
+        return self
+
+    def detach(self):
+        return self
+
+    def cpu(self):
+        return self
+
+    def numpy(self):
+        return self.array
+
+
+class FakeSam3Processor:
+    """Records what it was called with and returns scripted instances."""
+
+    def __init__(self, results):
+        self.results = results
+        self.calls = []
+        self.post_kwargs = None
+
+    def __call__(self, images=None, return_tensors=None, **prompt):
+        self.calls.append({"image_shape": np.asarray(images).shape, **prompt})
+        return {"pixel_values": FakeTensor(np.zeros((1, 3, 8, 8)))}
+
+    def post_process_instance_segmentation(self, outputs, **kwargs):
+        self.post_kwargs = kwargs
+        return self.results
+
+
+class FakeSam3Model:
+    def __call__(self, **_kw):
+        return object()
+
+
+def sam3_with(results):
+    processor = FakeSam3Processor(results)
+    return Sam3Segmenter(processor=processor, model=FakeSam3Model()), processor
+
+
+def test_sam3_concept_passes_the_phrase_and_returns_masks_at_original_size(world):
+    cat, dog = world["_shapes"]["cat"], world["_shapes"]["dog"]
+    seg, processor = sam3_with(
+        [{"masks": [FakeTensor(cat), FakeTensor(dog)], "scores": [0.91, 0.42]}]
+    )
+    out = seg.concept(textured_image(SHAPE), "cat")
+
+    assert processor.calls[0]["text"] == "cat"
+    assert processor.post_kwargs["target_sizes"] == [SHAPE]  # (height, width)
+    assert processor.post_kwargs["threshold"] == 0.3
+    assert [round(i.score, 2) for i in out] == [0.91, 0.42]
+    assert all(i.origin == "concept" and i.prompt == "cat" for i in out)
+    assert out[0].mask.dtype == bool and np.array_equal(out[0].mask, cat)
+
+
+def test_sam3_box_prompt_takes_the_highest_scoring_instance(world):
+    cat, dog = world["_shapes"]["cat"], world["_shapes"]["dog"]
+    seg, processor = sam3_with(
+        [{"masks": [FakeTensor(dog), FakeTensor(cat)], "scores": [0.20, 0.88]}]
+    )
+    box = M.bbox_xyxy(cat)
+    mask = seg.from_box(textured_image(SHAPE), box)
+
+    assert np.array_equal(mask, cat)  # the 0.88 one, not the first
+    assert processor.calls[0]["input_boxes"] == [[list(box)]]
+    assert processor.calls[0]["input_boxes_labels"] == [[[1]]]
+
+
+def test_sam3_box_prompt_returns_an_empty_mask_when_nothing_is_found():
+    """build_k2_scene drops these as empty_referent_mask rather than editing air."""
+    seg, _ = sam3_with([{"masks": [], "scores": []}])
+    mask = seg.from_box(textured_image(SHAPE), (10.0, 10.0, 50.0, 50.0))
+    assert mask.shape == SHAPE and not mask.any()
+
+
+def test_sam3_generic_refuses_even_when_the_flag_is_forced():
+    seg = Sam3Segmenter(has_generic_mode=True, processor=object(), model=object())
+    with pytest.raises(SegmenterUnsupported, match="no generate-everything call"):
+        seg.generic(np.zeros((4, 4, 3), np.uint8))
 
 
 def test_get_segmenter_names():
     assert isinstance(get_segmenter("sam2", checkpoint="/nonexistent"), Sam2Segmenter)
-    assert isinstance(get_segmenter("sam3", checkpoint="/nonexistent"), Sam3Segmenter)
+    assert isinstance(get_segmenter("sam3"), Sam3Segmenter)
     with pytest.raises(ValueError):
         get_segmenter("segment-everything")
 

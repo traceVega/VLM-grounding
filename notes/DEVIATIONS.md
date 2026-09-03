@@ -132,3 +132,25 @@ head-noun concept prompt.
 Design 4.2 asks for a single file with one row per asset. It is rendered from
 `shared/data/sources.py` by `python -m shared.data.licenses --write`, so the
 licence table cannot drift from the registry the download and build code reads.
+
+### D-16. SAM 3 is pinned to `facebook/sam3`, not `facebook/sam3.1`
+
+Design 4.1 says "SAM 3.1 if that is the current release at pin time; recorded".
+SAM 3.1 *is* released, but the two repositories ship different formats:
+`facebook/sam3` has `model.safetensors` (3.44 GB) and loads with
+`Sam3Model.from_pretrained`, while `facebook/sam3.1` ships only
+`sam3.1_multiplex.pt` (3.50 GB) with no safetensors, which the transformers
+integration cannot read. The pin is therefore `facebook/sam3` at
+`3c879f39826c...`, recorded here and in `shared/env/PINS.md`. Revisit if a
+safetensors conversion of 3.1 appears; the multiplex checkpoint would otherwise
+need a conversion step of our own, which is a new unpinned artefact in the
+middle of the edit stack.
+
+### D-17. SAM 3 runs through transformers, not a `sam3` package
+
+transformers 5.16.1 ships `Sam3Model` and `Sam3Processor`, and the processor
+takes `text=` for a concept prompt and `input_boxes=`/`input_boxes_labels=` for
+a box prompt -- exactly the two capabilities design 4.3 needs. The adapter was
+first written against a hypothetical standalone `sam3` package; it now uses the
+transformers classes, and both adapters accept injected processor/model objects
+so the tensor plumbing is unit-tested without the gated weights.

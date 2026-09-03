@@ -12,8 +12,16 @@ wait for SAM 3.  ``is_pinned_backend`` is False on the SAM 2 adapter and travels
 into every instance row, so a bank built on the contingency can never be read as
 a SAM 3 bank.
 
-Neither class imports its package at module import time: the checkpoints are not
-on this machine yet, and the rest of the stack must stay importable.
+SAM 3 is loaded through ``transformers`` (``Sam3Model`` / ``Sam3Processor``,
+native since transformers 5), not through a separate ``sam3`` package: the
+processor takes ``text=`` for a concept prompt and ``input_boxes=`` for a box
+prompt, which is exactly the two capabilities the instance stack needs.
+
+Neither class imports its package at module import time: the weights are gated
+and may not be on the machine, and the rest of the stack must stay importable.
+Both accept injected ``processor``/``model`` objects so the tensor plumbing --
+thresholds, target sizes, the numpy conversion -- is unit-testable without
+weights.
 """
 
 from __future__ import annotations
@@ -27,8 +35,23 @@ from idea91.masks import Box
 from idea91.instances.backend import RawInstance, Segmenter, SegmenterUnsupported
 
 
+#: The transformers-loadable SAM 3 release.  ``facebook/sam3.1`` exists and is
+#: newer, but ships only ``sam3.1_multiplex.pt`` -- no ``model.safetensors`` --
+#: so ``Sam3Model.from_pretrained`` cannot read it.  See notes/DEVIATIONS.md D-16.
+SAM3_HF_PATH = "facebook/sam3"
+SAM3_REVISION = "3c879f39826c281e95690f02c7821c4de09afae7"
+
+SAM3_SCORE_THRESHOLD = 0.3  # transformers' post-process default
+SAM3_MASK_THRESHOLD = 0.5
+
+
 class Sam3Segmenter(Segmenter):
-    """The pinned backend.  Requires the gated SAM 3 checkpoint (design O7)."""
+    """The pinned backend: ``Sam3Model`` / ``Sam3Processor`` from transformers.
+
+    The repository is gated (``gated=manual``), so the weights need an accepted
+    licence and a token on the machine; design O7 also wants the licence text
+    read before anything derived from it is released.
+    """
 
     name = "sam3"
     supports_concept = True
@@ -36,68 +59,119 @@ class Sam3Segmenter(Segmenter):
 
     def __init__(
         self,
-        checkpoint: str | Path | None = None,
-        config: str | None = None,
+        hf_path: str = SAM3_HF_PATH,
+        revision: str = SAM3_REVISION,
         device: str = "cuda",
-        revision: str = "PIN_REQUIRED",
-        has_generic_mode: bool | None = None,
+        *,
+        score_threshold: float = SAM3_SCORE_THRESHOLD,
+        mask_threshold: float = SAM3_MASK_THRESHOLD,
+        has_generic_mode: bool = False,  # design O6, open
+        processor=None,
+        model=None,
     ) -> None:
-        self.checkpoint = Path(checkpoint or os.environ.get("VLMG_SAM3_CKPT", "")).expanduser()
-        self.config = config
-        self.device = device
+        self.hf_path = hf_path
         self.revision = revision
-        # design O6, open until pin time; set explicitly once the release is read
+        self.device = device
+        self.score_threshold = score_threshold
+        self.mask_threshold = mask_threshold
         self.supports_generic = bool(has_generic_mode)
-        self._model = None
+        self._processor = processor
+        self._model = model
+
+    def describe(self) -> dict[str, object]:
+        return {**super().describe(), "hf_path": self.hf_path}
 
     def _load(self):
-        if self._model is None:
-            if not self.checkpoint.is_file():
-                raise FileNotFoundError(
-                    "SAM 3 checkpoint not found. It is gated (design O7): request access, "
-                    "record the repository commit and the file sha256 in shared/env/PINS.md, "
-                    "and set VLMG_SAM3_CKPT. Until then use Sam2Segmenter, which the design "
-                    "names as the contingency and which labels its output as such."
-                )
+        if self._processor is None or self._model is None:
             try:
-                from sam3.build_sam import build_sam3  # type: ignore
-                from sam3.sam3_image_predictor import SAM3ImagePredictor  # type: ignore
-            except ImportError as exc:  # pragma: no cover - depends on the release
+                import torch
+                from transformers import Sam3Model, Sam3Processor
+            except ImportError as exc:  # pragma: no cover
                 raise ImportError(
-                    "the SAM 3 package is not installed; pin the repository commit in "
-                    "shared/env/PINS.md and install it into ~/vlmg-env"
+                    "SAM 3 needs transformers >= 5 (Sam3Model / Sam3Processor) in ~/vlmg-env"
                 ) from exc
-            self._model = SAM3ImagePredictor(build_sam3(self.config, str(self.checkpoint)))
-        return self._model
+            try:
+                self._processor = self._processor or Sam3Processor.from_pretrained(
+                    self.hf_path, revision=self.revision
+                )
+                self._model = self._model or Sam3Model.from_pretrained(
+                    self.hf_path, revision=self.revision, dtype=torch.bfloat16
+                ).to(self.device).eval()
+            except Exception as exc:  # gated repo, no token, or no network
+                raise RuntimeError(
+                    f"cannot load {self.hf_path}@{self.revision[:12]}: {exc}. The repository is "
+                    "gated: accept the licence on Hugging Face and put a token on this machine "
+                    "(`hf auth login`, or HF_TOKEN). Until then use Sam2Segmenter, which the "
+                    "design names as the contingency and which labels its output as such."
+                ) from exc
+        return self._processor, self._model
 
-    def from_box(self, image: np.ndarray, box: Box) -> np.ndarray:  # pragma: no cover
-        model = self._load()
-        model.set_image(image)
-        masks, scores, _ = model.predict(box=np.array(box)[None, :], multimask_output=False)
-        return np.asarray(masks[0]).astype(bool)
+    def _predict(self, image: np.ndarray, **prompt) -> list[dict]:
+        """One forward pass, post-processed to original-resolution instances."""
+        import torch
 
-    def concept(self, image: np.ndarray, phrase: str) -> list[RawInstance]:  # pragma: no cover
-        model = self._load()
-        model.set_image(image)
-        masks, scores = model.predict_concept(phrase)
+        processor, model = self._load()
+        height, width = image.shape[:2]
+        inputs = processor(images=image, return_tensors="pt", **prompt)
+        inputs = {k: (v.to(self.device) if hasattr(v, "to") else v) for k, v in inputs.items()}
+        with torch.inference_mode():
+            outputs = model(**inputs)
+        return processor.post_process_instance_segmentation(
+            outputs,
+            threshold=self.score_threshold,
+            mask_threshold=self.mask_threshold,
+            target_sizes=[(height, width)],
+        )
+
+    @staticmethod
+    def _to_numpy(mask) -> np.ndarray:
+        arr = mask.detach().cpu().numpy() if hasattr(mask, "detach") else np.asarray(mask)
+        return arr.astype(bool)
+
+    def concept(self, image: np.ndarray, phrase: str) -> list[RawInstance]:
+        """Every instance of ``phrase``: the class labels (K1), noun phrases (K2)."""
+        result = self._predict(image, text=phrase)[0]
         return [
-            RawInstance(mask=np.asarray(m).astype(bool), score=float(s), prompt=phrase,
-                        origin="concept")
-            for m, s in zip(masks, scores)
+            RawInstance(
+                mask=self._to_numpy(mask),
+                score=float(score),
+                prompt=phrase,
+                origin="concept",
+            )
+            for mask, score in zip(result["masks"], result["scores"])
         ]
 
-    def generic(self, image, min_area_frac: float = 0.005) -> list[RawInstance]:  # pragma: no cover
+    def from_box(self, image: np.ndarray, box: Box) -> np.ndarray:
+        """P8/P9: the referent mask from the ground-truth box.
+
+        The highest-scoring instance is taken; an empty result returns an empty
+        mask, which ``build_k2_scene`` drops with ``empty_referent_mask`` rather
+        than editing a hole that is not there.
+        """
+        result = self._predict(
+            image,
+            input_boxes=[[[float(v) for v in box]]],
+            input_boxes_labels=[[[1]]],
+        )[0]
+        masks, scores = result["masks"], result["scores"]
+        if len(masks) == 0:
+            return np.zeros(image.shape[:2], dtype=bool)
+        best = int(np.argmax([float(s) for s in scores]))
+        return self._to_numpy(masks[best])
+
+    def generic(self, image, min_area_frac: float = 0.005) -> list[RawInstance]:
         if not self.supports_generic:
             raise SegmenterUnsupported(
                 "SAM 3's generic-object mode is design O6, still open. Use "
                 "Sam2Segmenter.generic (its automatic mask generator) for the "
                 "class-agnostic masks of P1/P3."
             )
-        model = self._load()
-        model.set_image(image)
-        masks = model.generate()
-        out = [RawInstance(mask=np.asarray(m).astype(bool), origin="generic") for m in masks]
-        return [i for i in out if i.area_frac > min_area_frac]
+        raise SegmenterUnsupported(
+            "has_generic_mode=True was set, but transformers' Sam3Processor exposes no "
+            "generate-everything call: it takes text or box prompts only. If SAM 3 grows "
+            "one, wire it here and close design O6; until then Sam2Segmenter.generic is "
+            "the class-agnostic pass."
+        )
 
 
 class Sam2Segmenter(Segmenter):
