@@ -252,12 +252,24 @@ def sample_control_bg(
     referent: Instance,
     exclusion: np.ndarray,
     *,
+    instances: list[Instance] | None = None,
     hole_type: str = "mask",
     rng: np.random.Generator | None = None,
     max_tries: int = MAX_TRIES,
     stats: SamplerStats | None = None,
 ) -> ControlChoice | None:
-    """P3 CONTROL_BG: the referent's hole shape moved somewhere with no overlap."""
+    """P3 CONTROL_BG: the referent's hole shape moved somewhere clear of objects.
+
+    With ``instances``, placement uses the same reading-B rule as CONTROL_OBJ
+    (Q-13): the referent is absolute and no other instance may be bitten by more
+    than :data:`CONTROL_BITE_TOLERANCE`.  Without it, the strict rule applies.
+
+    The rule is shared with CONTROL_OBJ on purpose.  P16's stop rule (b') asks
+    whether the box shift under CONTROL_OBJ exceeds the shift under CONTROL_BG;
+    placing the two controls under different rules would confound "object versus
+    background" with "rule A versus rule B".  Measured on 400 pool images: the
+    strict rule places a background hole on 27.5% of them, reading B on 77.2%.
+    """
     rng = rng or np.random.default_rng(0)
     stats = stats if stats is not None else SamplerStats()
     hole = hole_for(referent.mask, hole_type)
@@ -283,9 +295,19 @@ def sample_control_bg(
         if moved.sum() != hole.sum():  # clipped at the frame edge
             stats.reject("clipped")
             continue
-        if np.any(moved & exclusion):
-            stats.reject("exclusion_overlap")
-            continue
+        if instances is None:
+            if np.any(moved & exclusion):
+                stats.reject("exclusion_overlap")
+                continue
+        else:
+            violation = exclusion_violation(
+                moved, np.zeros_like(moved), referent, instances, candidate_id=None
+            )
+            if violation is not None:
+                stats.reject(
+                    "referent_contact" if "referent" in violation else "exclusion_overlap"
+                )
+                continue
         return ControlChoice(
             control_instance_id=None,
             control_source="background",
@@ -385,7 +407,9 @@ def plan_k1_image(
                 )
             )
     if with_background:
-        bg = sample_control_bg(referent, exclusion, hole_type=hole_type, rng=rng, stats=stats)
+        bg = sample_control_bg(
+            referent, exclusion, instances=instances, hole_type=hole_type, rng=rng, stats=stats
+        )
         if bg is not None:
             plans.append(
                 EditPlan(
@@ -440,11 +464,13 @@ def assert_no_exclusion_overlap(
         if "REMOVE" in plan.operator:
             continue  # the referent hole is meant to sit on the referent
         if plan.control_source == "background":
-            n = _overlaps_exclusion(plan.hole, exclusion, np.zeros_like(exclusion))
-            if n:
+            violation = exclusion_violation(
+                plan.hole, np.zeros_like(exclusion), referent, instances, candidate_id=None
+            )
+            if violation is not None:
                 raise AssertionError(
-                    f"{plan.operator} background hole overlaps the P3 exclusion set in "
-                    f"{n} pixels; acceptance check 2"
+                    f"{plan.operator} background hole violates the P3 exclusion rule: "
+                    f"{violation}; acceptance check 2"
                 )
             continue
         own = (

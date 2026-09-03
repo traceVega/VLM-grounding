@@ -103,7 +103,7 @@ by acceptance check 2 so the assert tests the rule the sampler sampled under.
 Re-measured on the same 25 images: CONTROL_OBJ yield 84%, control mix 11
 labelled_other_class and 27 class_agnostic. Must be frozen with P1 to P7 at B0a.
 
-### Q-13. CONTROL_BG placement, opened by the Q-12 fix
+### Q-13. CONTROL_BG placement -- RESOLVED 2026-09-03: reading B, same rule as CONTROL_OBJ
 CONTROL_BG keeps P3's strict rule -- the referent's hole shape translated to a
 position with *no* overlap with the exclusion set -- and with that set covering a
 median 80% of the image, a position is found on only 9 of 21 images (43%).
@@ -113,7 +113,33 @@ block the gate, but it does thin those rows, and in K2 it is the instability
 guard of stop rule (b'). The likely fix is that a background hole should avoid
 *objects* rather than the whole exclusion set: SAM's class-agnostic masks include
 sky, ground and wall regions, which is exactly where a background hole belongs.
-Not yet decided.
+**Resolved by measurement on 400 banked pool images** (CPU only, off the
+instance store):
+
+| CONTROL_BG placement rule | images placed |
+|---|---|
+| strict, P3 as written | 110/400 = 27.5% |
+| reading B (referent absolute, 10% nick) | 309/400 = **77.2%** |
+| objects only (class-agnostic regions allowed) | 303/400 = 75.8% |
+
+The two alternatives are within 1.4 points, so the tiebreaker is methodological:
+P16's stop rule (b') compares the box shift under CONTROL_OBJ against the shift
+under CONTROL_BG. Placing the two controls under different rules would confound
+"object versus background" with "rule A versus rule B". Reading B is therefore
+applied to both, and `sample_control_bg` takes `instances` to do it; the strict
+rule remains as the no-instances path. Must be frozen with P1 to P7 at B0a.
+
+The same run gives the real CONTROL_OBJ figures on 400 images rather than 25:
+**86.5% yield**, control mix 139 labelled_other_class and 207 class_agnostic,
+exclusion-set coverage median 85.6% (p10 41.6%, p90 97.0%).
+
+### Q-14. Rectangular holes yield less than mask holes
+P7 requires the gate verdict on both hole types. A rectangular hole is the mask's
+bounding box, so it is larger and meets the exclusion set more often: on a
+30-image smoke run, CONTROL_OBJ was found for 83% of images with mask holes and
+70% with rect holes. Not a blocker -- both hole types get their own count row and
+their own gate verdict -- but the rect arm will rest on a smaller bank, and the
+count table has to say so.
 
 ## Process
 

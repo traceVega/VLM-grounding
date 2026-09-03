@@ -109,7 +109,7 @@ def test_class_agnostic_is_only_the_fallback(scene):
     assert choice2.control_source == "class_agnostic"
 
 
-def test_control_bg_lands_clear_of_every_instance(scene):
+def test_control_bg_without_instances_uses_the_strict_rule(scene):
     excl = S.build_exclusion(scene["referent"], scene["instances"])
     bg = S.sample_control_bg(scene["referent"], excl, rng=rng(4))
     assert bg is not None
@@ -256,3 +256,30 @@ def test_check_2_asserts_the_same_rule_the_sampler_sampled_under(scene):
     )
     with pytest.raises(AssertionError, match="touches the referent"):
         S.assert_no_exclusion_overlap([touching], scene["referent"], instances)
+
+
+def test_control_bg_uses_the_same_reading_b_rule_as_control_obj(scene):
+    """Q-13: one rule for both controls, so P16 (b') compares like with like."""
+    excl = S.build_exclusion(scene["referent"], scene["instances"])
+    bg = S.sample_control_bg(
+        scene["referent"], excl, instances=scene["instances"], rng=rng(4)
+    )
+    assert bg is not None and bg.control_source == "background"
+    assert bg.hole.sum() == S.hole_for(scene["referent"].mask, "mask").sum()
+    # the referent stays absolute even under the tolerant rule
+    assert not np.any(bg.hole & M.dilate(scene["referent"].mask, S.EXCLUSION_DILATION_PX))
+    assert S.exclusion_violation(
+        bg.hole, np.zeros_like(bg.hole), scene["referent"], scene["instances"]
+    ) is None
+
+
+def test_a_background_hole_on_the_referent_fails_check_2(scene):
+    bad = S.EditPlan(
+        operator="CONTROL_BG",
+        hole=S.hole_for(scene["referent"].mask, "mask"),
+        mask=scene["referent"].mask,
+        hole_type="mask",
+        control_source="background",
+    )
+    with pytest.raises(AssertionError, match="touches the referent"):
+        S.assert_no_exclusion_overlap([bad], scene["referent"], scene["instances"])

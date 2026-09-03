@@ -282,3 +282,23 @@ image instead of once per prompt took the instance pass from about 4.3 s to
 identical outputs (verified prompt by prompt). The cache key is a content hash
 rather than `id(image)`, because array ids are reused after garbage collection
 and serving one image's embeddings for another would be silent corruption.
+
+### D-29. CONTROL_BG shares the reading-B rule (Q-13)
+
+`sample_control_bg` takes the instance list and applies the same rule as
+CONTROL_OBJ: the referent absolute, no other instance bitten by more than 10%.
+The strict rule (no overlap with the exclusion set at all) placed a background
+hole on 27.5% of 400 pool images against 77.2% for reading B. The deciding
+argument is not the yield but P16 (b'), which compares the CONTROL_OBJ shift with
+the CONTROL_BG shift: two controls placed under two different rules would not be
+comparable. Acceptance check 2 asserts whichever rule was used.
+
+### D-30. The K1 bank carries both hole types, and is larger than the design budgeted
+
+P7 requires the gate on both hole types, so the bank holds eight operators per
+image (REMOVE, CONTROL_OBJ, CONTROL_OBJ_2, CONTROL_BG and their RECT_ variants)
+rather than the four the design's 4.3 budget line counts. Measured on the smoke
+run, a stored window averages 0.78 MB, against the design's implied 0.4 MB
+(16 GB for 40,000). At roughly 7 edits per image over 10,000 images the bank is
+therefore about 54 GB rather than 16 GB. There is 870 GB free, so this is a
+budget correction, not a problem.
