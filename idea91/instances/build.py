@@ -25,7 +25,13 @@ import numpy as np
 
 from idea91 import masks as M
 from idea91.edits.sampler import Instance
-from idea91.instances.backend import RawInstance, Segmenter, deduplicate, filter_by_area
+from idea91.instances.backend import (
+    RawInstance,
+    Segmenter,
+    deduplicate,
+    drop_empty,
+    filter_by_area,
+)
 from idea91.instances.nounphrase import NounPhraseParse
 from idea91.masks import Box
 
@@ -116,7 +122,7 @@ def build_k1_scene(
                         meta={"from_gt_box": True},
                     )
                 )
-    raws = deduplicate(raws)
+    raws = deduplicate(drop_empty(raws))
 
     candidates = filter_by_area(raws, *area_band)
     if not candidates:
@@ -147,7 +153,7 @@ def build_k1_scene(
             )
         )
     if with_generic and segmenter.supports_generic:
-        generic = segmenter.generic(image, CLASS_AGNOSTIC_MIN_AREA)
+        generic = drop_empty(segmenter.generic(image, CLASS_AGNOSTIC_MIN_AREA))
         instances += _to_instances(generic, "class_agnostic", "gen", label_from_prompt=False)
 
     return Scene(
@@ -204,7 +210,7 @@ def build_k2_scene(
     neighbours: list[Instance] = []
 
     if segmenter.supports_concept:
-        head_raws = deduplicate(segmenter.concept(image, parse.head_noun))
+        head_raws = deduplicate(drop_empty(segmenter.concept(image, parse.head_noun)))
         for i, raw in enumerate(head_raws):
             if M.mask_iou(raw.mask, region) >= 0.5:
                 continue  # this is the referent itself
@@ -212,14 +218,14 @@ def build_k2_scene(
             neighbours.append(inst)
             instances.append(inst)
         for j, phrase in enumerate(parse.other_phrases()):
-            for i, raw in enumerate(deduplicate(segmenter.concept(image, phrase))):
+            for i, raw in enumerate(deduplicate(drop_empty(segmenter.concept(image, phrase)))):
                 instances.append(
                     Instance(f"np{j:02d}_{i:03d}", raw.mask, "noun_phrase_instance", phrase)
                 )
 
     if with_generic and segmenter.supports_generic:
         instances += _to_instances(
-            segmenter.generic(image, CLASS_AGNOSTIC_MIN_AREA),
+            drop_empty(segmenter.generic(image, CLASS_AGNOSTIC_MIN_AREA)),
             "class_agnostic",
             "gen",
             label_from_prompt=False,
@@ -244,6 +250,8 @@ def scene_rows(scene: Scene, set_or_pool: str) -> list[dict]:
         return []
     rows = []
     for inst in scene.instances:
+        if not inst.mask.any():
+            continue  # belt and braces; drop_empty should have caught it
         centre = M.centroid(inst.mask)
         rows.append(
             {

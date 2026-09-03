@@ -95,6 +95,17 @@ def filter_by_area(
     return [i for i in instances if min_frac <= i.area_frac <= max_frac]
 
 
+def drop_empty(instances: list[RawInstance]) -> list[RawInstance]:
+    """Discard masks with no pixels.
+
+    A concept prompt or an automatic mask can binarize to nothing at original
+    resolution, and such a mask has no centroid, no bounding box and no meaning.
+    Filtered here rather than guarded downstream, so no empty instance can reach
+    the sampler or the store.
+    """
+    return [i for i in instances if i.mask.any()]
+
+
 def deduplicate(instances: list[RawInstance], iou_threshold: float = 0.9) -> list[RawInstance]:
     """Drop near-duplicate masks (several prompts can return the same object).
 

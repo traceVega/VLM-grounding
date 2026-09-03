@@ -400,3 +400,29 @@ def test_an_instance_source_outside_the_list_is_refused(world):
     rows[0]["source"] = "vibes"
     with pytest.raises(Exception, match="source"):
         schemas.validate(pa.Table.from_pylist(rows, schema=schemas.INSTANCES_SCHEMA), "instances")
+
+
+def test_empty_masks_never_become_instances(world):
+    """SAM can return a mask that binarizes to nothing; it has no centroid."""
+    from idea91.instances.backend import drop_empty
+
+    shape = SHAPE
+    empty = np.zeros(shape, bool)
+    raws = [RawInstance(mask=world["_shapes"]["cat"], prompt="cat"),
+            RawInstance(mask=empty, prompt="ghost")]
+    assert [r.prompt for r in drop_empty(raws)] == ["cat"]
+
+
+def test_a_scene_with_an_empty_concept_mask_still_builds(world):
+    """The failure that killed a 10,000-image run after 842 images."""
+    shape = SHAPE
+    world = dict(world)
+    world["ghost"] = [np.zeros(shape, bool)]
+    seg = FakeSegmenter(world)
+    scene = build_k1_scene(
+        textured_image(shape), "img1", ["cat", "dog", "ghost"], seg, seed=0
+    )
+    assert scene.drop_reason is None
+    assert all(i.mask.any() for i in scene.instances)
+    rows = scene_rows(scene, "openimages_pool")  # used to raise
+    assert rows and all(r["area_frac"] > 0 for r in rows)

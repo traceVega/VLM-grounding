@@ -90,15 +90,14 @@ def stage_instances(limit: int | None, shard_size: int, seed: int, device: str) 
         try:
             image = read_image(path)
             scene = build_k1_scene(image, row.image_id, list(row.labels), segmenter, seed=seed)
-        except Exception as exc:  # a corrupt jpeg, an OOM on one huge image
+            if scene.drop_reason:
+                drops[scene.drop_reason] += 1
+                continue
+            rows = scene_rows(scene, SET_NAME)
+        except Exception as exc:  # a corrupt jpeg, an OOM, an odd mask
             drops[f"error:{type(exc).__name__}"] += 1
-            print(f"  {row.image_id}: {type(exc).__name__}: {exc}")
+            print(f"  {row.image_id}: {type(exc).__name__}: {exc}", flush=True)
             continue
-
-        if scene.drop_reason:
-            drops[scene.drop_reason] += 1
-            continue
-        rows = scene_rows(scene, SET_NAME)
         buffer.extend(rows)
         for r in rows:
             sources[r["source"]] += 1
@@ -153,7 +152,7 @@ def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("stage", choices=["instances", "status"])
     ap.add_argument("--limit", type=int, default=None, help="only the first N pool images")
-    ap.add_argument("--shard", type=int, default=20_000, help="rows per shard")
+    ap.add_argument("--shard", type=int, default=5_000, help="rows per shard")
     ap.add_argument("--seed", type=int, default=0, help="P1's referent choice seed")
     ap.add_argument("--device", default="cuda")
     args = ap.parse_args()
