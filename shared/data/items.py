@@ -175,12 +175,23 @@ def cocosearch18_items(root: Path) -> list[RawItem]:  # pragma: no cover
     )
 
 
-def openimages_pool(root: Path) -> list[RawItem]:  # pragma: no cover
-    """P1's pool.  Expressions are class labels; boxes come from the annotations."""
-    _pending(
-        "openimages",
-        "needs the images CSV (for the attribution columns) and the box annotations",
+def openimages_pool(root: Path) -> list[RawItem]:
+    """P1's pool.  Written: see ``shared/data/openimages.py``.
+
+    ``root`` is ignored; the pool is selected from the metadata CSVs and its
+    images are read from the download directory.
+    """
+    import pandas as pd
+
+    from shared.data import openimages
+
+    pool_path = paths.PREPARED / "openimages_pool" / "pool.parquet"
+    pool = (
+        pd.read_parquet(pool_path)
+        if pool_path.is_file()
+        else openimages.select_pool()
     )
+    return openimages.to_raw_items(pool)
 
 
 ADAPTERS = {

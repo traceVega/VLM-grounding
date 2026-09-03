@@ -19,7 +19,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from shared import paths
-from shared.data.sources import HF, HTTP, MANUAL, PIN, SOURCES, Source
+from shared.data.sources import HF, HTTP, MANUAL, MODULE, PIN, SOURCES, Source
 
 
 @dataclass
@@ -61,6 +61,9 @@ def plan_for(source: Source, root: Path | None = None) -> Step:
             f"locator/revision still {PIN}: read the source and pin it in "
             "shared/data/sources.py and shared/env/PINS.md before fetching",
         )
+    if source.kind == MODULE:
+        return Step(source, destination, list(source.module_command) or None,
+                    None if source.module_command else "no module_command set")
     if source.kind == HTTP:
         return Step(
             source,

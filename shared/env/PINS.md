@@ -55,7 +55,7 @@ Last updated 2026-09-02.
 
 | Item | Source | Revision | Status |
 |---|---|---|---|
-| OpenImages subset | official downloader by image id + images CSV | PIN_REQUIRED | K1 pool (P1); the CSV carries the attribution columns |
+| Open Images (K1 pool) | validation split: `validation-images-with-rotation.csv` (2018_04), `validation-annotations-bbox.csv` + `class-descriptions-boxable.csv` (v5), images from the CVDF S3 mirror | pinned 2026-09-03 | **metadata downloaded (38 MB), pool selected (10,000 images, mean 4.12 class labels each, 84.6% with >= 2 distinct classes)**. All 41,620 validation images are CC BY 2.0. Images (~3 GB) not yet fetched. See DEVIATIONS D-19 |
 | SA-1B shards | Meta release | PIN_REQUIRED | K1 fallback pool; makes that bank non-releasable |
 | GroundingME | HF `lirang04/GroundingME` | PIN_REQUIRED | K2 (P8); its evaluator repo commit is also needed for Q-1 |
 | OpenRef | release of arXiv 2605.25706 | PIN_REQUIRED | design O1: format and licence unread |

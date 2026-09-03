@@ -20,6 +20,7 @@ PIN = "PIN_REQUIRED"
 MANUAL = "manual"  # a signed link or a form; cannot be fetched by script
 HF = "huggingface"
 HTTP = "http"
+MODULE = "module"  # several files plus selection logic, handled by its own module
 
 
 @dataclass(frozen=True)
@@ -37,6 +38,8 @@ class Source:
     attribution: str = ""
     notes: str = ""
     optional: bool = False
+    #: for MODULE sources: the command that fetches and prepares it
+    module_command: tuple[str, ...] = ()
 
     @property
     def pinned(self) -> bool:
@@ -50,19 +53,24 @@ class Source:
 SOURCES: tuple[Source, ...] = (
     Source(
         key="openimages",
-        name="Open Images subset (K1 pool)",
-        kind=MANUAL,
-        locator=PIN,
-        revision=PIN,
-        approx_gb=15.0,
-        licence="CC-BY 4.0 per image (annotations CC BY 4.0)",
+        name="Open Images validation split (K1 pool)",
+        kind=MODULE,
+        locator="shared.data.openimages",
+        revision="validation; v5 boxes + 2018_04 image metadata",
+        approx_gb=3.1,
+        licence="CC BY 2.0 per image (verified: all 41,620 validation images)",
         allowed=("evaluate", "publish_numbers", "release_images", "release_derivatives"),
         used_by=("P1 K1 pool",),
-        attribution="author, URL and licence recorded per image from the images CSV (P1)",
+        date_read="2026-09-03",
+        attribution="Author, AuthorProfileURL, License, OriginalURL and Title recorded per "
+        "image in prepared/openimages_pool/attribution.csv (P1)",
+        module_command=("python", "-m", "shared.data.openimages", "--metadata", "--select", "--images"),
         notes=(
-            "Fetched by image id with the official downloader; the images CSV carries the "
-            "attribution columns P1 requires. Pin the CSV release and the downloader commit. "
-            "This is the only source whose edited bank may be released."
+            "The validation split, not train: 41,620 images all CC BY 2.0, a 24 MB box file "
+            "against 2.15 GB for train, and 20,535 images carrying a box inside P1's 0.5-15% "
+            "band -- twice the pool P1 asks for. Metadata is 38 MB; the 10,000 selected images "
+            "are about 3 GB from the CVDF mirror, no credentials needed. This is the only "
+            "source whose edited bank may be released."
         ),
     ),
     Source(

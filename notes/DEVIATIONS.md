@@ -164,3 +164,33 @@ bfloat16, so the geometry encoder raises `mat1 and mat2 must have the same
 dtype`; the adapter casts floating-point inputs to the model dtype. Text prompts
 hit neither path, which is why the concept prompt worked before the box prompt
 did. Both are covered by tests.
+
+### D-19. The K1 pool is the Open Images *validation* split
+
+P1 says "10,000 OpenImages images (CC-BY ...)" without naming a split. The
+validation split is used: 41,620 images, **all of them CC BY 2.0** (checked, not
+assumed), with a 24 MB box file against 2.15 GB for train, and 20,535 images
+carrying a box inside P1's 0.5-15% band -- twice the pool P1 asks for, so there
+is headroom for images the SAM 3 pass then drops. The v7 train bbox URL is a 403;
+v5 validation is what serves. Nothing in K1 depends on which split the pixels
+came from: it is a pool, not an evaluation set, and no model under test is
+trained on it. The saving is 38 MB of metadata instead of 2.8 GB.
+
+Images come from the CVDF mirror
+(`https://open-images-dataset.s3.amazonaws.com/validation/<id>.jpg`), one request
+per pool image, so only the 10,000 selected are fetched (~3 GB) rather than the
+whole split. No AWS credentials and no `downloader.py` are needed.
+
+Two pre-filters run before SAM 3 is loaded: `IsGroupOf` and `IsDepiction` boxes
+are dropped (P1 wants an object instance), and boxes under 0.5% of the image are
+dropped. The second is *sound* rather than heuristic -- a mask sits inside its
+box, so a box under 0.5% cannot yield a mask over 0.5% -- and there is no upper
+pre-filter, because a large box can still hold a small mask.
+
+### D-20. Attribution lives beside the pool, not in `items.parquet`
+
+P1 requires author, URL and licence recorded per image. `items.parquet`'s columns
+are fixed by SPEC Section 3 and have no room for them, so they are written to
+`prepared/openimages_pool/attribution.csv`, which must travel with the K1 bank if
+it is ever released. `pool.parquet` beside it carries the per-image class labels
+and boxes the instance pass prompts with.

@@ -59,7 +59,7 @@ def test_the_licence_file_names_the_releasable_artefact_and_the_gaps():
     assert "SAM 3" in text and "design O7" in text
     assert "no retention of inputs" in text  # P17 provider terms
     assert "Licence text not yet read" in text
-    for name in ("Open Images subset (K1 pool)", "COCO-Search18 (edit-free row)"):
+    for name in ("Open Images validation split (K1 pool)", "COCO-Search18 (edit-free row)"):
         assert name in text
 
 
@@ -149,8 +149,18 @@ def test_adapters_say_what_they_are_waiting_for():
 
 
 def test_an_unpinned_source_is_blocked_not_guessed():
-    step = download.plan_for(BY_KEY["openimages"])
+    step = download.plan_for(BY_KEY["groundingme"])  # revision still PIN_REQUIRED
     assert not step.ready and PIN in step.blocker
+
+
+def test_the_openimages_pool_is_pinned_and_fetchable():
+    """Pinned 2026-09-03: validation split, all CC BY 2.0, ~3.1 GB."""
+    source = BY_KEY["openimages"]
+    assert source.pinned and source.date_read
+    assert source.may_release_derivatives  # P1's releasable artefact
+    step = download.plan_for(source)
+    assert step.ready
+    assert step.command[:3] == ["python", "-m", "shared.data.openimages"]
 
 
 def test_a_manual_source_prints_instructions():
