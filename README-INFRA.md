@@ -20,7 +20,7 @@ shared/          shared with IDEA-11
   stats.py       AUROC, clustered bootstrap, kappa
 idea91/
   masks.py       RLE, dilation, area/centrality matching quantities
-  schemas.py     edits/index, edits/verifier, results/relations
+  schemas.py     edits/index, edits/verifier, results/relations, instances
   edits/         window.py (P2), composite.py (check 1c), sampler.py (P3, check 2),
                  inpaint.py (big-LaMa + a non-kill fallback), build.py
   gate/          inputs.py (P5 rows), ladders.py (check 1a/1b), verdict.py (P7),
@@ -111,6 +111,7 @@ wsl -d Ubuntu -e bash -lc 'cd /mnt/d/Dev/ArcNova/auto-research/VLM-grounding && 
 4. **Qwen3-VL's coordinate convention** (Q-3).
 5. **Downloads**: OpenImages subset (K1 pool), GroundingME, COCO train2014,
    COCO-Search18. About 60 GB core, 883 GB free on the ext4 volume.
+
 Resolved since: the repository exists (branch `main`), so the freeze points have
 something to tag and manifests carry a real `code_sha`.
 
