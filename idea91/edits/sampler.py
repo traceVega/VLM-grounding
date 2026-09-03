@@ -43,6 +43,11 @@ CLASS_AGNOSTIC_MIN_AREA_FRAC = 0.005  # P1/P3: class-agnostic masks above 0.5%
 AREA_RATIO_RANGE = (0.5, 2.0)  # P3
 CENTRALITY_TOLERANCE = 0.20  # P3, as a fraction of the image diagonal
 MAX_TRIES = 100  # P3
+#: P3's overlap rule, reading B (OPEN-QUESTIONS Q-12, chosen 2026-09-03): the
+#: referent is absolute, every other excluded instance tolerates a nick of at
+#: most this fraction of its area.  The literal reading yielded CONTROL_OBJ on
+#: 8% of real images because a dense segmentation leaves nothing untouched.
+CONTROL_BITE_TOLERANCE = 0.10
 
 #: ``control_source`` values, in the preference order of P3.
 CONTROL_SOURCES = ("labelled_other_class", "noun_phrase_instance", "class_agnostic")
@@ -118,8 +123,60 @@ def build_exclusion(
 
 
 def _overlaps_exclusion(hole: np.ndarray, exclusion: np.ndarray, own: np.ndarray) -> int:
-    """Pixels where the hole meets the exclusion set minus the candidate's own mask."""
+    """Pixels where the hole meets the exclusion set minus the candidate's own mask.
+
+    The literal reading of P3.  Kept because acceptance check 1c-style asserts and
+    the CONTROL_BG rule still use it; CONTROL_OBJ uses
+    :func:`exclusion_violation` (Q-12, reading B).
+    """
     return int(np.count_nonzero(hole & exclusion & ~own))
+
+
+def exclusion_violation(
+    hole: np.ndarray,
+    candidate_mask: np.ndarray,
+    referent: Instance,
+    instances: list[Instance],
+    *,
+    candidate_id: str | None = None,
+    tolerance: float = CONTROL_BITE_TOLERANCE,
+    referent_dilation_px: int = EXCLUSION_DILATION_PX,
+    class_agnostic_min_area_frac: float = CLASS_AGNOSTIC_MIN_AREA_FRAC,
+) -> str | None:
+    """P3's overlap rule under reading B (OPEN-QUESTIONS Q-12).
+
+    The referent is absolute: a control hole may not touch its dilated mask at
+    all, or the control would damage the very thing the REMOVE edit is supposed
+    to be the only edit of.  Every *other* excluded instance tolerates a nick of
+    at most ``tolerance`` of its area, measured outside the candidate itself,
+    because a dense automatic segmentation puts every object in contact with its
+    neighbours and the literal rule then yields a CONTROL_OBJ on 8% of images.
+
+    The bite is measured against the other instance's *whole* area: a mask lying
+    mostly inside the candidate is a part of the candidate and disappears with
+    it, which is correct rather than damage.
+
+    Returns ``None`` when the candidate is admissible, else a short reason.
+    """
+    if np.any(hole & M.dilate(referent.mask, referent_dilation_px)):
+        return "touches the referent"
+    for other in instances:
+        if other.instance_id in (candidate_id, referent.instance_id):
+            continue
+        if other.source == "referent":
+            continue
+        if (
+            other.source == "class_agnostic"
+            and M.area_frac(other.mask) <= class_agnostic_min_area_frac
+        ):
+            continue
+        area = int(other.mask.sum())
+        if area == 0:
+            continue
+        bitten = int(np.count_nonzero(hole & other.mask & ~candidate_mask)) / area
+        if bitten > tolerance:
+            return f"bites {bitten:.0%} of {other.instance_id}"
+    return None
 
 
 def sample_control_obj(
@@ -171,8 +228,13 @@ def sample_control_obj(
                 stats.reject("centrality")
                 continue
             hole = hole_for(cand.mask, hole_type)
-            if _overlaps_exclusion(hole, exclusion, cand.mask):
-                stats.reject("exclusion_overlap")
+            violation = exclusion_violation(
+                hole, cand.mask, referent, instances, candidate_id=cand.instance_id
+            )
+            if violation is not None:
+                stats.reject(
+                    "referent_contact" if "referent" in violation else "exclusion_overlap"
+                )
                 continue
             return ControlChoice(
                 control_instance_id=cand.instance_id,
@@ -365,20 +427,36 @@ def plan_k2_item(
 def assert_no_exclusion_overlap(
     plans: list[EditPlan], referent: Instance, instances: list[Instance]
 ) -> None:
-    """Acceptance check 2, as an independent pass over a built plan."""
+    """Acceptance check 2, as an independent pass over a built plan.
+
+    Asserts the rule the sampler actually sampled under (P3 reading B): the
+    referent is untouched absolutely, and no other excluded instance is bitten by
+    more than :data:`CONTROL_BITE_TOLERANCE`.  A CONTROL_BG hole is background by
+    construction and is held to the strict rule.
+    """
     exclusion = build_exclusion(referent, instances)
     by_id = {i.instance_id: i for i in instances}
     for plan in plans:
         if "REMOVE" in plan.operator:
             continue  # the referent hole is meant to sit on the referent
+        if plan.control_source == "background":
+            n = _overlaps_exclusion(plan.hole, exclusion, np.zeros_like(exclusion))
+            if n:
+                raise AssertionError(
+                    f"{plan.operator} background hole overlaps the P3 exclusion set in "
+                    f"{n} pixels; acceptance check 2"
+                )
+            continue
         own = (
             by_id[plan.control_instance_id].mask
             if plan.control_instance_id in by_id
             else np.zeros_like(exclusion)
         )
-        n = _overlaps_exclusion(plan.hole, exclusion, own)
-        if n:
+        violation = exclusion_violation(
+            plan.hole, own, referent, instances, candidate_id=plan.control_instance_id
+        )
+        if violation is not None:
             raise AssertionError(
-                f"{plan.operator} hole overlaps the P3 exclusion set in {n} pixels "
+                f"{plan.operator} hole violates the P3 exclusion rule: {violation} "
                 f"(control_instance_id={plan.control_instance_id}); acceptance check 2"
             )

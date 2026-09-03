@@ -72,7 +72,7 @@ gate, so it does not block the freeze, only the completeness of the table.
 ### Q-11. The class-agnostic area ceiling (DEVIATIONS D-23)
 0.50 is ours, not P1's. Must be frozen with P1 to P7.
 
-### Q-12. P3's overlap rule is close to unsatisfiable against a dense segmentation -- UNRESOLVED, blocks the K1 run
+### Q-12. P3's overlap rule against a dense segmentation -- RESOLVED 2026-09-03: reading B
 P3 rejects a CONTROL_OBJ candidate whose hole shows "no overlap with the
 exclusion set after the candidate's own mask is removed from it", and acceptance
 check 2 asserts the same on the *dilated* hole. The design appears to assume
@@ -97,9 +97,23 @@ what would damage a neighbour. C discards the protection P1 asks for by name.
 B keeps P3's purpose -- the control removes one object without materially
 damaging another, and never touches the referent -- while remaining satisfiable.
 
-This changes what CONTROL_OBJ means, so it is the user's call, not the
-implementation's. The K1 freeze (P20 / B0a) has not happened, so a refinement is
-still allowed, but it must be recorded before the bank is built.
+**Chosen: B** (user decision, 2026-09-03), implemented as
+`sampler.exclusion_violation` with `CONTROL_BITE_TOLERANCE = 0.10`, and asserted
+by acceptance check 2 so the assert tests the rule the sampler sampled under.
+Re-measured on the same 25 images: CONTROL_OBJ yield 84%, control mix 11
+labelled_other_class and 27 class_agnostic. Must be frozen with P1 to P7 at B0a.
+
+### Q-13. CONTROL_BG placement, opened by the Q-12 fix
+CONTROL_BG keeps P3's strict rule -- the referent's hole shape translated to a
+position with *no* overlap with the exclusion set -- and with that set covering a
+median 80% of the image, a position is found on only 9 of 21 images (43%).
+CONTROL_BG is secondary in P3 and feeds only *reported* comparison rows in K1
+(P7: "REMOVE versus CONTROL_BG is reported on the same rows"), so it does not
+block the gate, but it does thin those rows, and in K2 it is the instability
+guard of stop rule (b'). The likely fix is that a background hole should avoid
+*objects* rather than the whole exclusion set: SAM's class-agnostic masks include
+sky, ground and wall regions, which is exactly where a background hole belongs.
+Not yet decided.
 
 ## Process
 

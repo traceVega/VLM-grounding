@@ -173,3 +173,86 @@ def test_rect_hole_is_the_bounding_box(scene):
 def test_rle_round_trip(scene):
     mask = scene["referent"].mask
     assert np.array_equal(M.decode_rle(M.encode_rle(mask)), mask)
+
+
+# --- P3 reading B: the exclusion rule chosen for Q-12 ------------------------
+
+
+def test_the_referent_is_absolute_under_reading_b(scene):
+    """A control hole may not touch the referent's dilated mask at all."""
+    shape = scene["shape"]
+    ref = scene["referent"]
+    hugging = Instance("hug", disc(shape, 355, 400, 20), "labelled_other_class", "collar")
+    hole = S.hole_for(hugging.mask, "mask")
+    assert np.any(hole & M.dilate(ref.mask, S.EXCLUSION_DILATION_PX))
+
+    reason = S.exclusion_violation(hole, hugging.mask, ref, [ref, hugging], candidate_id="hug")
+    assert reason == "touches the referent"
+
+
+def test_a_small_nick_of_another_object_is_tolerated(scene):
+    """The change that makes P3 satisfiable against a dense segmentation."""
+    shape = scene["shape"]
+    ref = scene["referent"]
+    cand = Instance("cand", disc(shape, 700, 400, 44), "labelled_other_class", "dog")
+    # a big neighbour, barely grazed by the candidate's dilation ring
+    neighbour = Instance("big", disc(shape, 700, 500, 60), "labelled_other_class", "sofa")
+    instances = [ref, cand, neighbour]
+    hole = S.hole_for(cand.mask, "mask")
+
+    bitten = (hole & neighbour.mask & ~cand.mask).sum() / neighbour.mask.sum()
+    assert 0 < bitten <= S.CONTROL_BITE_TOLERANCE, f"fixture should graze, bit {bitten:.2%}"
+    assert S.exclusion_violation(hole, cand.mask, ref, instances, candidate_id="cand") is None
+
+
+def test_a_large_bite_of_another_object_is_still_refused(scene):
+    shape = scene["shape"]
+    ref = scene["referent"]
+    cand = Instance("cand", disc(shape, 700, 400, 44), "labelled_other_class", "dog")
+    swallowed = Instance("tiny", disc(shape, 745, 400, 8), "labelled_other_class", "tag")
+    instances = [ref, cand, swallowed]
+    hole = S.hole_for(cand.mask, "mask")
+
+    reason = S.exclusion_violation(hole, cand.mask, ref, instances, candidate_id="cand")
+    assert reason is not None and "tiny" in reason
+
+
+def test_a_mask_lying_inside_the_candidate_is_a_part_of_it_not_damage(scene):
+    """A nested part-mask disappears with the candidate; that is correct."""
+    shape = scene["shape"]
+    ref = scene["referent"]
+    cand = Instance("cand", disc(shape, 700, 400, 44), "labelled_other_class", "dog")
+    part = Instance("part", disc(shape, 700, 400, 20), "class_agnostic", None)
+    hole = S.hole_for(cand.mask, "mask")
+    assert np.all(part.mask & cand.mask == part.mask)  # fully nested
+    assert S.exclusion_violation(hole, cand.mask, ref, [ref, cand, part], candidate_id="cand") is None
+
+
+def test_sub_floor_class_agnostic_masks_are_ignored_by_the_rule(scene):
+    shape = scene["shape"]
+    ref = scene["referent"]
+    cand = Instance("cand", disc(shape, 700, 400, 44), "labelled_other_class", "dog")
+    speck = Instance("speck", disc(shape, 748, 400, 5), "class_agnostic", None)
+    assert M.area_frac(speck.mask) < S.CLASS_AGNOSTIC_MIN_AREA_FRAC
+    hole = S.hole_for(cand.mask, "mask")
+    assert S.exclusion_violation(hole, cand.mask, ref, [ref, cand, speck], candidate_id="cand") is None
+
+
+def test_check_2_asserts_the_same_rule_the_sampler_sampled_under(scene):
+    shape = scene["shape"]
+    extra = Instance("ok2", disc(shape, 300, 150, 42), "labelled_other_class", "hat")
+    instances = scene["instances"] + [extra]
+    plans = S.plan_k1_image(scene["referent"], instances, rng=rng(11))
+    assert plans is not None
+    S.assert_no_exclusion_overlap(plans, scene["referent"], instances)
+
+    touching = S.EditPlan(
+        operator="CONTROL_OBJ",
+        hole=S.hole_for(disc(shape, 355, 400, 20), "mask"),  # against the referent
+        mask=disc(shape, 355, 400, 20),
+        hole_type="mask",
+        control_instance_id="hug",
+        control_source="labelled_other_class",
+    )
+    with pytest.raises(AssertionError, match="touches the referent"):
+        S.assert_no_exclusion_overlap([touching], scene["referent"], instances)

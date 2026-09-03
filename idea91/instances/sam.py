@@ -72,6 +72,7 @@ class Sam3Segmenter(Segmenter):
         score_threshold: float = SAM3_SCORE_THRESHOLD,
         mask_threshold: float = SAM3_MASK_THRESHOLD,
         has_generic_mode: bool = False,  # design O6, open
+        cache_vision_embeds: bool = True,
         processor=None,
         model=None,
     ) -> None:
@@ -81,8 +82,13 @@ class Sam3Segmenter(Segmenter):
         self.score_threshold = score_threshold
         self.mask_threshold = mask_threshold
         self.supports_generic = bool(has_generic_mode)
+        self.cache_vision_embeds = cache_vision_embeds
         self._processor = processor
         self._model = model
+        self._embed_key = None
+        self._embeds = None
+        self.encodes = 0   # image encodes actually run
+        self.prompts = 0   # prompts served
 
     def describe(self) -> dict[str, object]:
         return {**super().describe(), "hf_path": self.hf_path}
@@ -119,6 +125,35 @@ class Sam3Segmenter(Segmenter):
         except (AttributeError, StopIteration, TypeError):
             return None  # an injected fake in the tests
 
+    def _vision_embeds(self, image: np.ndarray):
+        """Encode the image once and reuse it across every prompt on it.
+
+        P1 prompts *every* class label of an image (4.12 on average, up to 20),
+        and K2 prompts the head noun plus each context phrase.  Re-encoding per
+        prompt is the dominant cost; ``Sam3Model.forward`` documents
+        ``vision_embeds`` as reusable, so the encoder runs once per image.
+
+        The cache key is a content hash, not ``id(image)``: array ids are reused
+        after garbage collection, and serving one image's embeddings for another
+        would be a silent correctness bug.
+        """
+        import hashlib
+
+        import torch
+
+        contiguous = np.ascontiguousarray(image)
+        key = (contiguous.shape, hashlib.sha1(contiguous).hexdigest())
+        if self._embed_key != key:
+            processor, model = self._load()
+            pixel_values = processor(images=image, return_tensors="pt")["pixel_values"]
+            with torch.inference_mode():
+                self._embeds = model.get_vision_features(
+                    pixel_values=pixel_values.to(self.device, self._model_dtype(model))
+                )
+            self._embed_key = key
+            self.encodes += 1
+        return self._embeds
+
     def _predict(self, image: np.ndarray, **prompt) -> list[dict]:
         """One forward pass, post-processed to original-resolution instances."""
         import torch
@@ -138,6 +173,11 @@ class Sam3Segmenter(Segmenter):
             return value.to(self.device)
 
         inputs = {k: to_device(v) for k, v in inputs.items()}
+        if self.cache_vision_embeds and dtype is not None:
+            # forward takes pixel_values or vision_embeds, never both
+            inputs.pop("pixel_values", None)
+            inputs["vision_embeds"] = self._vision_embeds(image)
+        self.prompts += 1
         with torch.inference_mode():
             outputs = model(**inputs)
         return processor.post_process_instance_segmentation(

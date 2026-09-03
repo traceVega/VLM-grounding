@@ -261,3 +261,24 @@ keeps `is_pinned_backend=True`, because every mask that decides a referent or a
 control instance comes from SAM 3 and SAM 2 only contributes obstacles to the
 exclusion set, which can only make the sampler more conservative. Both backends
 are named in the index row.
+
+### D-27. P3's exclusion rule: reading B (Q-12)
+
+The referent is absolute -- a control hole may not touch its dilated mask at all
+-- and every other excluded instance tolerates a nick of at most 10% of its area,
+measured outside the candidate. The literal reading yielded CONTROL_OBJ on 8% of
+real images because SAM 2's automatic generator returns a near-complete scene
+partition and the exclusion set then covers a median 80% of the image; reading B
+yields 84%. Chosen by the user on 2026-09-03 after the four readings were
+measured on 25 images. Acceptance check 2 asserts the same rule, so it remains an
+independent second pass rather than a restatement of the sampler.
+
+### D-28. SAM 3 vision embeddings are cached per image
+
+P1 prompts every class label of an image and K2 every noun phrase, and
+`Sam3Model.forward` documents `vision_embeds` as reusable. Encoding once per
+image instead of once per prompt took the instance pass from about 4.3 s to
+1.08 s per image -- roughly 14 hours to 3 for the 10,000-image pool -- with
+identical outputs (verified prompt by prompt). The cache key is a content hash
+rather than `id(image)`, because array ids are reused after garbage collection
+and serving one image's embeddings for another would be silent corruption.
