@@ -1,0 +1,10 @@
+# status: UNVERIFIED
+# source: GroundingME's own instruction and null-box convention (design P12)
+# todo: copy the instruction string and the null-box literal from the GroundingME
+#   repository at the pinned commit (github.com/lirang04/GroundingME, its evaluator)
+#   and record that commit in shared/env/PINS.md. Do not paraphrase: P12 pins the
+#   primary protocol to the benchmark's own words, and the K2 numbers are only
+#   "under the benchmark's protocol" if these are them.
+# role: Qwen3-VL primary grounding prompt
+# fields: expr
+<<PLACEHOLDER: GroundingME grounding instruction for "{expr}">>

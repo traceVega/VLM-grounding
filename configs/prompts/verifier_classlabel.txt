@@ -1,0 +1,5 @@
+# status: VERIFIED
+# source: design P10, K1 removal success ("the same class-label question on the window")
+# role: K1 removal success for REMOVE and CONTROL_OBJ where a class label exists
+# fields: class_label
+Is there a {class_label} in this image? Answer with one word, yes or no.

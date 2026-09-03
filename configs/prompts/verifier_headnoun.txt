@@ -1,0 +1,5 @@
+# status: VERIFIED
+# source: design P10, quoted verbatim from the design document
+# role: edit verifier V1, asked on the edit window (up to 1,536 px) or on the tight crop
+# fields: head_noun
+Is there a {head_noun} in this image? Answer with one word, yes or no.

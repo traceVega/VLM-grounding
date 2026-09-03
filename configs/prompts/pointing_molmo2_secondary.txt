@@ -1,0 +1,7 @@
+# status: UNVERIFIED
+# source: design P12 -- "the same followed by 'If there is no such object, say none.'"
+# todo: same as pointing_molmo2_primary.txt; only the appended sentence is ours.
+# role: Molmo2 secondary (rejection-cued) pointing prompt
+# fields: expr
+Point to the {expr}.
+If there is no such object, say none.

@@ -1,0 +1,34 @@
+# SPEC v1.2 Section 1. Values still to be pinned carry PIN_REQUIRED; a kill run
+# refuses the file until they are filled (shared/harness/model_config.py).
+model_id: qwen3vl-8b-instruct
+hf_path: Qwen/Qwen3-VL-8B-Instruct
+revision: PIN_REQUIRED          # commit SHA, never a branch name (SPEC Section 1)
+dtype: bfloat16
+attn_impl:
+  text_config: eager_capture
+  vision_config: sdpa
+backend_default: hf             # vLLM only after the P21 parity run (SPEC Section 5)
+resolution_policy:
+  kind: pixels
+  fields: [min_pixels, max_pixels]   # values come from run-level overrides (P21)
+prompt_templates:
+  grounding: grounding_qwen3vl_primary
+  groundingme: grounding_qwen3vl_primary
+  presence: verifier_headnoun
+  t_null: t_null_qwen3vl
+  cocosearch18: cocosearch18_category
+coordinate_convention: PIN_REQUIRED   # read off the model card / processor before B8
+parser: qwen3vl_box
+abstain_protocol:
+  primary:
+    prompt_suffix: ""
+    none_patterns: [PIN_REQUIRED]     # GroundingME's own null convention (P12)
+    null_box: PIN_REQUIRED
+  secondary:
+    prompt_suffix: "If the object is not present, output none."
+    none_patterns: ["none", "no such object", "not present"]
+    null_box: null
+output_type_support: [box, none]
+tokens:
+  yes_ids: []
+  no_ids: []

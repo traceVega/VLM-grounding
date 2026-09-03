@@ -1,0 +1,60 @@
+[project]
+name = "vlm-grounding-kill-infra"
+version = "0.1.0"
+description = "Kill-experiment infrastructure for IDEA-11 and IDEA-91 (VLM grounding)"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "numpy>=2.1",
+    "pandas>=2.2",
+    "pyarrow>=18.0",
+    "pillow>=11.0",
+    "opencv-python-headless>=4.10",
+    "scikit-image>=0.24",
+    "scipy>=1.14",
+    "pyyaml>=6.0",
+    "tqdm>=4.66",
+    "imagehash>=4.3",
+    "pycocotools>=2.0.8",
+]
+
+[project.optional-dependencies]
+# Heavy, GPU-side. Installed on the run machine; not needed for the unit tests.
+gpu = [
+    "torch>=2.13",
+    "torchvision",
+    "timm>=1.0.9",
+    "transformers>=4.57",
+    "accelerate>=1.0",
+    "safetensors",
+]
+dev = [
+    "pytest>=8.3",
+    "pytest-xdist>=3.6",
+]
+
+[project.scripts]
+harness = "shared.harness.run:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["shared", "idea91"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+filterwarnings = ["ignore::DeprecationWarning"]
+markers = ["gpu: needs the local GPU and downloads pretrained weights"]
+
+[tool.uv]
+# torch cu130 wheels: the sm_120 (Blackwell) stack proven on this host.
+[[tool.uv.index]]
+name = "pytorch-cu130"
+url = "https://download.pytorch.org/whl/cu130"
+explicit = true
+
+[tool.uv.sources]
+torch = { index = "pytorch-cu130" }
+torchvision = { index = "pytorch-cu130" }

@@ -1,0 +1,7 @@
+# status: UNVERIFIED
+# source: design P12 -- "the same instruction followed by 'If the object is not present, output none.'"
+# todo: same as grounding_qwen3vl_primary.txt; only the appended sentence below is ours.
+# role: Qwen3-VL secondary (rejection-cued) grounding prompt
+# fields: expr
+<<PLACEHOLDER: GroundingME grounding instruction for "{expr}">>
+If the object is not present, output none.

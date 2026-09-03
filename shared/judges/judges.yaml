@@ -1,0 +1,46 @@
+# Judge registry and lineage rule (design 4.5; E91-0).
+#
+# The lineage rule exists so that no number is produced and then graded by the
+# same model family: the reward judge must not be the edit verifier, and a
+# generator must not share a family with the judge that scores it.
+# shared/judges/lineage.py enforces this at config load, not by convention.
+#
+# Only one judge is served at a time: 32 GB cannot hold a policy and a judge
+# together (EXPERIMENTS.md Section 0), so K2 runs the policies first, dumps
+# outputs, then swaps in the verifier.
+
+judges:
+  judge_a:
+    name: qwen3.5-9b
+    hf_path: Qwen/Qwen3.5-9B
+    revision: PIN_REQUIRED
+    lineage_family: qwen
+    roles: [reward_judge, crop_judge, noun_phrase_parser]
+    vram_gb: 19
+  judge_b:
+    name: gemma4-12b
+    hf_path: google/gemma-4-12b-it
+    revision: PIN_REQUIRED
+    lineage_family: gemma
+    roles: [held_out_judge, edit_verifier]
+    vram_gb: 25
+    max_model_len: 4096
+    notes: >
+      The edit verifier of P10. Temperature 0, max_tokens 4, first-word match on
+      yes or no, unparseable counted as not clean. gpu_memory_utilization is
+      derived from measured idle VRAM at start-up (shared/env/probe.py), not
+      hard-coded.
+
+# role -> which judge serves it
+assignments:
+  edit_verifier: judge_b
+  reward_judge: judge_a
+  crop_judge: judge_a
+  held_out_judge: judge_b
+  noun_phrase_parser: judge_a
+
+# pairs of roles that must not share a lineage family
+lineage_constraints:
+  - [edit_verifier, reward_judge]
+  - [held_out_judge, reward_judge]
+  - [generator, held_out_judge]

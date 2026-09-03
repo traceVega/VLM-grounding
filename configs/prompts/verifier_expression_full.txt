@@ -1,0 +1,5 @@
+# status: VERIFIED
+# source: design P10, secondary reported question ("the full expression on the full image")
+# role: reported only; never decides clean
+# fields: expr
+Is there {expr} in this image? Answer with one word, yes or no.

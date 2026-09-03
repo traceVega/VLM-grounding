@@ -1,0 +1,6 @@
+# status: UNVERIFIED
+# source: design P18 -- prompt "the {category}" under the primary protocol
+# todo: inherits the primary protocol's instruction; the expression slot is "the {category}".
+# role: the edit-free row (P18)
+# fields: category
+<<PLACEHOLDER: primary-protocol grounding instruction for "the {category}">>

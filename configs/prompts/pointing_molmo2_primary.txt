@@ -1,0 +1,9 @@
+# status: UNVERIFIED
+# source: Molmo2's native pointing instruction and abstention (design P12, P19)
+# todo: confirm the exact instruction string and the abstention form against the
+#   Molmo2-8B model card at the pinned revision, and set none_patterns in the model
+#   YAML from the card's wording. The instruction below is the design's paraphrase
+#   ("Point to the {expr}.") and must be checked before a kill run.
+# role: Molmo2 primary pointing prompt
+# fields: expr
+Point to the {expr}.

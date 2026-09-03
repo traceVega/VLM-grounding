@@ -1,0 +1,8 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+*.egg-info/
+# data, edits and results live on the ext4 volume (shared/paths.py), never here
+tables/*.md
+!tables/.gitkeep

@@ -1,0 +1,5 @@
+# status: UNVERIFIED
+# source: design P13 -- "the grounding instruction with the expression replaced by 'the object'"
+# todo: inherits grounding_qwen3vl_primary.txt; unblocked by the same copy.
+# role: T_NULL text-side control
+<<PLACEHOLDER: GroundingME grounding instruction for "the object">>

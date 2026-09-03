@@ -1,0 +1,4 @@
+# status: VERIFIED
+# source: design P10, V2, quoted verbatim
+# role: reported only, on REMOVE
+Does this image show signs of editing such as blurred, smeared or repeated texture? Answer yes or no.

@@ -1,0 +1,33 @@
+# SPEC v1.2 Section 1, with design P19: Molmo2 is served by vLLM (native support);
+# the Hugging Face trust_remote_code path is the batch-one parity spot check of
+# acceptance check 4. Resolution is the processor's crop policy, not max_pixels.
+model_id: molmo2-8b
+hf_path: allenai/Molmo2-8B
+revision: PIN_REQUIRED
+dtype: bfloat16
+attn_impl: sdpa
+backend_default: vllm           # P19: no Hugging Face-native implementation
+resolution_policy:
+  kind: crops
+  max_crops: PIN_REQUIRED       # read back from the processor and recorded (P19)
+  crop_size: PIN_REQUIRED
+prompt_templates:
+  grounding: pointing_molmo2_primary
+  presence: verifier_headnoun
+  t_null: pointing_molmo2_primary
+  cocosearch18: cocosearch18_category
+coordinate_convention: percent_float   # Molmo points; confirm against the card at B8
+parser: molmo2_point
+abstain_protocol:
+  primary:
+    prompt_suffix: ""
+    none_patterns: [PIN_REQUIRED]      # the card's own no-such-object sentence (P12)
+    null_box: null
+  secondary:
+    prompt_suffix: "If there is no such object, say none."
+    none_patterns: ["none", "no such object", "there is no"]
+    null_box: null
+output_type_support: [point, set, none]
+tokens:
+  yes_ids: []
+  no_ids: []
