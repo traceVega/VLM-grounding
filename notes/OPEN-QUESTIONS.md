@@ -69,6 +69,38 @@ detector of the PSCC-Net or MVSS-Net class". Undecided until the weights are
 requested; `PINS.md` has the row waiting. It is an adversary row and does not
 gate, so it does not block the freeze, only the completeness of the table.
 
+### Q-11. The class-agnostic area ceiling (DEVIATIONS D-23)
+0.50 is ours, not P1's. Must be frozen with P1 to P7.
+
+### Q-12. P3's overlap rule is close to unsatisfiable against a dense segmentation -- UNRESOLVED, blocks the K1 run
+P3 rejects a CONTROL_OBJ candidate whose hole shows "no overlap with the
+exclusion set after the candidate's own mask is removed from it", and acceptance
+check 2 asserts the same on the *dilated* hole. The design appears to assume
+class-agnostic masks are a modest addition covering unlabelled objects. In
+practice SAM 2's automatic generator returns a near-complete scene partition
+(20 to 31 masks per image), and the exclusion set then covers a median **80.3%**
+of the image (min 19.5%, max 97.7%), so almost every candidate's 5 px dilation
+ring touches something.
+
+Measured on 25 real pool images, 228 area- and centrality-matched candidates:
+
+| reading | CONTROL_OBJ yield |
+|---|---|
+| A, literal (as implemented) | **8%** |
+| B, referent absolute + no other object bitten by more than 10% | **84%** |
+| C, class-agnostic masks left out of the exclusion set | 36% |
+| D, tested on the undilated mask instead of the hole | 100% |
+
+A cannot produce the 10,000-image bank P1 asks for. D is close to vacuous, since
+candidates rarely overlap each other's cores and the dilation ring is exactly
+what would damage a neighbour. C discards the protection P1 asks for by name.
+B keeps P3's purpose -- the control removes one object without materially
+damaging another, and never touches the referent -- while remaining satisfiable.
+
+This changes what CONTROL_OBJ means, so it is the user's call, not the
+implementation's. The K1 freeze (P20 / B0a) has not happened, so a refinement is
+still allowed, but it must be recorded before the bank is built.
+
 ## Process
 
 ### Q-9. Git repository -- RESOLVED 2026-09-03

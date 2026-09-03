@@ -32,6 +32,12 @@ from pathlib import Path
 import numpy as np
 
 from idea91.masks import Box
+from idea91.instances.automask import (
+    SAM2_HF_PATH,
+    SAM2_REVISION,
+    AutoMaskSettings,
+    Sam2AutomaticMasks,
+)
 from idea91.instances.backend import RawInstance, Segmenter, SegmenterUnsupported
 
 
@@ -197,10 +203,21 @@ class Sam3Segmenter(Segmenter):
 
 
 class Sam2Segmenter(Segmenter):
-    """The contingency: box prompts and automatic masks, no concept mode.
+    """The contingency backend, and the class-agnostic pass O6 resolves to.
 
-    ``sam2.1_hiera_large.pt`` is already on this host, so the O6 class-agnostic
-    pass and a labelled-as-such K1 run can proceed without SAM 3.
+    Two distinct jobs, and only the first is a contingency:
+
+    * **box prompts** stand in for SAM 3 when it is unavailable -- design Section
+      8's "K1 can start with SAM 2 masks prompted by the OpenImages ground-truth
+      boxes, labelled as such".  ``is_pinned_backend`` is False, so every scene
+      built this way carries ``kill_grade=False``.
+    * **automatic masks** are not a contingency at all: SAM 3 has no
+      generate-everything call, so P1/P3's class-agnostic masks come from here in
+      the normal course of things (``idea91/instances/automask.py``).
+
+    Loaded through ``transformers`` (``Sam2Model`` / ``Sam2Processor``), not the
+    ``sam2`` PyPI package, whose 1.1.0 sdist declares no dependencies and does not
+    match the upstream project.
     """
 
     name = "sam2.1_hiera_large"
@@ -208,70 +225,131 @@ class Sam2Segmenter(Segmenter):
     supports_generic = True
     is_pinned_backend = False
 
-    DEFAULT_CONFIG = "configs/sam2.1/sam2.1_hiera_l.yaml"
-
     def __init__(
         self,
-        checkpoint: str | Path | None = None,
-        config: str = DEFAULT_CONFIG,
+        hf_path: str = SAM2_HF_PATH,
+        revision: str = SAM2_REVISION,
         device: str = "cuda",
-        revision: str = "PIN_REQUIRED",
-        points_per_side: int = 32,
         min_area_frac: float = 0.005,
+        settings: "AutoMaskSettings | None" = None,
+        processor=None,
+        model=None,
+        **legacy,
     ) -> None:
-        self.checkpoint = Path(
-            checkpoint or os.environ.get("VLMG_SAM2_CKPT", Path.home() / "sam2_ckpts" / "sam2.1_hiera_large.pt")
-        ).expanduser()
-        self.config = config
-        self.device = device
+        # ``checkpoint=`` was the original-format path; accepted and ignored so
+        # older call sites fail loudly on behaviour, not on a TypeError
+        self.legacy_checkpoint = legacy.pop("checkpoint", None)
+        if legacy:
+            raise TypeError(f"unexpected arguments: {sorted(legacy)}")
+        self.hf_path = hf_path
         self.revision = revision
-        self.points_per_side = points_per_side
+        self.device = device
         self.min_area_frac = min_area_frac
-        self._predictor = None
-        self._generator = None
+        self.settings = settings
+        self._processor = processor
+        self._model = model
+        self._auto = None
 
-    def _build(self):  # pragma: no cover - needs the checkpoint
-        if not self.checkpoint.is_file():
-            raise FileNotFoundError(
-                f"SAM 2 checkpoint not found at {self.checkpoint}; set VLMG_SAM2_CKPT"
+    def describe(self) -> dict[str, object]:
+        return {**super().describe(), "hf_path": self.hf_path}
+
+    def _load(self):
+        if self._processor is None or self._model is None:
+            import torch
+            from transformers import Sam2Model, Sam2Processor
+
+            self._processor = self._processor or Sam2Processor.from_pretrained(
+                self.hf_path, revision=self.revision
             )
-        try:
-            from sam2.build_sam import build_sam2  # type: ignore
-        except ImportError as exc:
-            raise ImportError(
-                "the sam2 package is not installed in ~/vlmg-env; pin its commit in "
-                "shared/env/PINS.md and install it"
-            ) from exc
-        return build_sam2(self.config, str(self.checkpoint), device=self.device)
+            self._model = self._model or (
+                Sam2Model.from_pretrained(self.hf_path, revision=self.revision, dtype=torch.float32)
+                .to(self.device)
+                .eval()
+            )
+        return self._processor, self._model
 
-    def from_box(self, image: np.ndarray, box: Box) -> np.ndarray:  # pragma: no cover
-        from sam2.sam2_image_predictor import SAM2ImagePredictor  # type: ignore
+    def from_box(self, image: np.ndarray, box: Box) -> np.ndarray:
+        import torch
 
-        if self._predictor is None:
-            self._predictor = SAM2ImagePredictor(self._build())
-        self._predictor.set_image(image)
-        masks, scores, _ = self._predictor.predict(
-            box=np.array(box)[None, :], multimask_output=False
+        processor, model = self._load()
+        height, width = image.shape[:2]
+        inputs = processor(
+            images=image,
+            input_boxes=[[[float(v) for v in box]]],
+            return_tensors="pt",
         )
-        return np.asarray(masks[0]).astype(bool)
+        inputs = {k: (v.to(self.device) if hasattr(v, "to") else v) for k, v in inputs.items()}
+        with torch.inference_mode():
+            out = model(**inputs, multimask_output=False)
+            masks = processor.post_process_masks(
+                out.pred_masks, original_sizes=[(height, width)], binarize=True
+            )[0]
+        arr = masks.squeeze().cpu().numpy()
+        if arr.ndim == 3:  # several candidates: take the highest-scoring
+            best = int(out.iou_scores.flatten().argmax())
+            arr = arr[best]
+        return arr.astype(bool)
 
-    def generic(self, image: np.ndarray, min_area_frac: float | None = None) -> list[RawInstance]:  # pragma: no cover
-        from sam2.automatic_mask_generator import SAM2AutomaticMaskGenerator  # type: ignore
-
-        if self._generator is None:
-            self._generator = SAM2AutomaticMaskGenerator(
-                self._build(), points_per_side=self.points_per_side
+    def generic(self, image: np.ndarray, min_area_frac: float | None = None) -> list[RawInstance]:
+        """P1/P3's class-agnostic masks above 0.5% area."""
+        if self._auto is None:
+            self._auto = Sam2AutomaticMasks(
+                hf_path=self.hf_path,
+                revision=self.revision,
+                device=self.device,
+                settings=self.settings,
+                processor=self._processor,
+                model=self._model,
             )
         floor = self.min_area_frac if min_area_frac is None else min_area_frac
-        out = [
-            RawInstance(
-                mask=np.asarray(r["segmentation"]).astype(bool),
-                score=float(r.get("predicted_iou", 1.0)),
-                origin="generic",
-            )
-            for r in self._generator.generate(image)
-        ]
-        return [i for i in out if i.area_frac > floor]
+        return self._auto.generate(image, min_area_frac=floor)
+
+
+class CompositeSegmenter(Segmenter):
+    """SAM 3 for concept and box prompts, SAM 2 for the class-agnostic masks.
+
+    This is how design O6 actually resolves. SAM 3 is the pinned backend and
+    answers every prompt the design names by text or box; it has no
+    generate-everything call, so P1/P3's class-agnostic masks -- the ones that
+    make the exclusion set cover *unlabelled* objects -- come from SAM 2's
+    automatic generator.
+
+    ``is_pinned_backend`` stays True: every mask that decides a referent or a
+    control instance comes from SAM 3, and SAM 2 only contributes obstacles to
+    the exclusion set, which can only ever make the sampler more conservative.
+    The two backends are named separately in ``describe()`` so an index row still
+    says exactly what produced it.
+    """
+
+    name = "sam3+sam2"
+    supports_concept = True
+    supports_generic = True
+    is_pinned_backend = True
+
+    def __init__(self, concept: Segmenter | None = None, generic: Segmenter | None = None,
+                 device: str = "cuda") -> None:
+        self.concept_backend = concept or Sam3Segmenter(device=device)
+        self.generic_backend = generic or Sam2Segmenter(device=device)
+        self.revision = self.concept_backend.revision
+
+    def describe(self) -> dict[str, object]:
+        return {
+            "segmenter": f"{self.concept_backend.name}+{self.generic_backend.name}",
+            "segmenter_revision": (
+                f"{self.concept_backend.revision}+{self.generic_backend.revision}"
+            ),
+            "pinned_backend": self.concept_backend.is_pinned_backend,
+            "hf_path": getattr(self.concept_backend, "hf_path", ""),
+        }
+
+    def concept(self, image: np.ndarray, phrase: str) -> list[RawInstance]:
+        return self.concept_backend.concept(image, phrase)
+
+    def from_box(self, image: np.ndarray, box: Box) -> np.ndarray:
+        return self.concept_backend.from_box(image, box)
+
+    def generic(self, image: np.ndarray, min_area_frac: float = 0.005) -> list[RawInstance]:
+        return self.generic_backend.generic(image, min_area_frac)
 
 
 def get_segmenter(name: str = "sam3", **kwargs) -> Segmenter:
@@ -279,4 +357,6 @@ def get_segmenter(name: str = "sam3", **kwargs) -> Segmenter:
         return Sam3Segmenter(**kwargs)
     if name in ("sam2", "sam-2", "sam2.1"):
         return Sam2Segmenter(**kwargs)
+    if name in ("composite", "sam3+sam2", "default"):
+        return CompositeSegmenter(**kwargs)
     raise ValueError(f"unknown segmenter {name!r}")

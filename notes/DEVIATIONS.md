@@ -221,3 +221,43 @@ on the editor would have undercut P1's reason for using CC-BY images at all. The
 upstream repository is Apache-2.0 and its README states no separate terms for the
 weights, whose download URL the README itself gives. Recorded in
 `data/LICENSES.md` with the date read.
+
+### D-23. Class-agnostic masks are capped at half the image
+
+P1 gives class-agnostic masks a floor ("above 0.5% area") and no ceiling. SAM 2's
+automatic generator readily returns the *background* as a high-confidence
+"object" -- measured at 81% of a test scene. Putting that in the P3 exclusion set
+leaves nowhere for a CONTROL_BG hole and rejects nearly every CONTROL_OBJ
+candidate, so masks covering more than half the image are treated as scene rather
+than object. Recorded as OPEN-QUESTIONS Q-11; the ceiling must be frozen with
+P1 to P7 at the K1 freeze.
+
+### D-24. De-duplication uses mask IoU, not box IoU
+
+SAM's own automatic generator de-duplicates by box NMS. That fails here: a
+candidate mask often carries a few stray pixels far from the object, and those
+pixels blow up its bounding box without changing the mask. Measured on a test
+scene, two candidates had mask IoU 1.000 and box IoU 0.348, so box NMS kept both
+and the same object was returned twice. `mask_nms` compares masks directly, on
+the 256 px decoder output so the comparison stays cheap. It also made the pass
+four times faster, because de-duplication now happens before upscaling.
+
+### D-25. SAM 2 comes from transformers, not the `sam2` PyPI package
+
+The `sam2` 1.1.0 sdist on PyPI declares no dependencies at all, which does not
+match the upstream `facebookresearch/sam2` project, and installing an unvetted
+sdist runs its `setup.py`. `Sam2Model`/`Sam2Processor` from transformers 5.16.1
+serve instead, with `facebook/sam2.1-hiera-large` at `665f8e2ad61c` (ungated).
+The automatic mask generator is therefore ours
+(`idea91/instances/automask.py`), following SAM's published algorithm: a point
+grid, three candidate masks per point, then predicted-IoU, stability and area
+filters, then de-duplication.
+
+### D-26. `CompositeSegmenter` is how O6 resolves
+
+SAM 3 answers concept and box prompts; it has no generate-everything call, so
+the class-agnostic masks come from SAM 2. `CompositeSegmenter` pairs them and
+keeps `is_pinned_backend=True`, because every mask that decides a referent or a
+control instance comes from SAM 3 and SAM 2 only contributes obstacles to the
+exclusion set, which can only make the sampler more conservative. Both backends
+are named in the index row.
