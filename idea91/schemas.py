@@ -123,10 +123,45 @@ RELATIONS_SCHEMA = pa.schema(
     ]
 )
 
+#: Instance roles.  The first three are the ``control_source`` values of P3; the
+#: last three are roles that belong in the P3 exclusion set but are never control
+#: candidates and never reach ``index.control_source``.
+INSTANCE_SOURCES = (
+    "labelled_other_class",
+    "noun_phrase_instance",
+    "class_agnostic",
+    "referent",
+    "same_class_other_instance",
+    "head_noun_neighbour",
+)
+
+#: Not in the design's Section 5 list; see notes/DEVIATIONS.md D-12.
+INSTANCES_SCHEMA = pa.schema(
+    [
+        pa.field("image_id", pa.string(), nullable=False),
+        pa.field("set_or_pool", pa.string(), nullable=False),
+        pa.field("instance_id", pa.string(), nullable=False),
+        pa.field("source", pa.string(), nullable=False),
+        pa.field("label", pa.string(), nullable=True),
+        pa.field("mask_rle", pa.string(), nullable=False),
+        pa.field("area_frac", pa.float64(), nullable=False),
+        pa.field("bbox_xyxy_px", pa.list_(pa.float64()), nullable=False),
+        pa.field("centre_xy_px", pa.list_(pa.float64()), nullable=False),
+        pa.field("box_to_mask_iou", pa.float64(), nullable=True),
+        pa.field("box_inpaint_flag", pa.bool_(), nullable=False),
+        pa.field("segmenter", pa.string(), nullable=False),
+        pa.field("segmenter_revision", pa.string(), nullable=False),
+        pa.field("kill_grade", pa.bool_(), nullable=False),
+        pa.field("head_noun", pa.string(), nullable=True),
+        pa.field("n_head_noun_instances", pa.int32(), nullable=False),
+    ]
+)
+
 SCHEMAS = {
     "index": INDEX_SCHEMA,
     "verifier": VERIFIER_SCHEMA,
     "relations": RELATIONS_SCHEMA,
+    "instances": INSTANCES_SCHEMA,
 }
 
 _ENUMS = {
@@ -137,6 +172,7 @@ _ENUMS = {
     },
     "verifier": {"question": VERIFIER_QUESTIONS},
     "relations": {"abstain_protocol": ("primary", "secondary")},
+    "instances": {"source": INSTANCE_SOURCES},
 }
 
 

@@ -61,8 +61,7 @@ gate, so it does not block the freeze, only the completeness of the table.
 
 ## Process
 
-### Q-9. This folder is not a git repository
-The freeze points B0a and B0b are git tags ("tag created"), and every manifest
-carries `code_sha`. `shared/env/probe.py` currently falls back to a hash over
-the source tree, written as `tree:<40 hex>`, and says so. A repository has to
-exist before the K1 freeze for the freeze rule to mean anything.
+### Q-9. Git repository -- RESOLVED 2026-09-03
+Initialised at `VLM-grounding/` on branch `main`; the freeze points B0a and B0b
+now have something to tag and `shared/env/probe.py` reports a real `code_sha`
+(with a `-dirty` suffix when the tree has uncommitted changes).

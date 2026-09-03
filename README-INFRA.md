@@ -14,7 +14,8 @@ shared/          shared with IDEA-11
   env/           PINS.md, probe.py (GPU name, idle VRAM, package versions, code_sha)
   harness/       SPEC.md, schema.py (normative), manifest.py, prompts.py, model_config.py
   judges/        judges.yaml + lineage.py (the lineage rule), serve.sh, client.py (cached)
-  data/          (empty: the download pipeline is not written yet)
+  data/          sources.py (registry + licences), licenses.py (renders LICENSES.md),
+                 items.py (items.parquet builder + per-set adapter seams), download.py
   paths.py       roots, env-overridable
   stats.py       AUROC, clustered bootstrap, kappa
 idea91/
@@ -26,10 +27,11 @@ idea91/
                  dataset.py, train.py (P6)
   relations/     compute.py (P14, P15), verifier_rules.py (P10)
   analysis/      k1.py (tables/k1.md), k2.py (P15 rates, P16 stop rules)
-  instances/     (empty: the SAM 3 adapter is not written yet)
+  instances/     backend.py (capability contract), sam.py (SAM 3 pin + SAM 2 contingency),
+                 nounphrase.py (head noun + phrases), build.py (K1/K2 scenes)
   frontier/      (empty: P17 API client is not written yet)
 configs/         models/*.yaml (SPEC Section 1), prompts/*.txt (versioned, hashed)
-tests/           129 tests, plus 4 marked `gpu`
+tests/           176 tests, plus 4 marked `gpu`
 ```
 
 ## Environment
@@ -81,8 +83,8 @@ wsl -d Ubuntu -e bash -lc 'cd /mnt/d/Dev/ArcNova/auto-research/VLM-grounding && 
 | Step | Deliverable | State |
 |---|---|---|
 | B1 | `shared/env`, `PINS.md`, runtime | **partial** -- runtime and probe done; SAM 3, big-LaMa, vLLM and judge weights unpinned (gated / not downloaded) |
-| B2 | `shared/data`: pools, benchmarks, `LICENSES.md` | **not started** -- needs the downloads |
-| B3 | `idea91/instances`, `idea91/edits` for the K1 pool | **edits done, instances not started** -- window, compositing, samplers, index and the builder are written and tested; the SAM 3 adapter is missing |
+| B2 | `shared/data`: pools, benchmarks, `LICENSES.md` | **written, not run** -- registry, licence renderer, `items.parquet` builder and the download plan are done and tested; each set's annotation adapter waits for its data, and every unpinned locator is refused rather than guessed |
+| B3 | `idea91/instances`, `idea91/edits` for the K1 pool | **written, not run** -- edits and the K1/K2 scene builders are done and tested against a fake segmenter; SAM 3 is the pin and SAM 2 is wired as the design's contingency, which stamps `kill_grade=False` on everything it makes |
 | B4a | gate ladders and nulls on the 1b pairs | **logic done** -- ladder operators, floors and verdicts written and tested; not yet run on a real bank |
 | B0a | K1 freeze | blocked on B2/B3 |
 | B4b | gate classifiers, adversaries, removal-success rows | **classifiers done** (trained end to end on the card in the smoke test); adversary and removal-success wiring pending |
@@ -109,6 +111,12 @@ wsl -d Ubuntu -e bash -lc 'cd /mnt/d/Dev/ArcNova/auto-research/VLM-grounding && 
 4. **Qwen3-VL's coordinate convention** (Q-3).
 5. **Downloads**: OpenImages subset (K1 pool), GroundingME, COCO train2014,
    COCO-Search18. About 60 GB core, 883 GB free on the ext4 volume.
-6. **A git repository** -- the freeze points B0a and B0b are tags, and every
-   manifest carries `code_sha`, which currently falls back to a source-tree hash
-   written as `tree:<hex>` (Q-9).
+Resolved since: the repository exists (branch `main`), so the freeze points have
+something to tag and manifests carry a real `code_sha`.
+
+## Fetching data
+
+`python -m shared.data.download --core` prints the plan and fetches nothing.
+Today 13.2 GB is fetchable (COCO train2014 and the 2017 annotations) and 44.2 GB
+is blocked on unread licences or unpinned locators; 879 GB free on the volume.
+`--yes` executes only the ready steps.

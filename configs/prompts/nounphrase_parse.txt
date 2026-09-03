@@ -1,0 +1,16 @@
+# status: VERIFIED
+# source: ours (design 4.3: "the head noun and every noun phrase of the expression,
+#   parsed by the text-only LLM Qwen3.5-9B with the parser output stored")
+# role: judge A, text-only. Feeds the P3 exclusion set and the P10 head-noun question.
+# fields: expr
+Read the referring expression below and return JSON only, no prose.
+
+Return an object with two keys:
+  "head_noun": the single common noun that names the object the expression refers to,
+    lower case, singular, no article, no adjectives.
+  "noun_phrases": a list of every noun phrase in the expression that names a physical
+    object in the image, including the referent's own phrase and any object mentioned
+    only as context (for example the landmark in "the cup on the table"). Lower case,
+    no articles. Do not include colours, materials or positions on their own.
+
+Expression: {expr}

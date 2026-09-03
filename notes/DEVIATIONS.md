@@ -97,3 +97,38 @@ repository and the model cards. They carry `status: UNVERIFIED` and
 `shared/harness/model_config.py` refuse to serve them to a run that is not
 `--non-kill`. A guessed instruction that silently became "the benchmark's
 protocol" is the failure the pre-registration exists to prevent.
+
+## 2026-09-03, instance stack and data registry
+
+### D-12. `instances.parquet` is a new store
+
+Design Section 5 lists `edits/index.parquet`, `edits/verifier.parquet`,
+`edits/human_labels.csv` and `results/<run_id>/relations.parquet`, but design
+4.3 describes instances as a product of `idea91/instances` ("masks as RLE with
+area fraction, bounding box, centre, `control_source` and box-to-mask IoU").
+They are written to `instances.parquet` with a schema in `idea91/schemas.py`, so
+the SAM pass runs once per image rather than once per edit. It also carries
+`kill_grade`, which is False whenever a contingency backend or the heuristic
+parser produced the scene.
+
+### D-13. Instance `source` has three values beyond P3's `control_source`
+
+`referent`, `same_class_other_instance` (K1) and `head_noun_neighbour` (K2).
+All three belong in the P3 exclusion set but are never control candidates, and
+none reaches `index.control_source`, whose enum is unchanged.
+
+### D-14. A noun phrase containing the head noun is not a control candidate
+
+P3 samples a K2 control from "a SAM 3 instance of a non-referent noun phrase".
+The parser returns the referent's own phrase among the noun phrases ("red cup"
+for head noun "cup"), and comparing phrases literally would have made it a
+non-referent phrase. `NounPhraseParse.other_phrases` drops any phrase containing
+the head noun as a word, so a control edit can never remove something the
+expression names. Those instances still reach the exclusion set through the
+head-noun concept prompt.
+
+### D-15. `data/LICENSES.md` is generated, not hand-written
+
+Design 4.2 asks for a single file with one row per asset. It is rendered from
+`shared/data/sources.py` by `python -m shared.data.licenses --write`, so the
+licence table cannot drift from the registry the download and build code reads.
