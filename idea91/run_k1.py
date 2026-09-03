@@ -4,7 +4,17 @@ Stages, each resumable and each writing its own store:
 
     python -m idea91.run_k1 instances   # SAM 3 concept + SAM 2 automatic -> instances.parquet
     python -m idea91.run_k1 edits       # P3/P4 sampler + LaMa            -> edits/index.parquet
+    python -m idea91.run_k1 checks      # B4a: ladders and nulls, pre-freeze
+    python -m idea91.run_k1 freeze      # B0a: bind P1 to P7 (needs a sign-off)
+    python -m idea91.run_k1 rows        # B4b: the classifiers that see a real REMOVE
+    python -m idea91.run_k1 report      # tables/k1.md
     python -m idea91.run_k1 status      # what exists so far
+
+The order is P20's, not a convenience.  ``checks`` runs before the freeze --
+the ladders and nulls touch no real removal, so they may inform the frozen gate
+resolution.  ``rows`` runs after it and refuses to start without an intact
+freeze record, because those classifiers are the first to see a real removal
+and the gate result must not be able to influence the gate constants.
 
 The instance pass is the expensive one (hours), and it is deliberately separate
 from the sampler: masks are a property of the image, control choices are a
@@ -27,6 +37,7 @@ import pandas as pd
 import pyarrow as pa
 import pyarrow.parquet as pq
 
+from idea91 import freeze as F
 from idea91 import schemas
 from idea91.edits.build import materialize, read_image
 from idea91.edits.sampler import HOLE_TYPES, SamplerStats, plan_k1_image
@@ -289,6 +300,274 @@ def count_table() -> str:
     return "\n".join(lines)
 
 
+# --- B4a, B0a, B4b, B5: the gate ---------------------------------------------
+
+
+def image_dir() -> Path:
+    return paths.RAW / "openimages" / "images"
+
+
+def gate_cache_dir() -> Path:
+    return paths.DATA_ROOT / "gate_cache"
+
+
+def checks_path() -> Path:
+    return paths.DATA_ROOT / "gate_checks.json"
+
+
+def load_index() -> pa.Table:
+    shards = sorted(index_dir().glob("shard-*.parquet"))
+    if not shards:
+        raise SystemExit(f"no edit index in {index_dir()}; run the edits stage first")
+    return pa.concat_tables([pq.read_table(s) for s in shards])
+
+
+def gate_config(args) -> "GateRunConfig":  # noqa: F821
+    from idea91.gate.run import GateRunConfig
+
+    holes = tuple(h.strip() for h in args.hole_types.split(",") if h.strip())
+    return GateRunConfig(
+        index=load_index(),
+        image_dir=image_dir(),
+        edits_root=paths.EDITS_ROOT,
+        cache_dir=gate_cache_dir(),
+        hole_types=holes,
+        epochs=args.epochs,
+        device=args.device,
+        workers=args.workers,
+        limit_images=args.limit,
+    )
+
+
+def stage_checks(args) -> None:
+    """B4a: the JPEG ladders and the nulls.  P20 lets these run before the freeze."""
+    import json
+
+    from idea91.gate.run import run_checks
+
+    checks = run_checks(gate_config(args))
+    checks_path().write_text(json.dumps(checks, indent=2, default=str), encoding="utf-8")
+    print(f"\nchecks -> {checks_path()}")
+    print(gate_resolution_note(checks))
+
+
+def gate_resolution_note(checks: dict) -> str:
+    """What check 1a says about the resolution the gate rows should run at.
+
+    Check 1a is a sensitivity floor: if no gate row can see a whole-image q75
+    re-encode, the gate is blind and a low AUROC on real removals would mean
+    nothing.  The design's one declared pre-freeze contingency is raising the
+    resolution in response, so this is the line the freeze sheet carries.
+    """
+    from idea91.gate import ladders as L
+
+    lines = []
+    for hole_type, by_quality in sorted(checks.get("global_ladder", {}).items()):
+        q75 = by_quality.get(75) or by_quality.get("75") or {}
+        best = max(q75.values()) if q75 else float("nan")
+        verdict = "sensitive" if best >= L.GLOBAL_REQUIRED_Q75_AUROC else "NOT SENSITIVE"
+        lines.append(
+            f"check 1a [{hole_type}]: best q75 AUROC {best:.3f} "
+            f"(needs >= {L.GLOBAL_REQUIRED_Q75_AUROC:.2f}) -- {verdict}"
+        )
+    return "\n".join(lines) or "check 1a: not run"
+
+
+def stage_freeze(args) -> None:
+    """B0a: bind P1 to P7.  The count tables must exist; a human must sign off."""
+    import json
+
+    table = count_table()
+    have_counts = table != "no edit index yet"
+    if args.sign_off and not have_counts:
+        # Reading the sheet early is fine and useful; binding the values is not.
+        raise SystemExit(
+            "P20 freezes K1 'after the pool, instances, edits and count tables exist'. "
+            "The edit bank is not built; run the edits stage first."
+        )
+
+    data_values: dict[str, object] = {}
+    if checks_path().is_file():
+        checks = json.loads(checks_path().read_text(encoding="utf-8"))
+        data_values["check_1a_resolution_note"] = gate_resolution_note(checks)
+        data_values["local_floors"] = {
+            hole_type: {b: q for b, q in bins.items()}
+            for hole_type, bins in checks.get("local_ladder", {}).items()
+        }
+    elif not args.sign_off:
+        print(
+            "note: no check-1a results yet. The ladders may run before the freeze (P20) "
+            "and settle the gate resolution, so freezing now forgoes that contingency."
+        )
+
+    if not args.sign_off:
+        path = paths.TABLES_ROOT / "FREEZE-B0a-sheet.md"
+        path.parent.mkdir(parents=True, exist_ok=True)
+        sheet = F.sheet(F.B0A, data_values=data_values)
+        counts = (
+            "\n\n## Count table committed with this freeze\n\n" + table + "\n"
+            if have_counts
+            else "\n\n## Count table\n\nNot yet built. P20 requires it before the freeze can be "
+            "taken, so this sheet is a preview: the values are final, the counts are not.\n"
+        )
+        path.write_text(sheet + counts, encoding="utf-8")
+        print(sheet)
+        print(f"\nsheet -> {path}")
+        if not have_counts:
+            print("PREVIEW ONLY: the edit bank does not exist, so the freeze cannot be taken yet.")
+        print("\nNothing is frozen yet. To bind these values:")
+        print("  python -m idea91.run_k1 freeze --sign-off '<your name>'")
+        return
+
+    record = F.create(
+        F.B0A,
+        sign_off=args.sign_off,
+        data_values=data_values,
+        count_table=table,
+        note=args.note,
+        allow_dirty=args.allow_dirty,
+    )
+    print(f"{record.point} frozen: {record.version}")
+    print(f"  commit     {record.git_commit[:12]}   tag {record.git_tag}")
+    print(f"  signed off {record.signed_off_by}   {record.created_utc}")
+    print(f"  record     {F.record_path(F.B0A)}")
+    print("\nEvery manifest from here carries freeze_version =", record.version)
+
+
+def stage_rows(args) -> None:
+    """B4b: the first classifiers to see a real REMOVE.  Refuses without the freeze."""
+    from idea91.gate.run import run_gate_rows
+
+    record = F.require(F.B0A, what="the K1 gate rows")
+    print(f"freeze {record.version} intact (signed off by {record.signed_off_by})\n")
+    results = run_gate_rows(gate_config(args))
+    print(f"\n{len(results)} rows trained -> {gate_cache_dir()}")
+
+
+def load_row_results() -> list:
+    """Every trained gate row from the cache, so ``report`` stands alone."""
+    import json
+
+    from idea91.gate.train import RowResult
+    from shared.stats import Interval
+
+    out = []
+    for path in sorted(gate_cache_dir().glob("gate__*.json")):
+        data = json.loads(path.read_text(encoding="utf-8"))
+        data["ci"] = Interval(**data["ci"])
+        out.append(RowResult(**data))
+    return out
+
+
+def frequency_check(limit: int = 200) -> dict[str, tuple[float, float]]:
+    """Design 4.4, once per editor: high-pass energy inside the hole versus outside."""
+    from idea91.edits.build import load_edited
+    from idea91.edits.composite import high_pass_residual_energy
+    from idea91.masks import decode_rle
+
+    table = load_index()
+    columns = {n: table.column(n).to_pylist() for n in table.column_names}
+    inside_all: list[float] = []
+    outside_all: list[float] = []
+    for i in range(min(limit, table.num_rows)):
+        if not columns["operator"][i].endswith("REMOVE"):
+            continue
+        try:
+            original = read_image(image_dir() / f"{columns['image_id'][i]}.jpg")
+            edited = load_edited(
+                original,
+                {
+                    "window_xyxy_px": columns["window_xyxy_px"][i],
+                    "window_path": columns["window_path"][i],
+                },
+                paths.EDITS_ROOT,
+            )
+            inside, outside = high_pass_residual_energy(edited, decode_rle(columns["mask_rle"][i]))
+        except Exception:
+            continue
+        if np.isfinite(inside) and np.isfinite(outside):
+            inside_all.append(inside)
+            outside_all.append(outside)
+    if not inside_all:
+        return {}
+    return {"big_lama": (float(np.mean(inside_all)), float(np.mean(outside_all)))}
+
+
+def stage_report(args) -> None:
+    """B5: tables/k1.md -- the verdict, its conditions, and every row behind it."""
+    import json
+
+    from idea91.analysis.k1 import K1Tables, verdict_from_results
+    from idea91.gate.run import summarise_checks
+
+    results = load_row_results()
+    if not results:
+        print(f"no trained gate rows in {gate_cache_dir()}; the verdict will read INCOMPLETE")
+
+    checks = {}
+    if checks_path().is_file():
+        checks = json.loads(checks_path().read_text(encoding="utf-8"))
+
+    holes = tuple(h.strip() for h in args.hole_types.split(",") if h.strip())
+    ladder = null_1b = None
+    floors: dict[str, int | None] = {}
+    asserted = False
+    for hole_type in holes:
+        if checks:
+            hole_ladder, hole_null, hole_floors = summarise_checks(checks, hole_type)
+            # The verdict takes the weakest evidence across hole types: P7 asks
+            # for the gate to hold "on both", so a ladder that fails on one is
+            # the one that has to be reported.
+            if ladder is None or not hole_ladder.passes:
+                ladder = hole_ladder
+            if null_1b is None or not hole_null.passes:
+                null_1b = hole_null
+            floors.update({f"{hole_type}/{b}": v for b, v in hole_floors.items()})
+        asserted = asserted or bool(checks.get("null_1c", {}).get(hole_type, {}) and
+                                    "failed" not in checks["null_1c"][hole_type])
+
+    record = F.read(F.B0A)
+    verdict = verdict_from_results(
+        results,
+        global_ladder=ladder,
+        null_1b=null_1b,
+        local_floors=floors,
+        null_1c_asserted=asserted,
+        freeze_version=record.version if record else "unfrozen",
+        gate_resolution_note=gate_resolution_note(checks) if checks else "",
+    )
+
+    tables = K1Tables(
+        results=results,
+        verdict=verdict,
+        frequency_check=frequency_check() if args.frequency_check else {},
+        counts=count_summary(),
+        editor="big_lama",
+        editor_weights_sha256=editor_weights_sha256(),
+    )
+    path = tables.write(paths.TABLES_ROOT / "k1.md")
+    print(verdict.report())
+    print(f"\n-> {path}")
+
+
+def count_summary() -> dict[str, int]:
+    shards = sorted(index_dir().glob("shard-*.parquet"))
+    if not shards:
+        return {}
+    table = pa.concat_tables([pq.read_table(s) for s in shards])
+    df = table.select(["operator", "image_id", "hole_type"]).to_pandas()
+    out = {"images": int(df.image_id.nunique()), "edits": len(df)}
+    for name, group in df.groupby("operator", observed=True):
+        out[f"edits/{name}"] = len(group)
+    return out
+
+
+def editor_weights_sha256() -> str:
+    from idea91.edits.lama import WEIGHTS_SHA256
+
+    return WEIGHTS_SHA256
+
+
 def stage_status() -> None:
     directory = instances_dir()
     shards = sorted(directory.glob("shard-*.parquet")) if directory.is_dir() else []
@@ -320,23 +599,41 @@ def load_instances() -> pa.Table:
 
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("stage", choices=["instances", "edits", "status"])
+    ap.add_argument(
+        "stage",
+        choices=["instances", "edits", "checks", "freeze", "rows", "report", "status"],
+    )
     ap.add_argument("--limit", type=int, default=None, help="only the first N pool images")
     ap.add_argument("--shard", type=int, default=5_000, help="rows per shard")
     ap.add_argument("--seed", type=int, default=0, help="P1's referent choice seed")
     ap.add_argument("--device", default="cuda")
     ap.add_argument("--hole-types", default=",".join(DEFAULT_HOLE_TYPES))
     ap.add_argument("--freeze-version", default="unfrozen")
+    ap.add_argument("--epochs", type=int, default=5, help="P6: epochs per gate row")
+    ap.add_argument("--workers", type=int, default=4, help="dataloader workers")
+    ap.add_argument("--sign-off", default="", help="freeze: the name binding P1 to P7 (P20)")
+    ap.add_argument("--note", default="", help="freeze: recorded with the record")
+    ap.add_argument("--allow-dirty", action="store_true", help="freeze: tag a dirty tree")
+    ap.add_argument("--frequency-check", action="store_true", help="report: design 4.4")
     args = ap.parse_args()
+
+    holes = tuple(h.strip() for h in args.hole_types.split(",") if h.strip())
+    bad = [h for h in holes if h not in HOLE_TYPES]
+    if bad:
+        raise SystemExit(f"unknown hole types {bad}; expected {list(HOLE_TYPES)}")
 
     if args.stage == "instances":
         stage_instances(args.limit, args.shard, args.seed, args.device)
     elif args.stage == "edits":
-        holes = tuple(h.strip() for h in args.hole_types.split(",") if h.strip())
-        bad = [h for h in holes if h not in HOLE_TYPES]
-        if bad:
-            raise SystemExit(f"unknown hole types {bad}; expected {list(HOLE_TYPES)}")
         stage_edits(args.limit, args.shard, args.seed, args.device, holes, args.freeze_version)
+    elif args.stage == "checks":
+        stage_checks(args)
+    elif args.stage == "freeze":
+        stage_freeze(args)
+    elif args.stage == "rows":
+        stage_rows(args)
+    elif args.stage == "report":
+        stage_report(args)
     else:
         stage_status()
 

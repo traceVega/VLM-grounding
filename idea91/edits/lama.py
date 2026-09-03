@@ -37,6 +37,12 @@ import numpy as np
 
 VENDOR_ROOT = Path(__file__).parent / "vendor"
 
+#: Design 4.1 pins every model "by name, revision and file sha256".  This is the
+#: sha256 of ``big-lama.zip`` as downloaded, recorded in ``vendor/NOTICE.md``;
+#: ``tables/k1.md`` reports it beside the verdict so a reader can tell which
+#: editor produced the bank.
+WEIGHTS_SHA256 = "f1b358ca24093b93a106183b98a3dea6e8ed09f3b43ea7251eb2c81e7b4575f6"
+
 #: Packages the Lightning pickle references but whose behaviour is irrelevant:
 #: the state_dict is plain tensors.
 _STUB_PREFIXES = ("pytorch_lightning", "omegaconf", "hydra")
