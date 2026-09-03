@@ -31,7 +31,7 @@ idea91/
                  nounphrase.py (head noun + phrases), build.py (K1/K2 scenes)
   frontier/      (empty: P17 API client is not written yet)
 configs/         models/*.yaml (SPEC Section 1), prompts/*.txt (versioned, hashed)
-tests/           176 tests, plus 4 marked `gpu`
+tests/           172 tests, 4 of them marked `gpu`
 ```
 
 ## Environment
