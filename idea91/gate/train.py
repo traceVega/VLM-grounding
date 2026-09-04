@@ -28,6 +28,7 @@ from idea91.gate.dataset import (
     GateSample,
     ShapeBucketSampler,
     TileDataset,
+    normalise,
     split_by_image,
 )
 from shared.stats import Interval, auroc, auroc_ci
@@ -157,7 +158,8 @@ def train_one(
         if isinstance(train_ds, TileDataset):
             train_ds.set_epoch(epoch)
         for x, y, _ in train_loader:
-            x = x.to(device, non_blocking=True)
+            # uint8 across the bus, normalised on the device (dataset.to_tensor)
+            x = normalise(x.to(device, non_blocking=True))
             y = y.to(device).float().unsqueeze(1)
             with torch.autocast("cuda", dtype=torch.bfloat16, enabled=device == "cuda"):
                 loss = criterion(model(x), y)
@@ -170,7 +172,7 @@ def train_one(
     test_loader, _ = _loader(test_ds, row, shuffle=False, seed=seed, workers=workers)
     with torch.inference_mode():
         for x, _, idx in test_loader:
-            x = x.to(device, non_blocking=True)
+            x = normalise(x.to(device, non_blocking=True))
             with torch.autocast("cuda", dtype=torch.bfloat16, enabled=device == "cuda"):
                 logits = model(x).float().squeeze(1)
             for i, s in zip(idx.tolist(), logits.tolist()):

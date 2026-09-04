@@ -86,11 +86,31 @@ class GateSample:
 
 
 def to_tensor(image: np.ndarray) -> torch.Tensor:
-    """HWC uint8 RGB -> CHW float, ImageNet-normalised."""
-    t = torch.from_numpy(np.ascontiguousarray(image)).permute(2, 0, 1).float().div_(255.0)
-    mean = torch.tensor(IMAGENET_MEAN).view(3, 1, 1)
-    std = torch.tensor(IMAGENET_STD).view(3, 1, 1)
-    return (t - mean) / std
+    """HWC uint8 RGB -> CHW **uint8**, ready to normalise on the device.
+
+    Deliberately not normalised here.  Doing it in the loader meant every worker
+    turned each sample into float32 and ran three full-size elementwise passes
+    on the CPU -- for a 1,024 px row that is 8 MB of float per image, several
+    times over, per epoch.  With the render cache in place that CPU work was
+    what the trainings were waiting on.  Moving it to :func:`normalise` keeps
+    the transfer at one byte per channel instead of four and does the arithmetic
+    where there is bandwidth for it.
+
+    ``np.array`` rather than ``ascontiguousarray``: the render cache hands back
+    a read-only memory map, and torch refuses to share memory with one.
+    """
+    return torch.from_numpy(np.array(image, dtype=np.uint8, order="C")).permute(2, 0, 1)
+
+
+def normalise(batch: torch.Tensor) -> torch.Tensor:
+    """uint8 CHW batch on the device -> ImageNet-normalised float.
+
+    Numerically the same as the old loader-side arithmetic: divide by 255,
+    subtract the mean, divide by the standard deviation, all in float32.
+    """
+    mean = torch.tensor(IMAGENET_MEAN, device=batch.device).view(1, 3, 1, 1)
+    std = torch.tensor(IMAGENET_STD, device=batch.device).view(1, 3, 1, 1)
+    return (batch.float().div_(255.0) - mean) / std
 
 
 class RenderCache:
