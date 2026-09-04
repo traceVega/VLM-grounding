@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import numpy as np
 import pyarrow as pa
+import pyarrow.parquet as pq
 import pytest
 
 from idea91 import masks as M
@@ -411,6 +412,95 @@ def test_empty_masks_never_become_instances(world):
     raws = [RawInstance(mask=world["_shapes"]["cat"], prompt="cat"),
             RawInstance(mask=empty, prompt="ghost")]
     assert [r.prompt for r in drop_empty(raws)] == ["cat"]
+
+
+def write_store(tmp_path, world, n_images, per_shard):
+    """A store of ``n_images`` scenes, flushed on image boundaries as the pass does."""
+    directory = tmp_path / "instances"
+    directory.mkdir()
+    seg = FakeSegmenter(world)
+    buffer, shard = [], 0
+    for i in range(n_images):
+        scene = build_k1_scene(textured_image(SHAPE), f"img{i}", ["cat", "dog"], seg, seed=0)
+        buffer.extend(scene_rows(scene, "openimages_pool"))
+        if len(buffer) >= per_shard:
+            pq.write_table(
+                pa.Table.from_pylist(buffer, schema=schemas.INSTANCES_SCHEMA),
+                directory / f"shard-{shard:04d}.parquet",
+            )
+            buffer, shard = [], shard + 1
+    if buffer:
+        pq.write_table(
+            pa.Table.from_pylist(buffer, schema=schemas.INSTANCES_SCHEMA),
+            directory / f"shard-{shard:04d}.parquet",
+        )
+    return directory
+
+
+def test_streaming_reads_one_shard_at_a_time(tmp_path, world, monkeypatch):
+    """The OOM that killed the edit bank: load_scenes materialised every mask.
+
+    The guarantee is not "the same scenes come back" -- an eager loader does that
+    too -- it is that no more than one shard is ever open at once.
+    """
+    from idea91.instances import store
+
+    directory = write_store(tmp_path, world, n_images=9, per_shard=6)
+    assert len(store.shard_paths(directory)) > 1, "the fixture must span shards"
+
+    open_tables = []
+    peak = 0
+    real = store.pq.read_table
+
+    def counting_read(path, **kwargs):
+        nonlocal peak
+        table = real(path, **kwargs)
+        open_tables.append(path)
+        peak = max(peak, len(open_tables))
+        return table
+
+    monkeypatch.setattr(store.pq, "read_table", counting_read)
+    for _ in store.iter_scenes(directory):
+        open_tables.clear()  # the previous shard is dropped before the next is read
+    assert peak == 1, f"{peak} shards resident at once; streaming is not streaming"
+
+
+def test_streaming_and_eager_loading_agree(tmp_path, world):
+    from idea91.instances import store
+
+    directory = write_store(tmp_path, world, n_images=9, per_shard=6)
+    streamed = [s.image_id for s in store.iter_scenes(directory)]
+    eager = [s.image_id for s in store.scenes(store.read_shards(directory))]
+    assert streamed == eager
+    assert len(streamed) == 9
+
+
+def test_the_limit_stops_reading_early(tmp_path, world):
+    from idea91.instances import store
+
+    directory = write_store(tmp_path, world, n_images=9, per_shard=3)
+    assert len([s for s in store.iter_scenes(directory, limit=2)]) == 2
+
+
+def test_a_scene_split_across_shards_is_refused_not_halved(tmp_path, world):
+    """Streaming is only safe while shards break on image boundaries; say so loudly."""
+    import pyarrow.parquet as pq_
+
+    from idea91.instances import store
+
+    directory = tmp_path / "instances"
+    directory.mkdir()
+    seg = FakeSegmenter(world)
+    scene = build_k1_scene(textured_image(SHAPE), "img0", ["cat", "dog"], seg, seed=0)
+    rows = scene_rows(scene, "openimages_pool")
+    assert len(rows) >= 2
+    for i, half in enumerate((rows[:1], rows[1:])):
+        pq_.write_table(
+            pa.Table.from_pylist(half, schema=schemas.INSTANCES_SCHEMA),
+            directory / f"shard-{i:04d}.parquet",
+        )
+    with pytest.raises(ValueError, match="more than one shard"):
+        list(store.iter_scenes(directory, validate=False))
 
 
 def test_a_scene_with_an_empty_concept_mask_still_builds(world):

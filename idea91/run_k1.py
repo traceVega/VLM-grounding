@@ -43,7 +43,7 @@ from idea91 import schemas
 from idea91.edits.build import materialize, read_image
 from idea91.edits.sampler import HOLE_TYPES, SamplerStats, plan_k1_image
 from idea91.instances.build import build_k1_scene, scene_rows
-from idea91.instances.store import load_scenes
+from idea91.instances.store import iter_scenes, shard_paths
 from shared import paths
 
 SET_NAME = "openimages_pool"
@@ -178,6 +178,24 @@ def write_index_shard(rows: list[dict], index: int) -> Path:
     return path
 
 
+def count_scenes(directory: Path) -> int:
+    """How many images the store holds, without decoding a single mask.
+
+    Only the ``source`` and ``image_id`` columns are read, so this costs a
+    fraction of a second where materialising the scenes costs the machine.
+    """
+    total = 0
+    for path in shard_paths(directory):
+        try:
+            table = pq.read_table(path, columns=["image_id", "source"])
+        except Exception:
+            continue
+        sources = table.column("source").to_pylist()
+        image_ids = table.column("image_id").to_pylist()
+        total += len({i for i, s in zip(image_ids, sources) if s == "referent"})
+    return total
+
+
 def stage_edits(
     limit: int | None,
     shard_size: int,
@@ -189,8 +207,11 @@ def stage_edits(
     """P3/P4 sampling plus the LaMa edits, off the persisted instances."""
     from idea91.edits.inpaint import LamaInpainter
 
-    scenes = load_scenes(instances_dir(), limit=limit)
-    print(f"{len(scenes)} scenes from the instance store; hole types {list(hole_types)}")
+    # Streamed, not loaded: the full pool's decoded masks do not fit in memory.
+    n_scenes = count_scenes(instances_dir())
+    scenes = iter_scenes(instances_dir(), limit=limit)
+    total = min(limit, n_scenes) if limit else n_scenes
+    print(f"{total} scenes from the instance store; hole types {list(hole_types)}")
     already = done_edit_keys()
     if already:
         print(f"  {len(already)} edits already indexed; resuming")
@@ -254,8 +275,8 @@ def stage_edits(
             elapsed = time.perf_counter() - started
             rate = n / elapsed
             print(
-                f"  [{n}/{len(scenes)}] wrote {written.name} ({len(buffer)} edits) "
-                f"{rate:.2f} img/s, eta {(len(scenes) - n) / max(rate, 1e-6) / 3600:.1f} h",
+                f"  [{n}/{total}] wrote {written.name} ({len(buffer)} edits) "
+                f"{rate:.2f} img/s, eta {(total - n) / max(rate, 1e-6) / 3600:.1f} h",
                 flush=True,
             )
             buffer.clear()

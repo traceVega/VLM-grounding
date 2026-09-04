@@ -107,10 +107,55 @@ def scenes(table: pa.Table) -> Iterator[StoredScene]:
         )
 
 
+def iter_scenes(
+    directory: str | Path, limit: int | None = None, *, validate: bool = True
+) -> Iterator[StoredScene]:
+    """Stream scenes one shard at a time, never holding the whole store.
+
+    :func:`read_shards` concatenates every shard and :func:`scenes` then calls
+    ``to_pylist`` on the result, so the pool's 325,000 instance rows and their
+    decoded masks are resident at once -- about 23 GB, which is the whole of
+    WSL's memory.  The instance pass flushes a shard only on an image boundary,
+    so a scene never straddles two shards and shard-at-a-time is safe; that
+    invariant is checked rather than assumed, because a future writer that
+    buffered differently would otherwise emit half-scenes in silence.
+
+    Peak memory is one shard's Arrow table plus one image's decoded masks.
+    """
+    from idea91 import schemas
+
+    seen: set[str] = set()
+    yielded = 0
+    for path in shard_paths(directory):
+        try:
+            table = pq.read_table(path)
+        except Exception as exc:
+            print(f"  skipping unreadable shard {path.name}: {exc}")
+            continue
+        if validate:
+            schemas.validate(table, "instances")
+        # Every image in the shard, not only the ones that yield a scene: a
+        # scene split across shards may leave its referent on one side and the
+        # rest of its instances on the other, in which case no duplicate scene
+        # is produced and the loss would be silent.
+        present = set(table.column("image_id").to_pylist())
+        overlap = present & seen
+        if overlap:
+            raise ValueError(
+                f"{len(overlap)} image(s) appear in more than one shard (at {path.name}, "
+                f"e.g. {sorted(overlap)[0]}); an image's instances would be split across "
+                "reads and the scene silently truncated. Use read_shards()/scenes() for "
+                "this store instead."
+            )
+        seen |= present
+        for scene in scenes(table):
+            yield scene
+            yielded += 1
+            if limit and yielded >= limit:
+                return
+        del table
+
+
 def load_scenes(directory: str | Path, limit: int | None = None) -> list[StoredScene]:
-    out = []
-    for scene in scenes(read_shards(directory)):
-        out.append(scene)
-        if limit and len(out) >= limit:
-            break
-    return out
+    """Every scene at once.  Use :func:`iter_scenes` for the full pool."""
+    return list(iter_scenes(directory, limit=limit))
