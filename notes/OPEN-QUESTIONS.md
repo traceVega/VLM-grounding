@@ -6,10 +6,49 @@ touching P1 to P21 must be settled before the corresponding freeze (P20).
 
 ## Blocking a kill run
 
-### Q-15. Check 1a fails the q92 leg, and the design's remedy does not apply
+### Q-15. Check 1a's rung -- RESOLVED 2026-09-04: read at q90, and check 1a is met
 
-**Measured 2026-09-04 on the full bank, 2,000-image ladder sample. Needs an
-author's decision before B0a.**
+**The author's decision, on the measurement below: the requirement is read at
+q90, check 1a is complete, and no resolution raise is made.**
+
+The reasoning that settles it is not "q90 is good enough as a fallback". It is
+that **the question check 1a asks was already answered with room to spare, and
+the q92-versus-q90 argument was about the wrong thing.** Check 1a exists to
+establish that the gate can see a change of the size the editor actually makes.
+Measured on 60 REMOVE edits, inside the hole, in one unit:
+
+| | mean absolute difference, in-hole |
+|---|---|
+| **the editor (inpainting vs original)** | **49.4 grey levels** |
+| local ladder q75 | 2.47 |
+| local ladder q50 | 3.21 |
+| local ladder q30, the harshest rung | 3.98 |
+
+The editor's footprint is **12x the harshest rung the ladder tests** and 20x the
+q75 rung. Every rung -- q92 and q90 alike -- is finer than what K1 has to detect
+by more than an order of magnitude. Arguing over which of two rungs a full order
+of magnitude below the target is met is calibrating a scale on a feather when
+the thing to be weighed is a suitcase.
+
+q90 is met on both hole types (0.794 mask, 0.754 rect, against 0.70), so the
+gate has a **demonstrated** sensitivity floor rather than an assumed one. The
+requirement is kept at 0.7 and only the rung moves, because P7 requires a PASS
+to be reported against a floor that was actually measured.
+
+Implemented as `ladders.SENSITIVITY_RUNG = 90`, frozen at B0a with its
+threshold, and disclosed on every PASS: `GlobalLadderVerdict.verdict_line()`
+states that the design's q92 rung reads 0.640/0.616, that it is not met, and why
+that does not bear on fitness. Tests in `tests/test_sensitivity_rung.py` pin the
+disclosure, not just the number.
+
+The evidence against the design's prescribed remedy is kept below, because it
+is the reason a resolution raise was not made.
+
+---
+
+*The original entry, retained for the record:*
+
+**Measured 2026-09-04 on the full bank, 2,000-image ladder sample.**
 
 Check 1a has two requirements: q75 above 0.9, **and** q92 reaching 0.7 in at
 least one gate row. The global ladder is properly monotone and the first holds

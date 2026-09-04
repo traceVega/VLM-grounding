@@ -403,8 +403,11 @@ def gate_resolution_note(checks: dict) -> str:
         lines.append(
             f"  q75 best {max(ladder.q75_auroc_by_row.values(), default=float('nan')):.3f} "
             f"(needs > {L.GLOBAL_REQUIRED_Q75_AUROC:.2f}); "
-            f"q92 best {max(ladder.q92_auroc_by_row.values(), default=float('nan')):.3f} "
-            f"(needs >= {L.GLOBAL_REQUIRED_Q92_AUROC:.2f})"
+            f"q{L.SENSITIVITY_RUNG} best "
+            f"{max(ladder.sensitivity_auroc_by_row.values(), default=float('nan')):.3f} "
+            f"(needs >= {L.GLOBAL_REQUIRED_RUNG_AUROC:.2f}); "
+            "the design's q92 rung reads "
+            f"{max(ladder.q92_auroc_by_row.values(), default=float('nan')):.3f}"
         )
         # The local floors are not repeated here: K1Verdict.conditions() already
         # reports them, prefixed by hole type, and P7 requires them beside the

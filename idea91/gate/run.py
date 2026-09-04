@@ -336,8 +336,9 @@ def summarise_checks(checks: dict, hole_type: str) -> tuple[L.GlobalLadderVerdic
     globals_ = _by_int_quality(checks["global_ladder"].get(hole_type, {}))
     ladder = L.GlobalLadderVerdict(
         q75_auroc_by_row=globals_.get(75, {}),
-        q92_auroc_by_row=globals_.get(92, {}),
+        sensitivity_auroc_by_row=globals_.get(L.SENSITIVITY_RUNG, {}),
         all_aurocs={(r, q): v for q, rows in globals_.items() for r, v in rows.items()},
+        q92_auroc_by_row=globals_.get(92, {}),
     )
     null = L.NullVerdict(auroc_by_row=checks["null_1b"].get(hole_type, {}))
     floors = {
