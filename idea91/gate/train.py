@@ -127,6 +127,7 @@ def train_one(
     device: str = "cuda",
     workers: int = 4,
     cache: dict | None = None,
+    render_cache=None,
 ) -> tuple[np.ndarray, np.ndarray, list[str]]:
     """Train one (row, seed) and score the held-out images.
 
@@ -139,8 +140,10 @@ def train_one(
         train_ds = TileDataset(train_samples, edits_root, mode="train", seed=seed, cache=cache)
         test_ds = TileDataset(test_samples, edits_root, mode="eval", seed=seed, cache=cache)
     else:
-        train_ds = GateDataset(train_samples, row, edits_root, cache=cache)
-        test_ds = GateDataset(test_samples, row, edits_root, cache=cache)
+        train_ds = GateDataset(train_samples, row, edits_root, cache=cache,
+                               render_cache=render_cache)
+        test_ds = GateDataset(test_samples, row, edits_root, cache=cache,
+                              render_cache=render_cache)
 
     model = build_model(row.classifier, device)
     optimizer = torch.optim.AdamW(model.parameters(), lr=LR)
@@ -215,6 +218,7 @@ def run_row(
     device: str = "cuda",
     workers: int = 4,
     cache: dict | None = None,
+    render_cache=None,
     allow_unfrozen: bool = False,
 ) -> RowResult:
     """P6 for one row: 3 seeds, mean AUROC, bootstrap CI over images.
@@ -254,6 +258,7 @@ def run_row(
             device=device,
             workers=workers,
             cache=cache,
+            render_cache=render_cache,
         )
         per_seed.append(auroc(labels, scores))
         pooled_labels.append(labels)

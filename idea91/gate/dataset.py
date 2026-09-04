@@ -16,6 +16,7 @@ Edited images are composed at load time from the original plus the stored window
 
 from __future__ import annotations
 
+import os
 from collections.abc import Iterator
 from dataclasses import dataclass
 from pathlib import Path
@@ -92,6 +93,81 @@ def to_tensor(image: np.ndarray) -> torch.Tensor:
     return (t - mean) / std
 
 
+class RenderCache:
+    """Rendered inputs on disk, shared across epochs, seeds and rows.
+
+    Composing an edit costs a full-size JPEG decode, a window PNG decode, a
+    composite and a resize -- and it was being paid again for every epoch, every
+    seed and every row.  Measured at 17% of the bank, one row at one seed took
+    150 s, which prices the 148 trainings of B4a and B4b at about 42 GPU-hours
+    against a design budget of 14 to 20 for all of K1.
+
+    The key is ``(input_kind, damage, sample_id)`` rather than the row name,
+    because rows share input kinds: the three 1,024 px rows (two gate, one
+    adversary) render identically and differ only in the classifier on top.  So
+    a render made for ``iii_resnet18_1024`` is reused by ``iii_vit_s16_1024``
+    and ``adv_dinov2b_1024``, across all their seeds.
+
+    Stored raw rather than as PNG or JPEG.  PNG would cost a decode per read and
+    JPEG would be unusable at any quality: re-encoding artifacts are the very
+    signal the gate is built to detect, so a lossy cache would manufacture the
+    thing check 1a measures.  ``.npy`` read through ``mmap_mode='r'`` is close to
+    a memcpy.
+
+    Tile rows are not cached here: they render a list of tiles whose count
+    varies per image, and the sampler draws a different tile per epoch by
+    design, so there is nothing stable to key.
+    """
+
+    def __init__(self, root: Path | None, *, enabled: bool = True) -> None:
+        self.root = Path(root) if root else None
+        self.enabled = enabled and self.root is not None
+        self.hits = 0
+        self.misses = 0
+
+    def _path(self, sample: GateSample, row: I.GateRow) -> Path:
+        damage = "none" if sample.damage is None else f"{sample.damage[0]}{sample.damage[1]}"
+        return self.root / row.input_kind / damage / f"{sample.sample_id}.npy"
+
+    def get(self, sample: GateSample, row: I.GateRow) -> np.ndarray | None:
+        if not self.enabled:
+            return None
+        path = self._path(sample, row)
+        if not path.is_file():
+            return None
+        try:
+            out = np.load(path, mmap_mode="r")
+        except Exception:
+            return None  # a half-written file from a killed run: re-render it
+        self.hits += 1
+        return np.asarray(out)
+
+    def put(self, sample: GateSample, row: I.GateRow, array: np.ndarray) -> None:
+        if not self.enabled:
+            return
+        path = self._path(sample, row)
+        path.parent.mkdir(parents=True, exist_ok=True)
+        # Write beside and rename, so a kill cannot leave a truncated .npy that
+        # would silently load as the wrong shape.  Written through a file handle
+        # rather than by name: np.save appends '.npy' to a path that lacks it,
+        # so naming the temporary '.tmp' meant renaming a file that did not
+        # exist -- and the OSError below swallowed it, leaving the cache silently
+        # doing nothing at all.
+        temporary = path.with_name(f"{path.name}.{os.getpid()}.tmp")
+        try:
+            with open(temporary, "wb") as handle:
+                np.save(handle, array)
+            os.replace(temporary, path)
+        except OSError:
+            temporary.unlink(missing_ok=True)  # out of disk: fall back to rendering
+        self.misses += 1
+
+    def line(self) -> str:
+        total = self.hits + self.misses
+        rate = self.hits / total if total else 0.0
+        return f"render cache: {self.hits} hits / {total} ({rate:.0%})"
+
+
 class GateDataset(Dataset):
     """Full-image and crop rows: one tensor per edit."""
 
@@ -102,11 +178,13 @@ class GateDataset(Dataset):
         edits_root: Path,
         *,
         cache: dict | None = None,
+        render_cache: RenderCache | None = None,
     ) -> None:
         self.samples = samples
         self.row = row
         self.edits_root = Path(edits_root)
         self.cache = cache  # optional {sample_id: np.ndarray} for small banks
+        self.render_cache = render_cache
 
     def __len__(self) -> int:
         return len(self.samples)
@@ -114,8 +192,14 @@ class GateDataset(Dataset):
     def render(self, sample: GateSample) -> np.ndarray:
         if self.cache is not None and sample.sample_id in self.cache:
             return self.cache[sample.sample_id]
+        if self.render_cache is not None:
+            cached = self.render_cache.get(sample, self.row)
+            if cached is not None:
+                return cached
         image = sample.compose(self.edits_root)
         out = I.render(image, self.row, hole_box=sample.hole_box)
+        if self.render_cache is not None:
+            self.render_cache.put(sample, self.row, out)
         if self.cache is not None:
             self.cache[sample.sample_id] = out
         return out

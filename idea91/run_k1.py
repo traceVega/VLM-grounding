@@ -358,7 +358,12 @@ def gate_config(args) -> "GateRunConfig":  # noqa: F821
         device=args.device,
         workers=args.workers,
         limit_images=args.limit,
+        render_cache_dir=None if args.no_render_cache else render_cache_dir(),
     )
+
+
+def render_cache_dir() -> Path:
+    return paths.DATA_ROOT / "gate_renders"
 
 
 def stage_checks(args) -> None:
@@ -714,6 +719,11 @@ def main() -> None:
     ap.add_argument("--note", default="", help="freeze: recorded with the record")
     ap.add_argument("--allow-dirty", action="store_true", help="freeze: tag a dirty tree")
     ap.add_argument("--frequency-check", action="store_true", help="report: design 4.4")
+    ap.add_argument(
+        "--no-render-cache",
+        action="store_true",
+        help="re-render every epoch instead of caching to disk (slow; for comparison)",
+    )
     ap.add_argument(
         "--tiers",
         default="",

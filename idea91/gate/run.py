@@ -27,6 +27,7 @@ import pyarrow as pa
 from idea91.gate import build as B
 from idea91.gate import inputs as I
 from idea91.gate import ladders as L
+from idea91.gate.dataset import RenderCache
 from idea91.gate.train import ADVERSARY_SEEDS, SEEDS, RowResult, run_row
 from idea91.gate.verdict import GATE_ROW_NAMES
 from shared.stats import Interval
@@ -47,6 +48,9 @@ class GateRunConfig:
     device: str = "cuda"
     workers: int = 4
     limit_images: int | None = None
+    #: where rendered inputs are cached between epochs, seeds and rows; ``None``
+    #: renders every time, which is what made a single row cost 150 s
+    render_cache_dir: Path | None = None
 
 
 def _cache_path(cache: Path, key: str) -> Path:
@@ -95,6 +99,7 @@ def train_cached(
         print(f"  [skip]   {key}: {len(samples)} samples, needs both classes")
         return None
     started = time.perf_counter()
+    renders = RenderCache(cfg.render_cache_dir)
     result = run_row(
         samples,
         row,
@@ -105,9 +110,11 @@ def train_cached(
         epochs=cfg.epochs,
         device=cfg.device,
         workers=cfg.workers,
+        render_cache=renders,
     )
     _save_cached(cfg.cache_dir, key, result)
-    print(f"  {key}: AUROC {result.auroc_mean:.3f} ({time.perf_counter()-started:.0f}s)")
+    elapsed = time.perf_counter() - started
+    print(f"  {key}: AUROC {result.auroc_mean:.3f} ({elapsed:.0f}s, {renders.line()})")
     return result
 
 
