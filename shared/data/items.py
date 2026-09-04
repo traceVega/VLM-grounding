@@ -147,13 +147,18 @@ def _pending(set_name: str, what: str):
     )
 
 
-def groundingme_items(root: Path) -> list[RawItem]:  # pragma: no cover - needs the data
-    """P8: positive single-box items, with the GroundingME dimension recorded."""
-    _pending(
-        "groundingme",
-        "needs the annotation file layout at the pinned revision, the dimension field name, "
-        "and which items are positive single-box",
-    )
+def groundingme_items(root: Path) -> list[RawItem]:
+    """P8: positive single-box items, with the GroundingME dimension recorded.
+
+    Written: see ``shared/data/groundingme.py``.  ``root`` is ignored; the set is
+    read from the pinned HF snapshot and its images from the extraction
+    directory.  ``dimension`` is ``subtask_l1``, which is what P15 reports per;
+    the 201 ``Rejection`` items come back with ``in_kill_set`` false, because P8
+    scopes K2 to positive single-box items.
+    """
+    from shared.data import groundingme
+
+    return groundingme.to_raw_items()
 
 
 def openref_items(root: Path) -> list[RawItem]:  # pragma: no cover

@@ -42,6 +42,28 @@ freeze, not silently changed.
 **(c) The benchmark's scorer is oracle-assisted and K2 cannot copy it.** See
 Q-3.
 
+### Q-1c. GroundingME's items are not independent -- MEASURED 2026-09-03
+The 804 kill-set items sit on **685 distinct images**: 53 images carry more than
+one item, one carries eight, and 172 items share an image with another. No
+near-duplicates beyond that -- distinct pHash equals distinct sha256 at 685.
+
+Two consequences, neither of which needs a design change but both of which
+change the numbers:
+
+* **P15's bootstrap is already "clustered by image", which is the right call and
+  now clearly load-bearing.** The effective cluster count is 685, not 804, so
+  the CI half-widths are wider than an item-level count would suggest. Nothing
+  may quietly resample by item.
+* Two items on one image become two K2 pairs with *different* holes in the same
+  source image. That is legitimate -- each pair removes its own referent -- but
+  it is another reason the unit of resampling is the image.
+
+**P8's size-bin stratification is thin at the bottom**: tiny 8, small 115,
+medium 222, large 255, xl 204. Any draw stratified by size bin (P11's 200,
+P17's 500) will be near-empty in `tiny`, so the per-bin rows of P15 will carry
+almost no tiny items from this set. Reported rather than rebalanced: the bins
+are P8's.
+
 ### Q-1b. P21's cap share on GroundingME -- MEASURED 2026-09-03
 **99.3% of GroundingME images exceed P21's 2.4 Mpx cap** (998/1005); median
 3.4 Mpx, max 59.0 Mpx (7680x7680), median downscale 0.85x. P21 asks for this

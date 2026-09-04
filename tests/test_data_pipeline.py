@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import inspect
 from pathlib import Path
 
 import numpy as np
@@ -137,20 +138,38 @@ def test_building_asserts_dev_slice_disjointness(tmp_path):
 
 
 def test_adapters_say_what_they_are_waiting_for():
-    with pytest.raises(NotImplementedError, match="annotation file layout"):
-        items.groundingme_items(Path("/nowhere"))
+    """An unwritten adapter must name the missing fact, not return an empty list."""
     with pytest.raises(NotImplementedError, match="design O1"):
         items.openref_items(Path("/nowhere"))
     with pytest.raises(NotImplementedError, match="letterbox"):
         items.cocosearch18_items(Path("/nowhere"))
+    with pytest.raises(NotImplementedError, match="no-target annotation format"):
+        items.grefcoco_p12_items(Path("/nowhere"))
+
+
+def test_the_written_adapters_are_registered_and_not_stubs():
+    """groundingme and openimages are written; the registry must reach them."""
+    for key in ("groundingme", "openimages_pool"):
+        assert key in items.ADAPTERS or key == "openimages_pool"
+    source = inspect.getsource(items.groundingme_items)
+    assert "_pending" not in source
+    assert "shared/data/groundingme.py" in source, "it must say where the work lives"
 
 
 # --- download plan -----------------------------------------------------------
 
 
 def test_an_unpinned_source_is_blocked_not_guessed():
-    step = download.plan_for(BY_KEY["groundingme"])  # revision still PIN_REQUIRED
+    step = download.plan_for(BY_KEY["openref"])  # locator and revision still PIN_REQUIRED
     assert not step.ready and PIN in step.blocker
+
+
+def test_groundingme_is_pinned_and_stays_unreleasable():
+    """Pinned 2026-09-03. Its licence is what keeps the K2 bank local (P1, P17)."""
+    source = BY_KEY["groundingme"]
+    assert source.pinned and source.date_read
+    assert not source.may_release_derivatives
+    assert "release_images" not in source.allowed
 
 
 def test_the_openimages_pool_is_pinned_and_fetchable():

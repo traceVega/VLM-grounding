@@ -91,15 +91,21 @@ SOURCES: tuple[Source, ...] = (
         name="GroundingME",
         kind=HF,
         locator="lirang04/GroundingME",
-        revision=PIN,
+        revision="78e3c7974b2b1db0ea52266969e40f664a38e330",
         approx_gb=3.0,
         licence="research use, under SA-1B and HR-Bench terms",
         allowed=("evaluate", "publish_numbers"),
         used_by=("P8 K2 items", "P12 primary protocol"),
+        date_read="2026-09-03",
         notes=(
-            "Images run 1,500 to 7,680 px, which is why P2 edits a window. Its evaluator "
-            "repository is also needed, at a recorded commit, for the primary protocol's "
-            "instruction and null-box convention (OPEN-QUESTIONS Q-1)."
+            "Downloaded and read 2026-09-03. 1,005 test items: 804 positive single-box and "
+            "201 Rejection whose bbox is null; bbox is absolute xyxy in original pixels and "
+            "detection_type carries a head noun for every item. The 804 sit on only 685 "
+            "distinct images, so P15's bootstrap must cluster by image (OPEN-QUESTIONS "
+            "Q-1c). Images run 1,500 to 7,680 px -- 99.3% over P21's 2.4 Mpx cap -- which "
+            "is why P2 edits a window. The evaluator repository is pinned separately in "
+            "PINS.md at 6867f7a0 for the primary protocol's instruction and null-box "
+            "convention (Q-1); its best-of-four coordinate decode is not adopted (Q-3)."
         ),
     ),
     Source(
