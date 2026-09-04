@@ -485,7 +485,12 @@ def stage_rows(args) -> None:
 
 
 def load_row_results() -> list:
-    """Every trained gate row from the cache, so ``report`` stands alone."""
+    """Every trained gate row from the cache, so ``report`` stands alone.
+
+    The ``gate__`` prefix is load-bearing: a run with ``--limit`` writes its rows
+    under ``limit<N>__gate__``, so a smoke test's numbers cannot reach the K1
+    table by being left in the cache.
+    """
     import json
 
     from idea91.gate.train import RowResult

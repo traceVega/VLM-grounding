@@ -92,7 +92,16 @@ def train_cached(
     contrast: str,
     seeds: tuple[int, ...],
 ) -> RowResult | None:
-    """One row, cached by key.  ``None`` when the sample set is too thin."""
+    """One row, cached by key.  ``None`` when the sample set is too thin.
+
+    A limited run gets its own key space.  Without that, a ``--limit 30`` smoke
+    test writes cache entries that the real run then reads back and reports as
+    check 1a -- numbers from thirty images, wearing the name of a result over
+    nine thousand.  Nothing downstream could tell the difference, so the
+    separation is in the key rather than in remembering to clear the cache.
+    """
+    if cfg.limit_images:
+        key = f"limit{cfg.limit_images}__{key}"
     cached = _load_cached(cfg.cache_dir, key)
     if cached is not None:
         print(f"  [cached] {key}")
