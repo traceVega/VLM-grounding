@@ -11,10 +11,17 @@
 # minute or two, killing nohup, a systemd --user unit and a bare sleep alike.
 # Preventing the kill is the host's problem; surviving it is ours.
 #
-# A restart is only worth attempting when the stage was killed rather than when
-# it failed on its own: a traceback will repeat forever, so only a signal death
-# (exit code above 128, or 0 progress) is retried, and the loop stops after
-# MAX_RESTARTS consecutive attempts that made no progress.
+# When to retry. The first version only relaunched signal deaths, on the
+# reasoning that a traceback repeats forever. That was wrong for the failure it
+# then met: the checks stage died with `CUDA error: unknown error` out of
+# cuMemcpyHtoDAsync, which is the WSL GPU interface hiccupping and not a bug --
+# the same copy ran thirty times immediately afterwards. Exit code cannot tell
+# a transient fault from a deterministic one.
+#
+# So the rule is progress, not exit code: any death is retried, and the loop
+# gives up after MAX_STALLED consecutive attempts that got nothing further done.
+# A real bug costs a handful of attempts and stops; a flaky host gets as many
+# chances as it keeps earning.
 set -u
 
 STAGE="${1:?usage: supervise.sh <stage> [args...]}"
@@ -23,7 +30,7 @@ shift
 REPO="${VLMG_REPO:-/mnt/d/Dev/ArcNova/auto-research/VLM-grounding}"
 PYTHON="${VLMG_PYTHON:-$HOME/vlmg-env/bin/python}"
 LOG="${VLMG_LOG:-$HOME/vlmg-data/k1_${STAGE}.log}"
-MAX_RESTARTS="${VLMG_MAX_RESTARTS:-40}"
+MAX_STALLED="${VLMG_MAX_STALLED:-4}"
 export VLMG_LAMA_DIR="${VLMG_LAMA_DIR:-$HOME/vlmg-data/raw/big-lama/big-lama}"
 
 cd "$REPO" || exit 1
@@ -38,6 +45,10 @@ progress() {
       ;;
     instances)
       find "$HOME/vlmg-data/prepared/openimages_pool/instances" -maxdepth 1 -name "shard-*.parquet" 2>/dev/null | wc -l
+      ;;
+    checks|rows)
+      # each trained row is one cached json, so the count is the work done
+      find "$HOME/vlmg-data/gate_cache" -maxdepth 1 -name "*.json" 2>/dev/null | wc -l
       ;;
     *) echo 0 ;;
   esac
@@ -59,25 +70,19 @@ while :; do
     exit 0
   fi
 
-  # An ordinary failure is a bug and will repeat; only a killed process is
-  # worth relaunching.  128+N is the shell's encoding of death by signal N.
-  if [ "$code" -lt 129 ]; then
-    echo "[$(date +%H:%M:%S)] === $STAGE exited $code (not a signal); not retrying ===" | tee -a "$LOG"
-    tail -20 "$LOG"
-    exit "$code"
-  fi
-
   if [ "${after:-0}" -gt "${before:-0}" ]; then
     stalled=0
   else
     stalled=$((stalled + 1))
   fi
-  echo "[$(date +%H:%M:%S)] killed with $code; progress ${before:-0} -> ${after:-0} " \
-       "(stalled $stalled/$MAX_RESTARTS)" | tee -a "$LOG"
+  echo "[$(date +%H:%M:%S)] exited $code; progress ${before:-0} -> ${after:-0}" \
+       "(stalled $stalled/$MAX_STALLED)" | tee -a "$LOG"
 
-  if [ "$stalled" -ge "$MAX_RESTARTS" ]; then
-    echo "[$(date +%H:%M:%S)] === $MAX_RESTARTS restarts with no progress; giving up ===" | tee -a "$LOG"
+  if [ "$stalled" -ge "$MAX_STALLED" ]; then
+    echo "[$(date +%H:%M:%S)] === $MAX_STALLED attempts with no progress; giving up ===" \
+      | tee -a "$LOG"
+    tail -30 "$LOG"
     exit 1
   fi
-  sleep 5
+  sleep 10
 done
