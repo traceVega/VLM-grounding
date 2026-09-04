@@ -359,6 +359,7 @@ def gate_config(args) -> "GateRunConfig":  # noqa: F821
         workers=args.workers,
         limit_images=args.limit,
         render_cache_dir=None if args.no_render_cache else render_cache_dir(),
+        render_cache_gb=args.render_cache_gb,
     )
 
 
@@ -723,6 +724,12 @@ def main() -> None:
         "--no-render-cache",
         action="store_true",
         help="re-render every epoch instead of caching to disk (slow; for comparison)",
+    )
+    ap.add_argument(
+        "--render-cache-gb",
+        type=float,
+        default=150.0,
+        help="stop writing renders past this many GB (0 = unlimited); reads continue",
     )
     ap.add_argument(
         "--tiers",

@@ -119,11 +119,54 @@ class RenderCache:
     design, so there is nothing stable to key.
     """
 
-    def __init__(self, root: Path | None, *, enabled: bool = True) -> None:
+    #: Stop writing once the cache reaches this. Raw 2.4 Mpx renders are 7 MB
+    #: each, and ``full_cap`` alone over the full bank plus its three global
+    #: ladder qualities would run to several hundred gigabytes -- enough to
+    #: crowd the 54 GB edit bank off the volume. Past the budget the cache still
+    #: *reads*, so the rows rendered early keep their speedup and the rest fall
+    #: back to rendering rather than the run dying on a full disk.
+    DEFAULT_BUDGET_GB = 150.0
+
+    #: Re-measuring the directory on every write would cost a stat per sample,
+    #: so the size is tracked incrementally and re-checked against the disk
+    #: occasionally, in case another run is writing to the same cache.
+    RECHECK_EVERY = 2000
+
+    def __init__(
+        self, root: Path | None, *, enabled: bool = True, budget_gb: float | None = None
+    ) -> None:
         self.root = Path(root) if root else None
         self.enabled = enabled and self.root is not None
+        self.budget_bytes = (
+            float("inf")
+            if budget_gb is not None and budget_gb <= 0
+            else (budget_gb if budget_gb is not None else self.DEFAULT_BUDGET_GB) * 1e9
+        )
         self.hits = 0
         self.misses = 0
+        self.bytes_written = 0
+        self.over_budget = False
+        self._writes_since_check = 0
+
+    def _measure(self) -> int:
+        if self.root is None or not self.root.is_dir():
+            return 0
+        return sum(p.stat().st_size for p in self.root.rglob("*.npy"))
+
+    def _may_write(self) -> bool:
+        if self.over_budget:
+            return False
+        if self._writes_since_check >= self.RECHECK_EVERY:
+            self._writes_since_check = 0
+            self.bytes_written = self._measure()
+        if self.bytes_written >= self.budget_bytes:
+            self.over_budget = True
+            print(
+                f"  render cache at {self.bytes_written/1e9:.0f} GB, the budget; "
+                "reading on, writing no more"
+            )
+            return False
+        return True
 
     def _path(self, sample: GateSample, row: I.GateRow) -> Path:
         damage = "none" if sample.damage is None else f"{sample.damage[0]}{sample.damage[1]}"
@@ -143,7 +186,7 @@ class RenderCache:
         return np.asarray(out)
 
     def put(self, sample: GateSample, row: I.GateRow, array: np.ndarray) -> None:
-        if not self.enabled:
+        if not self.enabled or not self._may_write():
             return
         path = self._path(sample, row)
         path.parent.mkdir(parents=True, exist_ok=True)
@@ -158,14 +201,19 @@ class RenderCache:
             with open(temporary, "wb") as handle:
                 np.save(handle, array)
             os.replace(temporary, path)
+            self.bytes_written += array.nbytes
+            self._writes_since_check += 1
         except OSError:
             temporary.unlink(missing_ok=True)  # out of disk: fall back to rendering
+            self.over_budget = True  # and stop trying, rather than failing per sample
         self.misses += 1
 
     def line(self) -> str:
         total = self.hits + self.misses
         rate = self.hits / total if total else 0.0
-        return f"render cache: {self.hits} hits / {total} ({rate:.0%})"
+        size = f", {self.bytes_written/1e9:.1f} GB" if self.bytes_written else ""
+        capped = ", at budget" if self.over_budget else ""
+        return f"render cache: {self.hits} hits / {total} ({rate:.0%}{size}{capped})"
 
 
 class GateDataset(Dataset):

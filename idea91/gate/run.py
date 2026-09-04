@@ -51,6 +51,8 @@ class GateRunConfig:
     #: where rendered inputs are cached between epochs, seeds and rows; ``None``
     #: renders every time, which is what made a single row cost 150 s
     render_cache_dir: Path | None = None
+    #: stop writing renders past this, so the cache cannot crowd out the bank
+    render_cache_gb: float = RenderCache.DEFAULT_BUDGET_GB
 
 
 def _cache_path(cache: Path, key: str) -> Path:
@@ -99,7 +101,7 @@ def train_cached(
         print(f"  [skip]   {key}: {len(samples)} samples, needs both classes")
         return None
     started = time.perf_counter()
-    renders = RenderCache(cfg.render_cache_dir)
+    renders = RenderCache(cfg.render_cache_dir, budget_gb=cfg.render_cache_gb)
     result = run_row(
         samples,
         row,
