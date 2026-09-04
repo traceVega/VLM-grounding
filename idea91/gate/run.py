@@ -175,31 +175,85 @@ def run_checks(cfg: GateRunConfig) -> dict:
     return out
 
 
-def run_gate_rows(cfg: GateRunConfig) -> list[RowResult]:
-    """B4b: the classifiers that see a real REMOVE.  Runs after the K1 freeze."""
+#: B4b in the order the verdict needs it, not the order the table prints it.
+#:
+#: P7's PASS/FAIL is the maximum over the gate rows of ResNet-18 and ViT-S/16 on
+#: REMOVE versus CONTROL_OBJ, on both hole types.  That is 24 of the 100
+#: trainings B4b asks for.  Everything else is reported alongside the verdict --
+#: CONTROL_BG "on the same rows", the smaller-resolution rows, the strong
+#: adversaries "without a hard gate" -- so running them first would mean waiting
+#: for four fifths of the compute before learning whether the editor passed.
+#:
+#: Tiers do not change what is computed or how; each row is cached by the same
+#: key whichever tier reaches it, so this is ordering alone.
+TIERS: tuple[tuple[str, str], ...] = (
+    ("verdict", "P7's gate rows on REMOVE vs CONTROL_OBJ -- the PASS/FAIL"),
+    ("comparison", "the same gate rows on REMOVE vs CONTROL_BG"),
+    ("reported", "the lower-resolution and shown-crop rows"),
+    ("adversary", "DINOv2-B, reported without a hard gate"),
+)
+
+
+def _tier_of(row: I.GateRow, contrast: str) -> str:
+    if row in I.ADVERSARY_ROWS:
+        return "adversary"
+    if row in I.GATE_ROWS:
+        return "verdict" if contrast == CONTRAST_OBJ else "comparison"
+    return "reported"
+
+
+def run_gate_rows(cfg: GateRunConfig, tiers: tuple[str, ...] | None = None) -> list[RowResult]:
+    """B4b: the classifiers that see a real REMOVE.  Runs after the K1 freeze.
+
+    Ordered so the P7 verdict is decidable as early as possible; pass ``tiers``
+    to run only some of them.
+    """
+    wanted = tiers or tuple(name for name, _ in TIERS)
     results: list[RowResult] = []
-    for hole_type in cfg.hole_types:
-        for contrast, negative in ((CONTRAST_OBJ, "CONTROL_OBJ"), (CONTRAST_BG, "CONTROL_BG")):
-            samples = _trim(
-                B.contrast_samples(cfg.index, cfg.image_dir, hole_type=hole_type,
-                                   negative=negative),
-                cfg.limit_images,
-            )
-            print(f"\n[{hole_type}] {contrast}: {len(samples)} samples "
-                  f"({len({s.image_id for s in samples})} images)")
-            rows = list(I.GATE_ROWS) + list(I.REPORTED_ROWS)
-            if contrast == CONTRAST_OBJ:
-                rows += list(I.ADVERSARY_ROWS)
-            for row in rows:
-                if row.input_kind == "paired_crop":
-                    continue  # check 1c is an assert
-                if row.classifier == I.FORENSIC:
-                    continue  # weights unpinned (OPEN-QUESTIONS Q-8)
-                seeds = ADVERSARY_SEEDS if row in I.ADVERSARY_ROWS else cfg.seeds
-                key = f"gate__{hole_type}__{contrast}__{row.name}"
-                result = train_cached(cfg, key, samples, row, hole_type, contrast, seeds)
-                if result:
-                    results.append(result)
+    sample_cache: dict[tuple[str, str], list] = {}
+
+    for tier in wanted:
+        description = dict(TIERS).get(tier, "")
+        print(f"\n=== tier '{tier}': {description} ===")
+        for hole_type in cfg.hole_types:
+            for contrast, negative in (
+                (CONTRAST_OBJ, "CONTROL_OBJ"),
+                (CONTRAST_BG, "CONTROL_BG"),
+            ):
+                rows = [
+                    r
+                    for r in list(I.GATE_ROWS) + list(I.REPORTED_ROWS) + list(I.ADVERSARY_ROWS)
+                    if _tier_of(r, contrast) == tier
+                    and r.input_kind != "paired_crop"  # check 1c is an assert
+                    and r.classifier != I.FORENSIC  # weights unpinned (Q-8)
+                ]
+                if contrast == CONTRAST_BG:
+                    # P7 reports CONTROL_BG "on the same rows" -- the gate rows.
+                    rows = [r for r in rows if r in I.GATE_ROWS]
+                if not rows:
+                    continue
+
+                key = (hole_type, negative)
+                if key not in sample_cache:
+                    sample_cache[key] = _trim(
+                        B.contrast_samples(
+                            cfg.index, cfg.image_dir, hole_type=hole_type, negative=negative
+                        ),
+                        cfg.limit_images,
+                    )
+                samples = sample_cache[key]
+                print(
+                    f"[{hole_type}] {contrast}: {len(samples)} samples "
+                    f"({len({s.image_id for s in samples})} images), {len(rows)} row(s)"
+                )
+                for row in rows:
+                    seeds = ADVERSARY_SEEDS if row in I.ADVERSARY_ROWS else cfg.seeds
+                    cache_key = f"gate__{hole_type}__{contrast}__{row.name}"
+                    result = train_cached(
+                        cfg, cache_key, samples, row, hole_type, contrast, seeds
+                    )
+                    if result:
+                        results.append(result)
     return results
 
 

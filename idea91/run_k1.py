@@ -458,12 +458,24 @@ def stage_freeze(args) -> None:
 
 def stage_rows(args) -> None:
     """B4b: the first classifiers to see a real REMOVE.  Refuses without the freeze."""
-    from idea91.gate.run import run_gate_rows
+    from idea91.gate.run import TIERS, run_gate_rows
 
     record = F.require(F.B0A, what="the K1 gate rows")
     print(f"freeze {record.version} intact (signed off by {record.signed_off_by})\n")
-    results = run_gate_rows(gate_config(args))
+
+    known = {name for name, _ in TIERS}
+    tiers = tuple(t.strip() for t in args.tiers.split(",") if t.strip()) if args.tiers else None
+    if tiers:
+        unknown = [t for t in tiers if t not in known]
+        if unknown:
+            raise SystemExit(f"unknown tier(s) {unknown}; expected {sorted(known)}")
+
+    results = run_gate_rows(gate_config(args), tiers=tiers)
     print(f"\n{len(results)} rows trained -> {gate_cache_dir()}")
+    if tiers and set(tiers) != known:
+        remaining = [t for t, _ in TIERS if t not in tiers]
+        print(f"tiers not yet run: {', '.join(remaining)}")
+        print("The table will mark the missing rows; the P7 verdict needs 'verdict' only.")
 
 
 def load_row_results() -> list:
@@ -702,6 +714,12 @@ def main() -> None:
     ap.add_argument("--note", default="", help="freeze: recorded with the record")
     ap.add_argument("--allow-dirty", action="store_true", help="freeze: tag a dirty tree")
     ap.add_argument("--frequency-check", action="store_true", help="report: design 4.4")
+    ap.add_argument(
+        "--tiers",
+        default="",
+        help="rows: comma-separated subset of verdict,comparison,reported,adversary. "
+        "'verdict' alone is the 24 trainings P7's PASS/FAIL needs, out of 100.",
+    )
     args = ap.parse_args()
 
     holes = tuple(h.strip() for h in args.hole_types.split(",") if h.strip())
