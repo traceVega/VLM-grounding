@@ -6,6 +6,66 @@ touching P1 to P21 must be settled before the corresponding freeze (P20).
 
 ## Blocking a kill run
 
+### Q-15. Check 1a fails the q92 leg, and the design's remedy does not apply
+
+**Measured 2026-09-04 on the full bank, 2,000-image ladder sample. Needs an
+author's decision before B0a.**
+
+Check 1a has two requirements: q75 above 0.9, **and** q92 reaching 0.7 in at
+least one gate row. The global ladder is properly monotone and the first holds
+comfortably; the second does not.
+
+| hole type | q92 | q90 | q75 |
+|---|---|---|---|
+| mask | **0.640** | 0.794 | 0.945 |
+| rect | **0.616** | 0.754 | 0.976 |
+
+So the ladder fails, and P20's one declared pre-freeze contingency is live.
+
+**The prescribed remedy is raising the gate resolution** (design line 181, and
+the review response at line 238). The evidence says it will not work: across a
+nine-fold range of input pixels every gate row lands between 0.55 and 0.64 at
+q92, and on mask holes the 1,024 px row *beats* the 2.46 Mpx row.
+
+| row | px seen | q92 (mask) | q92 (rect) |
+|---|---|---|---|
+| `i_resnet18_full_cap` | 2,457,600 | 0.604 | **0.616** |
+| `iii_resnet18_1024` | 699,392 | **0.640** | 0.577 |
+| `iii_vit_s16_1024` | 699,392 | 0.549 | 0.595 |
+| `ii_vit_s16_tiles_native` | 262,144 | 0.598 | 0.582 |
+
+Resolution does not predict detection here, so raising it spends the "classifier
+budget grows accordingly" for a predicted null.
+
+**Two explanations were proposed and both failed testing**, recorded so they are
+not proposed again:
+
+* *"The pool is already JPEG, so the q92 rung is near-invisible by
+  construction."* Prior quantisation does halve the absolute perturbation (2.44
+  grey levels near-pristine against 1.24 on the pool), but the rung relative to
+  q75 is unchanged -- 55.6% on the pool against 59.1% near-pristine. If the pool
+  were the cause, that ratio would have collapsed.
+* *"Rebuild the ladder against a cleaner reference."* Not constructible. The
+  pool is JPEG all the way down, and the q95 reference is a correct control --
+  both arms go through one re-encode, which is what stops the classifier simply
+  detecting "re-encoded once more".
+
+**What survives is measured.** The q92 step is 1.24 grey levels mean absolute
+difference on this pool, near the floor of what is structurally learnable
+against natural image variation, while q75 at 2.23 is plainly learnable
+(AUROC 0.94). Detectability is strongly nonlinear in perturbation magnitude.
+
+**The decision.** The gate's demonstrated global sensitivity floor is **q90**,
+not q92, on both hole types and clear of the 0.7 bar. The options are to accept
+that as the achieved floor and report every K1 result against it -- declared
+under the contingency, with the per-row table above published beside the verdict
+-- or to raise the resolution anyway against the evidence. This is a
+pre-registration judgement and belongs to whoever signs B0a; the implementation
+takes neither on its own.
+
+Until it is settled, `K1Verdict` will not call any PASS decisive, which is the
+correct behaviour and is tested.
+
 ### Q-1. GroundingME's instruction and null-box convention -- RESOLVED 2026-09-03
 Read from `lmms_eval_task/groundingme/utils.py` (the module-level `PROMPT`, line
 95) and `evaluate.py` at `lirang04/GroundingME@6867f7a0`, recorded in `PINS.md`.
