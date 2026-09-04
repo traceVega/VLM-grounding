@@ -342,6 +342,22 @@ def create(
     path.write_text(record.to_json(), encoding="utf-8")
     if tag:
         _git("tag", "-a", record.git_tag, "-m", f"{point} freeze {record.version} ({sign_off})")
+        # P20's freeze points *are* git tags, so a record naming one that does
+        # not exist is a broken guarantee rather than a cosmetic slip.  This
+        # happened on the real B0a: `git tag -a` needs a committer identity, WSL
+        # had none, and `_git` swallowed the failure -- leaving a record that
+        # claimed `freeze-B0a` against a repository with no tags at all.
+        if record.git_tag not in _git("tag", "-l").splitlines():
+            record.git_tag = ""
+            path.write_text(record.to_json(), encoding="utf-8")
+            print(
+                f"WARNING: could not create the tag {point} claims. The record is written "
+                f"and its git_tag is now empty rather than a false claim.\n"
+                f"  Create it yourself against the recorded commit:\n"
+                f"    git tag -a freeze-{point} {record.git_commit[:12]} -m '{point} freeze "
+                f"{record.version}'\n"
+                "  (a likely cause is no committer identity: git config user.name / user.email)"
+            )
     return record
 
 

@@ -208,3 +208,24 @@ def test_the_sheet_groups_by_definition_and_states_the_contingencies(isolated):
 def test_the_sheet_flags_a_dirty_tree(isolated, monkeypatch):
     monkeypatch.setattr(F, "working_tree_clean", lambda: False)
     assert "**dirty**" in F.sheet(F.B0A)
+
+
+def test_a_tag_that_could_not_be_created_is_not_claimed(isolated, monkeypatch, capsys):
+    """P20's freeze points are git tags, so a record naming one that does not
+    exist is a broken guarantee. This happened on the real B0a: `git tag -a`
+    needs a committer identity, WSL had none, and the failure was swallowed."""
+    monkeypatch.setattr(F, "_git", lambda *a: "deadbeef" if a[:1] == ("rev-parse",) else "")
+    record = F.create(F.B0A, sign_off="A Human", tag=True)
+    assert record.git_tag == "", "an uncreated tag must not be claimed"
+    assert F.read(F.B0A).git_tag == "", "and the claim must not survive on disk"
+    out = capsys.readouterr().out
+    assert "could not create the tag" in out
+    assert "git tag -a" in out and "user.name" in out, "it must say how to fix it"
+
+
+def test_a_tag_that_was_created_is_recorded(isolated, monkeypatch):
+    monkeypatch.setattr(
+        F, "_git",
+        lambda *a: "freeze-B0a" if a[:2] == ("tag", "-l") else "deadbeef",
+    )
+    assert F.create(F.B0A, sign_off="A Human", tag=True).git_tag == "freeze-B0a"
