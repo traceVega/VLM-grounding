@@ -99,7 +99,21 @@ class RowResult:
         )
 
 
-def _loader(dataset, row: I.GateRow, *, shuffle: bool, seed: int, workers: int = 4):
+def _loader(dataset, row: I.GateRow, *, shuffle: bool, seed: int, workers: int = 0):
+    """A DataLoader, single-process by default.
+
+    ``workers=0`` is not a tuning choice.  On this host the checks stage died
+    twice on its first row with ``CUDA error: unknown error`` out of
+    ``cuMemcpyHtoDAsync``, while the same copy of the same shape ran thirty
+    times in a row from a plain script -- the difference being four forked
+    DataLoader workers, forked after the model had already initialised CUDA.
+    With ``workers=0`` the identical run completed thirteen rows without a
+    fault (DEVIATIONS D-32).
+
+    The cost is small now that the render cache turned loading into an ``.npy``
+    read and normalising moved to the device: about 17% on a warm row, against
+    a stage that otherwise does not finish at all.
+    """
     batch = batch_size_for(row)
     if row.input_kind in ("full_cap", "full_1024") and isinstance(dataset, GateDataset):
         shapes = [dataset.shape_of(i) for i in range(len(dataset))]
@@ -126,7 +140,7 @@ def train_one(
     seed: int = 0,
     epochs: int = EPOCHS,
     device: str = "cuda",
-    workers: int = 4,
+    workers: int = 0,
     cache: dict | None = None,
     render_cache=None,
 ) -> tuple[np.ndarray, np.ndarray, list[str]]:
@@ -218,7 +232,7 @@ def run_row(
     seeds: tuple[int, ...] = SEEDS,
     epochs: int = EPOCHS,
     device: str = "cuda",
-    workers: int = 4,
+    workers: int = 0,
     cache: dict | None = None,
     render_cache=None,
     allow_unfrozen: bool = False,

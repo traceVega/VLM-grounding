@@ -720,7 +720,13 @@ def main() -> None:
     ap.add_argument("--hole-types", default=",".join(DEFAULT_HOLE_TYPES))
     ap.add_argument("--freeze-version", default="unfrozen")
     ap.add_argument("--epochs", type=int, default=5, help="P6: epochs per gate row")
-    ap.add_argument("--workers", type=int, default=4, help="dataloader workers")
+    ap.add_argument(
+        "--workers",
+        type=int,
+        default=0,
+        help="dataloader workers; 0 by default because forked workers crash this "
+        "host's CUDA (DEVIATIONS D-32) and the render cache makes them near-free to lose",
+    )
     ap.add_argument("--sign-off", default="", help="freeze: the name binding P1 to P7 (P20)")
     ap.add_argument("--note", default="", help="freeze: recorded with the record")
     ap.add_argument("--allow-dirty", action="store_true", help="freeze: tag a dirty tree")

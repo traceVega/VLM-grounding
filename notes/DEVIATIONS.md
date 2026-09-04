@@ -341,3 +341,34 @@ discount them, and this entry exists so a reader knows they were seen. If that
 is judged insufficient, the remedy under P20 is to fork the document and report
 both versions; that call belongs to whoever signs B0a, not to the
 implementation.
+
+### D-32. The gate trains with no DataLoader workers, because forked ones crash CUDA
+
+**2026-09-04.** The checks stage died twice on its first row with
+`torch.AcceleratorError: CUDA error: unknown error`, the driver reporting
+`Returning 999 (CUDA_ERROR_UNKNOWN) from cuMemcpyHtoDAsync_v2` on the
+host-to-device copy in `train_one`.
+
+Not the code, and not the card. Immediately afterwards, a plain script did
+thirty host-to-device copies of the same shape (64x3x1024x1024 uint8) and a
+20-step bf16 matmul without a fault, and `nvidia-smi` showed the GPU idle and
+healthy. The distinguishing factor is that the stage runs four DataLoader
+workers, forked *after* the model has already initialised CUDA -- the classic
+way to inherit a broken context, and evidently one this host's WSL GPU stack
+does not tolerate. It is the same neighbourhood as the `dxg` ioctl failures in
+the kernel log (see the WSL memory note).
+
+With `--workers 0` the identical command completed thirteen rows with no fault,
+including the four check-1b nulls and eight ladder rows.
+
+**Cost:** about 17%. A fully cached row took 25 s at 500 images, which scales to
+roughly 89 s at 1,787, against 76 s measured with four workers. That is a small
+price now that the render cache made loading an `.npy` read and normalising
+moved to the device -- and it is measured against a stage that otherwise does
+not finish.
+
+`--workers` still exists and can be raised on a host that tolerates it; the
+default is 0. An untested alternative that would keep the parallelism is a
+`spawn` multiprocessing context on the DataLoader, which avoids inheriting the
+parent's CUDA state; it was not tried, because robustness at one in the morning
+was worth more than an unmeasured speedup.

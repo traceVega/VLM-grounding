@@ -46,7 +46,7 @@ class GateRunConfig:
     seeds: tuple[int, ...] = SEEDS
     epochs: int = 5
     device: str = "cuda"
-    workers: int = 4
+    workers: int = 0
     limit_images: int | None = None
     #: where rendered inputs are cached between epochs, seeds and rows; ``None``
     #: renders every time, which is what made a single row cost 150 s
