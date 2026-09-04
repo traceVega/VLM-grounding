@@ -249,18 +249,39 @@ def local_floor(aurocs_by_quality: dict[int, float]) -> int | None:
     return detected[0] if detected else None
 
 
+#: What the local rungs actually perturb, inside the hole, in grey levels --
+#: measured on 60 REMOVE edits (OPEN-QUESTIONS Q-15).  Alongside them, what the
+#: editor itself perturbs: 49.4.  The rungs are twelve to twenty times smaller
+#: than the thing they are calibrating against, which is the fact these lines
+#: have to state and originally did not.
+LOCAL_RUNG_GREY_LEVELS = {75: 2.47, 50: 3.21, 30: 3.98}
+EDITOR_GREY_LEVELS = 49.4
+
+
 def local_floor_line(bin_name: str, floor: int | None) -> str:
-    """The line carried into the first table of every downstream use (check 1a)."""
+    """The line carried into the first table of every downstream use (check 1a).
+
+    These lines used to say a bin with no detection meant "the gate is blind to
+    editor-scale artefacts".  That was wrong, and misleading in the direction
+    that matters: the harshest local rung perturbs 3.98 grey levels inside the
+    hole while the editor perturbs 49.4, so the rungs are more than an order of
+    magnitude finer than editor scale and failing them says nothing about
+    editor-scale blindness.  What the floor does bound is how small a *class
+    difference* confined to the hole could hide, which is a real and much
+    narrower limitation.
+    """
+    harshest = LOCAL_RUNG_GREY_LEVELS[min(LOCAL_LADDER_QUALITIES)]
     if floor is None:
         return (
-            f"local floor [{bin_name}]: none of q75/q50/q30 detected -- the gate is blind to "
-            "editor-scale artefacts in this bin; a PASS here says nothing about the editor"
+            f"local floor [{bin_name}]: not detected down to q{min(LOCAL_LADDER_QUALITIES)} "
+            f"(~{harshest:.1f} grey levels in-hole). A class difference confined to the hole "
+            f"and smaller than that could hide here. For scale, the editor's own footprint is "
+            f"~{EDITOR_GREY_LEVELS:.0f} grey levels, so this is not blindness at editor scale"
         )
-    if floor >= max(LOCAL_LADDER_QUALITIES):
-        return f"local floor [{bin_name}]: q{floor} (the gate sees editor-scale damage)"
+    detected = LOCAL_RUNG_GREY_LEVELS[floor]
     return (
-        f"local floor [{bin_name}]: q{floor}, coarser than q{max(LOCAL_LADDER_QUALITIES)} -- "
-        "reads as the gate being blind in this bin, not as the editor being clean"
+        f"local floor [{bin_name}]: q{floor} (~{detected:.1f} grey levels in-hole) is the "
+        f"smallest in-hole difference detected; anything finer could hide"
     )
 
 

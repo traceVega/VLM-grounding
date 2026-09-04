@@ -123,10 +123,32 @@ def test_local_floor_is_the_highest_detected_quality():
     assert L.local_floor({75: 0.51, 50: 0.55, 30: 0.60}) is None
 
 
-def test_local_floor_line_says_blindness_not_cleanliness():
-    assert "blind" in L.local_floor_line("1-2%", None)
-    assert "blind" in L.local_floor_line("1-2%", 30)
-    assert "sees editor-scale damage" in L.local_floor_line("1-2%", 75)
+def test_local_floor_line_reports_a_bound_not_a_clean_bill():
+    """An undetected bin bounds how small a hidden class difference could be; it
+    is not evidence the editor is clean."""
+    line = L.local_floor_line("1-2%", None)
+    assert "could hide" in line
+    assert "clean" not in line
+
+
+def test_local_floor_line_gives_the_bound_in_grey_levels():
+    """A JPEG quality is not a magnitude. The line has to say how big the
+    undetected difference actually is, or a reader cannot judge it."""
+    for floor in (None, 30, 50, 75):
+        assert "grey levels" in L.local_floor_line("1-2%", floor)
+    harshest = L.LOCAL_RUNG_GREY_LEVELS[min(L.LOCAL_LADDER_QUALITIES)]
+    assert f"{harshest:.1f}" in L.local_floor_line("1-2%", None), "the harshest rung"
+    assert f"{L.LOCAL_RUNG_GREY_LEVELS[75]:.1f}" in L.local_floor_line("1-2%", 75)
+
+
+def test_an_undetected_bin_is_not_called_blindness_at_editor_scale():
+    """It said exactly that, and it was false: the harshest rung perturbs ~4 grey
+    levels in-hole while the editor perturbs ~49, so the rungs are more than an
+    order of magnitude finer than editor scale (OPEN-QUESTIONS Q-15)."""
+    line = L.local_floor_line("1-2%", None)
+    assert "not blindness at editor scale" in line
+    assert str(int(L.EDITOR_GREY_LEVELS)) in line, "the editor's own scale, for comparison"
+    assert L.EDITOR_GREY_LEVELS > 10 * L.LOCAL_RUNG_GREY_LEVELS[min(L.LOCAL_LADDER_QUALITIES)]
 
 
 def test_global_ladder_verdict_needs_both_legs():
