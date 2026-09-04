@@ -121,8 +121,10 @@ REGISTRY: dict[str, tuple[tuple[str, str, str], ...]] = {
 B0A_BEHAVIOURS: tuple[tuple[str, str, str, str], ...] = (
     ("P7", "idea91.gate.ladders", "local_ladder_pair",
      "Q-5: the local ladder's reference class sets the local floor"),
-    ("P5", "idea91.gate.dataset", "ShapeBucketSampler",
-     "Q-7: the tile budget for gate row (ii) decides what one epoch means"),
+    ("P5", "idea91.gate.dataset", "TileDataset",
+     "Q-7: how row (ii) draws training tiles decides what it can detect at all"),
+    ("P6", "idea91.gate.dataset", "ShapeBucketSampler",
+     "batching by exact shape, so native-resolution rows keep their pixels"),
     ("P3", "idea91.edits.sampler", "exclusion_violation",
      "Q-12/Q-13: reading B is the exclusion rule both controls are sampled under"),
 )

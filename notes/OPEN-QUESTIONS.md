@@ -262,7 +262,48 @@ before the freeze because it sets the local floor.
 ### Q-6. Hole-area bin edges for the local floor
 See D-7. Must be frozen with P5 to P7.
 
-### Q-7. Tile budget for gate row (ii)
+### Q-16. Gate row (ii) is structurally blind to local artefacts -- MEASURED 2026-09-04
+
+The local ladder was rerun over both row (iii) (full image, 1,024 px) and row
+(ii) (native 512 px tiles, max aggregation), on the expectation that the tile
+row would be the one able to see damage confined to a hole. **It is the
+opposite**, on the single cell where anything was detected at all:
+
+| mask 5-15% at q30 | AUROC |
+|---|---|
+| `iii_resnet18_1024` | **0.815** |
+| `ii_vit_s16_tiles_native` | 0.518 |
+
+and the tile row sits at chance (0.481 to 0.518) in every other cell too.
+
+The cause is in `TileDataset`, not in the editor. In train mode it draws **one
+random tile per image per epoch**. An image has four to nine tiles and the hole
+is in one of them, so eighty to ninety per cent of training samples carry the
+label "damaged" while containing no damage whatsoever. That is label noise by
+construction and the model cannot learn through it. At eval every tile is used
+and aggregated by the maximum, which would find the damaged tile -- but nothing
+was learned to find it with.
+
+It explains the asymmetry cleanly: **global** damage reaches every tile, so any
+tile carries the signal, and row (ii) is in fact the best row on the global
+ladder at q90 (0.794 on mask). **Local** damage lives in one tile, which
+training almost never shows it.
+
+**This is not confined to the ladder.** Row (ii) is a *gating* row for P7's
+verdict and is trained the same way, and the editor's artefact is local by
+definition -- it is confined to the hole. So row (ii) is near-blind to exactly
+what the gate exists to detect, and contributes little to P7's maximum. The
+verdict is a maximum over rows, so this does not make a PASS wrong; it makes one
+of the four gating rows close to dead weight, and a reader should know which.
+
+Two ways out, both belonging to B0a rather than to the implementation: draw the
+hole's tile deliberately during training (a labelled positive then contains the
+thing being labelled), or drop row (ii) from the gating set and report it. The
+design fixes row (ii)'s *input* -- "native-resolution 512 px tiles with max
+aggregation" -- but says nothing about how training tiles are drawn, so the
+sampler is ours and is frozen at B0a as a behaviour.
+
+### Q-7. Tile budget for gate row (ii) -- ANSWERED by Q-16
 P5 aggregates ViT-S/16 tile scores per image by the maximum. Over an OpenImages
 pool most images give 4 to 9 tiles, which is affordable, but the design's
 budget (gate classifiers 4 to 6 h) assumes something. `TileDataset` draws one
