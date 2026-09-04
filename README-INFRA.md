@@ -80,49 +80,74 @@ wsl -d Ubuntu -e bash -lc 'cd /mnt/d/Dev/ArcNova/auto-research/VLM-grounding && 
 | Same-box excludes UNRESOLVED items | `analysis/k2.compute_rates` |
 | (b') does not fire when the CONTROL_BG shift is within 10 points | `analysis/k2.rule_b_prime` |
 | Verifier-clean is decisive only when kappa >= 0.6 | `analysis/k2.decisive_clean_column` |
+| P20: no classifier trains on a real removal before B0a exists | `gate/train.run_row` |
+| A value frozen at B0a cannot change without the run refusing | `freeze.require` |
+| The freeze covers behaviours too, by source hash, not only constants | `freeze.B0A_BEHAVIOURS` |
+| A wrapped header comment cannot reach the model as prompt text | `harness/prompts._parse` |
+| class_agnostic controls never enter P10's verified-pairs row | `gate/removal_success` |
+| The box parser cannot be handed a ground-truth box to choose by | `harness/parsers` |
+| An image control changes no words; a text control changes no pixels | `harness/conditions.resolve` |
+| T_NULL renders the same template as the condition it controls for | `configs/models/*.yaml` |
+| The render cache is lossless, so it cannot manufacture JPEG artifacts | `gate/dataset.RenderCache` |
 
 ## Build plan status (design Section 7)
 
 | Step | Deliverable | State |
 |---|---|---|
-| B1 | `shared/env`, `PINS.md`, runtime | **SAM 3 and big-LaMa done and verified on the card**; vLLM build and judge weights still unpinned |
-| B2 | `shared/data`: pools, benchmarks, `LICENSES.md` | **written, not run** -- registry, licence renderer, `items.parquet` builder and the download plan are done and tested; each set's annotation adapter waits for its data, and every unpinned locator is refused rather than guessed |
-| B3 | `idea91/instances`, `idea91/edits` for the K1 pool | **written, not run** -- edits and the K1/K2 scene builders are done and tested against a fake segmenter; the SAM 3 adapter runs on transformers' `Sam3Model`/`Sam3Processor` with its plumbing unit-tested against fakes, and SAM 2 is wired as the design's contingency, which stamps `kill_grade=False` on everything it makes. Waiting on an HF token |
-| B4a | gate ladders and nulls on the 1b pairs | **logic done** -- ladder operators, floors and verdicts written and tested; not yet run on a real bank |
-| B0a | K1 freeze | blocked on B2/B3 |
-| B4b | gate classifiers, adversaries, removal-success rows | **classifiers done** (trained end to end on the card in the smoke test); adversary and removal-success wiring pending |
-| B5 | K1 full run | blocked |
-| B6 | K2 instances and edits | blocked on an HF token, then the GroundingME adapter |
-| B7 | `shared/judges` and the verifier | **service and rules done**, weights unpinned |
-| B8 | harness additions, Molmo2 path, parity run | **contract done** (configs, prompts, manifests); the backends and parsers are not written |
-| B9 | relations, analysis, human-check project | **relations and analysis done**; the Label Studio project is not set up |
+| B1 | `shared/env`, `PINS.md`, runtime | **done.** SAM 3, big-LaMa, both judges, both policies and GroundingME all downloaded and pinned by revision in `PINS.md`; vLLM build still unpinned |
+| B2 | `shared/data`: pools, benchmarks, `LICENSES.md` | **OpenImages and GroundingME run.** 10,000-image pool selected and fetched; GroundingME extracted to 1,005 images with `items.parquet` built and validated. OpenRef, gRefCOCO and COCO-Search18 adapters still wait for their formats, and every unpinned locator is refused rather than guessed |
+| B3 | `idea91/instances`, `idea91/edits` for the K1 pool | **instances done, edits running.** 9,692 scenes banked in 3.6 h (311,282 instance rows, 65 shards). The edit bank is building under `scripts/supervise.sh` |
+| B4a | gate ladders and nulls on the 1b pairs | **written; sample sets verified on the real bank**, both classes present in the 1b null and all four hole-area bins populated. Not yet trained |
+| B0a | K1 freeze | **machinery done and self-verifying**; `tables/FREEZE-B0a-sheet.md` is ready to read. Waits on the bank and check 1a, then a human sign-off |
+| B4b | gate classifiers, adversaries, removal-success rows | **all three written.** Tiered so P7's verdict is 24 trainings rather than 76; P10 removal success and the verified-pairs AUROC are wired into the K1 table |
+| B5 | K1 full run | blocked on B4a/B0a/B4b |
+| B6 | K2 instances and edits | **adapter done**, 804 positives on 685 images; instances and edits not run |
+| B7 | `shared/judges` and the verifier | **done.** Service, rules and both judge revisions pinned |
+| B8 | harness additions, Molmo2 path, parity run | **parsers and conditions done** with both models' conventions settled (Q-1, Q-2); the run loop and the backends are not written |
+| B9 | relations, analysis, human-check project | **relations, analysis and a local annotation UI done**; the hosted project is not set up |
 | B0b | K2 freeze | blocked |
 | B10 | frontier client | **not started** |
 | B11 | K2 full run | blocked |
 
 ## What blocks the first real run
 
-1. ~~SAM 3~~ **done 2026-09-03.** `facebook/sam3` @ `3c879f39826c`, downloaded
-   and verified: concept prompt IoU 0.99, absent concept returns nothing, box
-   prompt IoU 0.99, ~0.2 s per prompt, 2.13 GB VRAM.
-2. ~~big-LaMa weights~~ **done 2026-09-03.** Apache-2.0, downloaded, generator
-   vendored at `advimman/lama@786f5936`, verified: 0.029 s per 512x512 fill,
-   0.45 GB VRAM. Set `VLMG_LAMA_DIR` to the unpacked `big-lama` directory.
-3. **GroundingME's instruction and null-box literal**, and Molmo2's native
-   pointing instruction and abstention (OPEN-QUESTIONS Q-1, Q-2). Both prompts
-   are `UNVERIFIED` and refused by a kill run.
-4. **Qwen3-VL's coordinate convention** (Q-3).
-5. **Downloads still outstanding**: the 10,000 K1 pool images (~3 GB, pinned and
-   selected, awaiting a go), GroundingME, COCO train2014, COCO-Search18.
+1. ~~SAM 3, big-LaMa, the judges, the policies, GroundingME~~ **all downloaded
+   and pinned 2026-09-03**; see `shared/env/PINS.md` for revisions and the
+   measurements taken on the card.
+2. ~~GroundingME's instruction and null-box literal~~ **resolved (Q-1).** Copied
+   byte for byte from the benchmark's own evaluator at `lirang04/GroundingME@6867f7a0`.
+   Both Qwen3-VL prompts are `VERIFIED`.
+3. ~~Molmo2's pointing instruction and coordinate convention~~ **resolved (Q-2).**
+   Points are 0-1000 against the original image; the config had said
+   `percent_float`, which was Molmo v1's. Its **abstention form is still
+   `PIN_REQUIRED`** -- the card never shows one -- and is measured on P12's own
+   `p12` dev slice.
+4. **Qwen3-VL's coordinate convention (Q-3)** -- still open, and now a
+   correctness requirement rather than a detail: the benchmark's scorer picks
+   whichever of four readings maximises IoU against ground truth, which K2
+   cannot copy because REMOVE has no ground-truth box. Needs a GPU probe.
+5. **Still outstanding**: OpenRef (design O1), gRefCOCO for the `p12` slice,
+   COCO train2014 and COCO-Search18.
 
-Resolved since: the repository exists (branch `main`), so the freeze points have
-something to tag and manifests carry a real `code_sha`.
+## Compute, measured rather than budgeted
+
+The design allows 14 to 20 GPU-hours for all of K1. Measured on this card:
+
+| | per training, full bank | 148 trainings |
+|---|---|---|
+| as first written | 18 min | 45 h |
+| with the render cache | 9.5 min | 24 h |
+
+The gate is tiered, so **P7's PASS/FAIL is 24 of those trainings**, not 148 --
+roughly 4 hours. Everything else is reported alongside the verdict and blocks
+nothing. `run_k1 rows --tiers verdict` runs only that.
 
 ## Fetching data
 
 `python -m shared.data.download --core` prints the plan and fetches nothing.
-Today 13.2 GB is fetchable (COCO train2014 and the 2017 annotations) and 44.2 GB
-is blocked on unread licences or unpinned locators; 879 GB free on the volume.
+`python -m shared.data.groundingme --extract --items` builds the K2 set from the
+pinned snapshot. 767 GB free on the volume, against a 54 GB edit bank and a
+render cache capped at 150 GB.
 `--yes` executes only the ready steps.
 
 
