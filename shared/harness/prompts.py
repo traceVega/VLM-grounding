@@ -52,13 +52,28 @@ class Prompt:
 
 
 def _parse(path: Path) -> Prompt:
+    """Split a prompt file into its header and the text actually sent.
+
+    A header line is ``# key: value``; a following ``#`` line that is not itself
+    a header continues the previous value.  Continuations matter more than they
+    look: without them a wrapped comment falls through to the body and is sent
+    to the model as part of a pre-registered, hashed prompt, silently.  Once the
+    body has started a ``#`` line is content, because at that point it can only
+    have been written as content.
+    """
     raw = path.read_text(encoding="utf-8")
     meta: dict[str, str] = {}
     body: list[str] = []
+    last_key: str | None = None
     for line in raw.splitlines():
         m = HEADER.match(line)
         if m and not body:
-            meta[m.group("key")] = m.group("value").strip()
+            last_key = m.group("key")
+            meta[last_key] = m.group("value").strip()
+        elif line.lstrip().startswith("#") and not body:
+            if last_key is None:
+                continue  # a comment before any header: not addressed to us
+            meta[last_key] = f"{meta[last_key]} {line.lstrip('# ').rstrip()}".strip()
         elif line.strip() or body:
             body.append(line)
     return Prompt(name=path.stem, path=path, text="\n".join(body).strip(), meta=meta)

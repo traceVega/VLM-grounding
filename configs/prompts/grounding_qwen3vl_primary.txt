@@ -1,10 +1,18 @@
-# status: UNVERIFIED
-# source: GroundingME's own instruction and null-box convention (design P12)
-# todo: copy the instruction string and the null-box literal from the GroundingME
-#   repository at the pinned commit (github.com/lirang04/GroundingME, its evaluator)
-#   and record that commit in shared/env/PINS.md. Do not paraphrase: P12 pins the
+# status: VERIFIED
+# source: GroundingME's own evaluator, lmms_eval_task/groundingme/utils.py line 95
+#   (the module-level PROMPT constant), github.com/lirang04/GroundingME at commit
+#   6867f7a045596d29cd77a14a01d22d4a68d64fb6, read 2026-09-03. Recorded in
+#   shared/env/PINS.md. Copied byte for byte, not paraphrased: P12 pins the
 #   primary protocol to the benchmark's own words, and the K2 numbers are only
 #   "under the benchmark's protocol" if these are them.
+# note: the benchmark's own placeholder is {description}; only the placeholder
+#   name is ours, so the rendered text is identical. The doubled braces are the
+#   benchmark's too -- it renders this with str.format, as the harness does.
+# note: the primary instruction already carries a rejection channel of its own,
+#   the null bbox. See notes/OPEN-QUESTIONS.md Q-1 for what that does to P12's
+#   secondary protocol and to P16 (b).
 # role: Qwen3-VL primary grounding prompt
 # fields: expr
-<<PLACEHOLDER: GroundingME grounding instruction for "{expr}">>
+All spatial relationships are defined from the viewer's perspective, where 'front' means closer to the viewer and 'back' means farther from the viewer. Please provide the bounding box coordinate of the object the following statement describes:
+{expr}
+Ensure that all details mentioned about the object are accurate. Provide at most one bounding box. If a matching object is found, provide its bounding box as a JSON in the format {{"bbox_2d": [x1, y1, x2, y2]}}. If no matching object is found, output {{"bbox_2d": null}}.

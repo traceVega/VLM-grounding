@@ -6,12 +6,47 @@ touching P1 to P21 must be settled before the corresponding freeze (P20).
 
 ## Blocking a kill run
 
-### Q-1. GroundingME's own instruction and null-box convention (P12)
-The primary protocol is pinned to the benchmark's own words, so the K2 numbers
-can be described as "under the benchmark's protocol". Needs the GroundingME
-repository at a recorded commit. Until then
-`configs/prompts/grounding_qwen3vl_primary.txt` is `UNVERIFIED` and any run
-without `--non-kill` refuses it. **Blocks B8 and B11.**
+### Q-1. GroundingME's instruction and null-box convention -- RESOLVED 2026-09-03
+Read from `lmms_eval_task/groundingme/utils.py` (the module-level `PROMPT`, line
+95) and `evaluate.py` at `lirang04/GroundingME@6867f7a0`, recorded in `PINS.md`.
+Copied byte for byte into `grounding_qwen3vl_primary.txt`, now `VERIFIED`; the
+secondary is the same string plus P12's sentence, and a test asserts it is a
+strict prefix.
+
+The dataset itself: 1,005 items, of which **804 are positive single-box** and
+**201 are `Rejection`, whose `bbox` is null**. `bbox` is absolute `xyxy` in
+original-image pixels (100% of positives are consistent with `xyxy`, 15% with
+`xywh`). `detection_type` carries a head noun for 100% of items, so P10's
+verifier question needs no noun-phrase parse on this set. Every positive is
+already within P8's 30% area limit, so that filter excludes nothing here.
+
+Three consequences the pre-registration should absorb:
+
+**(a) P8's 2,000 pairs are unreachable from GroundingME alone.** 804 positives
+is the ceiling before the SAM 3 box-to-mask IoU filter. Without OpenRef, design
+contingency O1 applies -- K2 becomes every eligible GroundingME item and P15's
+CI half-widths are restated against a denominator near 800, not 2,000.
+
+**(b) The primary protocol already has a rejection channel.** The benchmark's
+own instruction ends "If no matching object is found, output `{"bbox_2d":
+null}`". Deviation (3) in the design's preamble assumed the opposite -- that
+under the benchmark's protocol the models have no way to abstain, which is why
+the box-shift form (b') was pre-registered for P16. That reasoning needs
+revisiting: abstention is available under the primary, so P16 (b) may be
+fireable there after all, and P12's secondary ("output none") adds a *second*,
+differently-formatted channel rather than introducing the first one. The parser
+must accept both under the secondary or a primary-style abstention would be
+scored as an unparseable box. Implemented as pre-registered; flagged for the
+freeze, not silently changed.
+
+**(c) The benchmark's scorer is oracle-assisted and K2 cannot copy it.** See
+Q-3.
+
+### Q-1b. P21's cap share on GroundingME -- MEASURED 2026-09-03
+**99.3% of GroundingME images exceed P21's 2.4 Mpx cap** (998/1005); median
+3.4 Mpx, max 59.0 Mpx (7680x7680), median downscale 0.85x. P21 asks for this
+share to be reported per set; on this set it is very nearly everything, so the
+token-count histogram is the informative artifact rather than the share.
 
 ### Q-2. Molmo2's native pointing instruction and abstention (P12, P19)
 Same, from the Molmo2-8B model card at the pinned revision: the exact
@@ -19,13 +54,33 @@ instruction string, the form of the no-such-object sentence, and how an empty
 point list is emitted, which becomes `none_patterns` in the model YAML.
 **Blocks B8 and B11.**
 
-### Q-3. Qwen3-VL's coordinate convention (SPEC Section 1)
+### Q-3. Qwen3-VL's coordinate convention (SPEC Section 1) -- STILL OPEN, and now load-bearing
 SPEC allows `relative_1000`, `absolute_resized`, `percent_float` or
 `loc_tokens`. Qwen2-VL used 0-1000 relative; Qwen2.5-VL moved to absolute
 coordinates of the resized input. Which applies to Qwen3-VL-8B-Instruct must be
-read off the processor and confirmed on the dev slice, not assumed: the whole
-box-mapping path depends on it. `PIN_REQUIRED` in
-`configs/models/qwen3vl-8b-instruct.yaml`. **Blocks B8.**
+read off the processor and confirmed on the dev slice, not assumed.
+`PIN_REQUIRED` in `configs/models/qwen3vl-8b-instruct.yaml`. **Blocks B8.**
+
+Checked 2026-09-03: neither the model card nor `config.json` /
+`preprocessor_config.json` states it, so this needs an empirical probe on the
+GPU -- deferred while the K1 edit bank has the device.
+
+Q-1 raised the stakes. GroundingME's own scorer does *not* fix a convention: it
+parses the box, builds four candidate readings (raw, normalised-or-0-999, MIMO,
+Qwen) and **keeps whichever has the highest IoU with the ground-truth box**.
+That is oracle-assisted decoding, and K2 cannot use it:
+
+* the REMOVE condition has no ground-truth box by construction, so "the reading
+  that maximises IoU with ground truth" is undefined there; and
+* P14's same-box statistic is `IoU(box on REMOVE, box on ORIGINAL)`, which is
+  meaningless unless both conditions are decoded in one frame.
+
+So K2 must fix **one** convention per model and apply it to every condition.
+A consequence to report rather than hide: K2's ORIGINAL-correct rate will not
+match GroundingME's published accuracy for the same model, because the published
+number is computed with the more generous best-of-four decode. P12 pins the
+*prompt*, not the scorer, so this is consistent with running "under the
+benchmark's protocol" -- but it has to be said out loud in the K2 table.
 
 ### Q-4. SAM 3 access -- RESOLVED 2026-09-03
 Access approved, token in place, weights downloaded and the adapter verified

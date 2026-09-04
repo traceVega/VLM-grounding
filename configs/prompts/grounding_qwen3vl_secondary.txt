@@ -1,7 +1,20 @@
-# status: UNVERIFIED
-# source: design P12 -- "the same instruction followed by 'If the object is not present, output none.'"
-# todo: same as grounding_qwen3vl_primary.txt; only the appended sentence below is ours.
+# status: VERIFIED
+# source: design P12 -- "the same instruction followed by 'If the object is not
+#   present, output none.'" The instruction above the appended sentence is
+#   GroundingME's, byte for byte, from the same pinned commit as
+#   grounding_qwen3vl_primary.txt; only the last line is ours.
+# note: P12 wrote this cue for a benchmark whose primary instruction has no
+#   rejection channel. GroundingME's does -- the null bbox -- so the appended
+#   sentence names a SECOND and differently-formatted way to abstain ("none"
+#   against {"bbox_2d": null}). The two protocols are therefore much closer than
+#   P12 assumed, and the secondary may read as a conflicting instruction rather
+#   than a stronger cue. Recorded in notes/OPEN-QUESTIONS.md Q-1; implemented as
+#   pre-registered, because P12 is pre-registered.
+# note: the parser must accept both channels under this protocol, or an abstention
+#   expressed the primary way would be scored as an unparseable box.
 # role: Qwen3-VL secondary (rejection-cued) grounding prompt
 # fields: expr
-<<PLACEHOLDER: GroundingME grounding instruction for "{expr}">>
+All spatial relationships are defined from the viewer's perspective, where 'front' means closer to the viewer and 'back' means farther from the viewer. Please provide the bounding box coordinate of the object the following statement describes:
+{expr}
+Ensure that all details mentioned about the object are accurate. Provide at most one bounding box. If a matching object is found, provide its bounding box as a JSON in the format {{"bbox_2d": [x1, y1, x2, y2]}}. If no matching object is found, output {{"bbox_2d": null}}.
 If the object is not present, output none.

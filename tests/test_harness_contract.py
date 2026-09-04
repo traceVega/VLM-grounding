@@ -175,14 +175,62 @@ def test_a_verified_prompt_loads_and_renders():
 
 
 def test_an_unverified_prompt_is_refused_by_a_kill_run():
+    # Molmo2's pointing instruction still needs its card read (Q-2).
     with pytest.raises(PR.PromptError, match="UNVERIFIED"):
-        PR.load("grounding_qwen3vl_primary")
-    assert PR.load("grounding_qwen3vl_primary", non_kill=True).text  # smoke runs may
+        PR.load("pointing_molmo2_primary")
+    assert PR.load("pointing_molmo2_primary", non_kill=True).text  # smoke runs may
 
 
 def test_a_prompt_missing_a_field_says_which():
     with pytest.raises(PR.PromptError, match="head_noun"):
         PR.load("verifier_headnoun").render()
+
+
+def test_a_wrapped_header_comment_never_reaches_the_model(tmp_path):
+    """The header is ``# key: value``; a wrapped comment continues the value.
+
+    Without continuations the second line of a wrapped comment fell through to
+    the body and was sent to the model as part of a pre-registered, hashed
+    prompt -- silently, because nothing downstream can tell prose from prompt.
+    """
+    path = tmp_path / "wrapped.txt"
+    path.write_text(
+        "# status: VERIFIED\n"
+        "# source: a note long enough to wrap onto\n"
+        "#   a second line mentioning {not_a_field}\n"
+        "# fields: expr\n"
+        "Find {expr}.\n",
+        encoding="utf-8",
+    )
+    p = PR.load("wrapped", root=tmp_path)
+    assert p.text == "Find {expr}."
+    assert "second line" in p.meta["source"], "the continuation belongs to the header"
+    assert p.render(expr="the cup") == "Find the cup."  # no stray field needed
+
+
+def test_a_hash_covers_the_file_so_a_comment_edit_is_visible():
+    """prompt_version is the sha256 of the whole file, header included (SPEC)."""
+    p = PR.load("verifier_headnoun")
+    assert len(p.version) == 64
+
+
+def test_the_groundingme_instruction_is_the_benchmarks_own():
+    """P12 pins the primary protocol to GroundingME's words, not a paraphrase."""
+    rendered = PR.load("grounding_qwen3vl_primary").render(expr="THE_EXPR")
+    assert rendered.startswith("All spatial relationships are defined from the viewer's")
+    assert "THE_EXPR" in rendered
+    # the benchmark's own rejection channel, which P16 (b) has to reckon with
+    assert '{"bbox_2d": null}' in rendered
+    assert '{"bbox_2d": [x1, y1, x2, y2]}' in rendered
+    assert not rendered.startswith("#")
+
+
+def test_the_secondary_protocol_is_the_primary_plus_one_sentence():
+    """P12: 'the same instruction followed by ...' -- so it must be a prefix."""
+    primary = PR.load("grounding_qwen3vl_primary").render(expr="X")
+    secondary = PR.load("grounding_qwen3vl_secondary").render(expr="X")
+    assert secondary.startswith(primary)
+    assert secondary[len(primary):].strip() == "If the object is not present, output none."
 
 
 # --- model configs -----------------------------------------------------------
