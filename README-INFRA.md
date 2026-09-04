@@ -97,10 +97,10 @@ wsl -d Ubuntu -e bash -lc 'cd /mnt/d/Dev/ArcNova/auto-research/VLM-grounding && 
 | B1 | `shared/env`, `PINS.md`, runtime | **done.** SAM 3, big-LaMa, both judges, both policies and GroundingME all downloaded and pinned by revision in `PINS.md`; vLLM build still unpinned |
 | B2 | `shared/data`: pools, benchmarks, `LICENSES.md` | **OpenImages and GroundingME run.** 10,000-image pool selected and fetched; GroundingME extracted to 1,005 images with `items.parquet` built and validated. OpenRef, gRefCOCO and COCO-Search18 adapters still wait for their formats, and every unpinned locator is refused rather than guessed |
 | B3 | `idea91/instances`, `idea91/edits` for the K1 pool | **instances done, edits running.** 9,692 scenes banked in 3.6 h (311,282 instance rows, 65 shards). The edit bank is building under `scripts/supervise.sh` |
-| B4a | gate ladders and nulls on the 1b pairs | **written; sample sets verified on the real bank**, both classes present in the 1b null and all four hole-area bins populated. Not yet trained |
-| B0a | K1 freeze | **machinery done and self-verifying**; `tables/FREEZE-B0a-sheet.md` is ready to read. Waits on the bank and check 1a, then a human sign-off |
-| B4b | gate classifiers, adversaries, removal-success rows | **all three written.** Tiered so P7's verdict is 24 trainings rather than 76; P10 removal success and the verified-pairs AUROC are wired into the K1 table |
-| B5 | K1 full run | blocked on B4a/B0a/B4b |
+| B4a | gate ladders and nulls on the 1b pairs | **done and passing, 2026-09-04.** See the results below |
+| B0a | K1 freeze | **taken 2026-09-04**: `B0a@38589450bde7`, 47 values, signed off by Jiaqi Zhang, tag `freeze-B0a` on `b8fc7fc` |
+| B4b | gate classifiers, adversaries, removal-success rows | **written; the verdict tier is running.** Tiered so P7's verdict is 24 trainings rather than 76. P10 removal success still needs the judge served |
+| B5 | K1 full run | verdict tier in flight; the remaining three tiers block nothing |
 | B6 | K2 instances and edits | **adapter done**, 804 positives on 685 images; instances and edits not run |
 | B7 | `shared/judges` and the verifier | **done.** Service, rules and both judge revisions pinned |
 | B8 | harness additions, Molmo2 path, parity run | **parsers and conditions done** with both models' conventions settled (Q-1, Q-2); the run loop and the backends are not written |
@@ -128,6 +128,32 @@ wsl -d Ubuntu -e bash -lc 'cd /mnt/d/Dev/ArcNova/auto-research/VLM-grounding && 
    cannot copy because REMOVE has no ground-truth box. Needs a GPU probe.
 5. **Still outstanding**: OpenRef (design O1), gRefCOCO for the `p12` slice,
    COCO train2014 and COCO-Search18.
+
+## B4a results (2026-09-04, 2,000-image ladder sample, whole bank behind it)
+
+| check | mask | rect | requirement |
+|---|---|---|---|
+| **1b** null, must sit at chance | 0.499 to 0.507 | 0.498 to 0.507 | 0.5 +/- 0.05 |
+| **1a** global, q75 | 0.945 | 0.976 | > 0.90 |
+| **1a** global, **q90** (the rung the requirement is read at) | **0.794** | **0.754** | >= 0.70 |
+| 1a global, q92 (the design's rung, not met) | 0.640 | 0.616 | -- |
+| **1c** paired-crop | 200 pairs clean | 200 pairs clean | identical bytes |
+
+**All three checks pass.** The sensitivity requirement is read at q90 rather than
+the design's q92, amended at B0a on measured grounds: the editor's own footprint
+is 49.4 grey levels inside the hole against 3.98 at the harshest rung the ladder
+tests, so every rung is more than an order of magnitude finer than what K1 has
+to detect and the distinction cannot bear on fitness. No resolution raise was
+made -- a ninefold range of input pixels moves the q92 AUROC only between 0.55
+and 0.64. See `notes/OPEN-QUESTIONS.md` Q-15.
+
+**The local floor is the caveat every K1 result carries** (P7 requires it beside
+the verdict). Only one cell in eight detects in-hole damage at all: mask 5-15%
+at q30, AUROC 0.815. Every other bin on both hole types is at chance, confirmed
+against a second gate row, so this is a property of the gate rather than of the
+row that measured it. A K1 PASS therefore means "no systematic difference the
+gate can see", not "no difference". Row (ii) is separately near-blind to local
+artefacts for a structural reason -- `notes/OPEN-QUESTIONS.md` Q-16.
 
 ## Compute, measured rather than budgeted
 
