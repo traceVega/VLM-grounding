@@ -100,6 +100,33 @@ def numbers_in(text: str) -> list[float] | None:
         return None
 
 
+#: How far the observed ratio may sit from 1.0 and still count as "did not move".
+STAYS_PUT = 0.08
+#: ...and from the frame ratio to count as "scaled with the frame".
+SCALES = 0.12
+#: Above this, coordinates are 0-1000 rather than 0-100.
+RELATIVE_1000_FLOOR = 100.0
+
+
+def decide(ratio: float, frame_ratio: float, max_coordinate: float) -> tuple[str, str]:
+    """Which convention the two-cap ratio implies, and why.
+
+    ``UNDECIDED`` rather than a nearest-match, because a convention chosen by
+    "which is least unlike the data" is a guess wearing a measurement's clothes,
+    and every box in K2 depends on it.
+    """
+    if abs(ratio - 1.0) < STAYS_PUT:
+        if max_coordinate > RELATIVE_1000_FLOOR:
+            return "relative_1000", "coordinates did not move when the resized frame changed"
+        return "percent_float", "coordinates did not move, and are on a 0-100 scale"
+    if abs(ratio - frame_ratio) < SCALES:
+        return "absolute_resized", "coordinates scaled with the resized frame"
+    return (
+        "UNDECIDED",
+        f"ratio {ratio:.3f} matches neither 1.0 nor the frame ratio {frame_ratio:.3f}",
+    )
+
+
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--n", type=int, default=8, help="items to probe")
@@ -173,16 +200,7 @@ def main() -> None:
     print(f"median small/big resized-frame ratio: {frame_ratio:.3f}")
     print(f"largest coordinate seen: {magnitude:.1f}")
 
-    if abs(ratio - 1.0) < 0.08:
-        convention = "relative_1000" if magnitude > 100 else "percent_float"
-        why = "coordinates did not move when the resized frame changed"
-    elif abs(ratio - frame_ratio) < 0.12:
-        convention = "absolute_resized"
-        why = "coordinates scaled with the resized frame"
-    else:
-        convention = "UNDECIDED"
-        why = f"ratio {ratio:.3f} matches neither 1.0 nor the frame ratio {frame_ratio:.3f}"
-
+    convention, why = decide(ratio, frame_ratio, magnitude)
     print(f"\nQ-3: {convention}  ({why})")
     if convention == "UNDECIDED":
         print("Do not guess. Widen --n, or read the answers in the JSON below.")
