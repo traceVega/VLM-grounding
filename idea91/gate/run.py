@@ -35,6 +35,15 @@ from shared.stats import Interval
 CONTRAST_OBJ = "REMOVE_vs_CONTROL_OBJ"
 CONTRAST_BG = "REMOVE_vs_CONTROL_BG"
 
+#: Rows the local ladder is measured on.  The tile row is the one that can see a
+#: small hole at all -- it reads native 512 px tiles and aggregates by the
+#: maximum -- and the 1,024 px row is kept for comparability with the global
+#: ladder.  Both, because the floor is the best detector's.
+LOCAL_LADDER_ROWS = (
+    I.ROWS_BY_NAME["ii_vit_s16_tiles_native"],
+    I.ROWS_BY_NAME["iii_resnet18_1024"],
+)
+
 
 @dataclass
 class GateRunConfig:
@@ -182,13 +191,30 @@ def run_checks(cfg: GateRunConfig) -> dict:
                 cfg.limit_images,
             )
             for bin_name, subset in B.by_hole_area_bin(samples).items():
-                key = f"local__{hole_type}__{bin_name}__q{quality}"
-                row = I.ROWS_BY_NAME["iii_resnet18_1024"]
-                result = train_cached(cfg, key, subset, row, hole_type,
-                                      f"local_q{quality}_{bin_name}", (cfg.seeds[0],))
-                if result:
+                # Over the same gate rows the global ladder uses, and for the
+                # same reason: the floor is "the smallest detected local step",
+                # so it belongs to the best detector, not to one arbitrary row.
+                #
+                # Which row matters more here than it does globally. This ran
+                # against `iii_resnet18_1024` alone at first and reported the
+                # gate blind in nearly every bin -- unsurprising in hindsight,
+                # because a full-image 1,024 px classifier downsamples a hole of
+                # 0.5 to 15% toward nothing. Row (ii) sees native 512 px tiles
+                # and aggregates by the maximum, so it looks at the hole at full
+                # resolution in whichever tile holds it. A floor measured
+                # without it describes the row, not the editor.
+                best: dict[str, float] = {}
+                for row in LOCAL_LADDER_ROWS:
+                    key = f"local__{hole_type}__{bin_name}__q{quality}__{row.name}"
+                    result = train_cached(cfg, key, subset, row, hole_type,
+                                          f"local_q{quality}_{bin_name}", (cfg.seeds[0],))
+                    if result and np.isfinite(result.auroc_mean):
+                        best[row.name] = result.auroc_mean
+                if best:
                     out["local_ladder"].setdefault(hole_type, {}).setdefault(
-                        bin_name, {})[quality] = result.auroc_mean
+                        bin_name, {})[quality] = max(best.values())
+                    out.setdefault("local_ladder_by_row", {}).setdefault(
+                        hole_type, {}).setdefault(bin_name, {})[quality] = best
 
         # check 1c: an assert, not a trained row
         try:
@@ -285,19 +311,37 @@ def run_gate_rows(cfg: GateRunConfig, tiers: tuple[str, ...] | None = None) -> l
     return results
 
 
+def _by_int_quality(mapping: dict) -> dict:
+    """JPEG qualities back to ints.
+
+    ``run_checks`` keys these by int, but the results are written to
+    ``gate_checks.json`` and JSON has no int keys -- so on reload they are
+    ``"75"`` and ``"92"``.  Everything below then looked up ``75``, found
+    nothing, and decided the ladder on empty data: ``stage_report`` would have
+    called check 1a a failure whatever the numbers said, and ``local_floor``
+    would have compared a string against an int.  Normalising at this boundary
+    is the fix, because this is the only door the reloaded dict comes through.
+    """
+    out = {}
+    for key, value in mapping.items():
+        try:
+            out[int(key)] = value
+        except (TypeError, ValueError):
+            out[key] = value
+    return out
+
+
 def summarise_checks(checks: dict, hole_type: str) -> tuple[L.GlobalLadderVerdict, L.NullVerdict, dict]:
     """Fold the raw AUROCs into the verdict objects P7 reports with."""
-    globals_ = checks["global_ladder"].get(hole_type, {})
-    q75 = globals_.get(75, {})
-    q92 = globals_.get(92, {})
+    globals_ = _by_int_quality(checks["global_ladder"].get(hole_type, {}))
     ladder = L.GlobalLadderVerdict(
-        q75_auroc_by_row=q75,
-        q92_auroc_by_row=q92,
+        q75_auroc_by_row=globals_.get(75, {}),
+        q92_auroc_by_row=globals_.get(92, {}),
         all_aurocs={(r, q): v for q, rows in globals_.items() for r, v in rows.items()},
     )
     null = L.NullVerdict(auroc_by_row=checks["null_1b"].get(hole_type, {}))
     floors = {
-        bin_name: L.local_floor(by_quality)
+        bin_name: L.local_floor(_by_int_quality(by_quality))
         for bin_name, by_quality in checks["local_ladder"].get(hole_type, {}).items()
     }
     return ladder, null, floors

@@ -382,22 +382,32 @@ def stage_checks(args) -> None:
 def gate_resolution_note(checks: dict) -> str:
     """What check 1a says about the resolution the gate rows should run at.
 
-    Check 1a is a sensitivity floor: if no gate row can see a whole-image q75
+    Check 1a is a sensitivity floor: if no gate row can see a whole-image
     re-encode, the gate is blind and a low AUROC on real removals would mean
     nothing.  The design's one declared pre-freeze contingency is raising the
     resolution in response, so this is the line the freeze sheet carries.
+
+    Asks :class:`GlobalLadderVerdict` rather than re-deciding here.  This
+    function previously tested the q75 leg only and reported "sensitive" on a
+    ladder that fails: check 1a has two requirements -- q75 above 0.9 *and* q92
+    reaching 0.7 in at least one gate row -- and a summary that reimplements
+    half a rule is worse than no summary, because it reads like a verdict.
     """
     from idea91.gate import ladders as L
+    from idea91.gate.run import summarise_checks
 
     lines = []
-    for hole_type, by_quality in sorted(checks.get("global_ladder", {}).items()):
-        q75 = by_quality.get(75) or by_quality.get("75") or {}
-        best = max(q75.values()) if q75 else float("nan")
-        verdict = "sensitive" if best >= L.GLOBAL_REQUIRED_Q75_AUROC else "NOT SENSITIVE"
+    for hole_type in sorted(checks.get("global_ladder", {})):
+        ladder, _, floors = summarise_checks(checks, hole_type)
+        lines.append(f"check 1a [{hole_type}]: {ladder.verdict_line()}")
         lines.append(
-            f"check 1a [{hole_type}]: best q75 AUROC {best:.3f} "
-            f"(needs >= {L.GLOBAL_REQUIRED_Q75_AUROC:.2f}) -- {verdict}"
+            f"  q75 best {max(ladder.q75_auroc_by_row.values(), default=float('nan')):.3f} "
+            f"(needs > {L.GLOBAL_REQUIRED_Q75_AUROC:.2f}); "
+            f"q92 best {max(ladder.q92_auroc_by_row.values(), default=float('nan')):.3f} "
+            f"(needs >= {L.GLOBAL_REQUIRED_Q92_AUROC:.2f})"
         )
+        for bin_name, floor in sorted(floors.items()):
+            lines.append("  " + L.local_floor_line(bin_name, floor))
     return "\n".join(lines) or "check 1a: not run"
 
 
