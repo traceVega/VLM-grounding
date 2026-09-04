@@ -15,7 +15,12 @@ prompt_templates:
   grounding: grounding_qwen3vl_primary
   groundingme: grounding_qwen3vl_primary
   presence: verifier_headnoun
-  t_null: t_null_qwen3vl
+  # P13: "the grounding instruction with the expression replaced by 'the
+  # object'". The same template, rendered with a different expr -- not a copy of
+  # it. A separate file would be free to drift from the instruction it is meant
+  # to control for, and then T_NULL would differ from the real condition in two
+  # ways instead of one. Molmo2's config already did it this way.
+  t_null: grounding_qwen3vl_primary
   cocosearch18: cocosearch18_category
 coordinate_convention: PIN_REQUIRED   # read off the model card / processor before B8
 parser: qwen3vl_box
