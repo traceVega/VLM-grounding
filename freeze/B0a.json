@@ -1,0 +1,250 @@
+{
+  "count_table": "# K1 edit-bank counts\n\nimages 8,123   edits 53,935\n\n| set | hole type | operator | control source | edits | median hole area |\n|---|---|---|---|---|---|\n| openimages_pool | mask | CONTROL_BG | background | 6,808 | 1.41% |\n| openimages_pool | mask | CONTROL_OBJ | class_agnostic | 4,929 | 1.31% |\n| openimages_pool | mask | CONTROL_OBJ | labelled_other_class | 3,166 | 1.16% |\n| openimages_pool | mask | CONTROL_OBJ_2 | class_agnostic | 5,319 | 1.16% |\n| openimages_pool | mask | CONTROL_OBJ_2 | labelled_other_class | 1,567 | 1.04% |\n| openimages_pool | mask | REMOVE | - | 8,097 | 1.27% |\n| openimages_pool | rect | RECT_CONTROL_BG | background | 5,448 | 1.73% |\n| openimages_pool | rect | RECT_CONTROL_OBJ | class_agnostic | 4,586 | 1.08% |\n| openimages_pool | rect | RECT_CONTROL_OBJ | labelled_other_class | 2,142 | 0.91% |\n| openimages_pool | rect | RECT_CONTROL_OBJ_2 | class_agnostic | 4,340 | 0.95% |\n| openimages_pool | rect | RECT_CONTROL_OBJ_2 | labelled_other_class | 805 | 0.80% |\n| openimages_pool | rect | RECT_REMOVE | - | 6,728 | 1.09% |",
+  "count_table_sha256": "df4bf8302125a5d2fe975d884adab954273bbe5abb329835012c2fd39a6db2b7",
+  "created_utc": "2026-09-04T18:17:01+00:00",
+  "data_values": {
+    "check_1a_resolution_note": "check 1a [mask]: check 1a global ladder: PASS (q90 AUROC 0.794 >= 0.70; the gate is sensitive at the frozen resolution). The design's q92 rung reads 0.640 and is not met; the requirement was amended to q90 at B0a because every rung is more than an order of magnitude finer than the editor's own footprint (49.4 grey levels in-hole against 3.98 at the harshest rung), so the distinction cannot bear on fitness for K1 (OPEN-QUESTIONS Q-15)\n  q75 best 0.945 (needs > 0.90); q90 best 0.794 (needs >= 0.70); the design's q92 rung reads 0.640\ncheck 1a [rect]: check 1a global ladder: PASS (q90 AUROC 0.754 >= 0.70; the gate is sensitive at the frozen resolution). The design's q92 rung reads 0.616 and is not met; the requirement was amended to q90 at B0a because every rung is more than an order of magnitude finer than the editor's own footprint (49.4 grey levels in-hole against 3.98 at the harshest rung), so the distinction cannot bear on fitness for K1 (OPEN-QUESTIONS Q-15)\n  q75 best 0.976 (needs > 0.90); q90 best 0.754 (needs >= 0.70); the design's q92 rung reads 0.616",
+    "local_floors": {
+      "mask": {
+        "0.5-1%": {
+          "30": 0.5209381955144667,
+          "50": 0.5168464304057524,
+          "75": 0.5133709981167608
+        },
+        "1-2%": {
+          "30": 0.5232974910394266,
+          "50": 0.5197821891370279,
+          "75": 0.5180590019299697
+        },
+        "2-5%": {
+          "30": 0.5815850815850816,
+          "50": 0.5365467865467866,
+          "75": 0.5281385281385281
+        },
+        "5-15%": {
+          "30": 0.8147435897435897,
+          "50": 0.5230769230769231,
+          "75": 0.48653846153846153
+        }
+      },
+      "rect": {
+        "0.5-1%": {
+          "30": 0.5039244186046512,
+          "50": 0.5073297342192691,
+          "75": 0.49761212624584716
+        },
+        "1-2%": {
+          "30": 0.5137776040648818,
+          "50": 0.4999348576639958,
+          "75": 0.4893492280633184
+        },
+        "2-5%": {
+          "30": 0.563588007736944,
+          "50": 0.5469052224371374,
+          "75": 0.5432785299806576
+        },
+        "5-15%": {
+          "30": 0.43333333333333335,
+          "50": 0.4666666666666667,
+          "75": 0.5
+        }
+      }
+    }
+  },
+  "git_commit": "b8fc7fc18241b0f2345ae1951834e12161bce8d6",
+  "git_tag": "freeze-B0a",
+  "note": "",
+  "point": "B0a",
+  "signed_off_by": "Jiaqi Zhang",
+  "values": {
+    "P1:idea91.instances.automask.MAX_AREA_FRAC": 0.5,
+    "P1:idea91.instances.automask.MIN_AREA_FRAC": 0.005,
+    "P1:idea91.instances.automask.NMS_IOU_THRESH": 0.7,
+    "P1:idea91.instances.automask.POINTS_PER_SIDE": 32,
+    "P1:idea91.instances.automask.PRED_IOU_THRESH": 0.8,
+    "P1:idea91.instances.automask.STABILITY_SCORE_THRESH": 0.9,
+    "P1:idea91.instances.build.CLASS_AGNOSTIC_MIN_AREA": 0.005,
+    "P2:idea91.edits.sampler.HOLE_DILATION_PX": 5,
+    "P2:idea91.edits.sampler.HOLE_TYPES": [
+      "mask",
+      "rect"
+    ],
+    "P2:idea91.edits.window.LAMA_MAX_SIDE": 2048,
+    "P2:idea91.edits.window.LAMA_PAD_MULTIPLE": 8,
+    "P2:idea91.edits.window.WINDOW_FACTOR": 4.0,
+    "P2:idea91.edits.window.WINDOW_MAX_SIDE": 2048,
+    "P2:idea91.edits.window.WINDOW_MIN_SIDE": 768,
+    "P3:idea91.edits.sampler.AREA_RATIO_RANGE": [
+      0.5,
+      2.0
+    ],
+    "P3:idea91.edits.sampler.CENTRALITY_TOLERANCE": 0.2,
+    "P3:idea91.edits.sampler.CLASS_AGNOSTIC_MIN_AREA_FRAC": 0.005,
+    "P3:idea91.edits.sampler.CONTROL_BITE_TOLERANCE": 0.1,
+    "P3:idea91.edits.sampler.CONTROL_SOURCES": [
+      "labelled_other_class",
+      "noun_phrase_instance",
+      "class_agnostic"
+    ],
+    "P3:idea91.edits.sampler.EXCLUSION_DILATION_PX": 16,
+    "P3:idea91.edits.sampler.MAX_TRIES": 100,
+    "P3:idea91.edits.sampler.exclusion_violation()": {
+      "source_sha256": "5992cd501d6b1e7dc185a74de80881038595b464dd1e4431e87a99fae748f819",
+      "why": "Q-12/Q-13: reading B is the exclusion rule both controls are sampled under"
+    },
+    "P5:idea91.gate.dataset.TileDataset()": {
+      "source_sha256": "33edc4004e052e4614a335463a99cd0c2665e0a20508139e2d324e73d08b57c3",
+      "why": "Q-7: how row (ii) draws training tiles decides what it can detect at all"
+    },
+    "P5:idea91.gate.inputs.ADVERSARY_ROWS": [
+      {
+        "aggregate": "image",
+        "classifier": "dinov2_b",
+        "gating": false,
+        "input_kind": "full_1024",
+        "name": "adv_dinov2b_1024",
+        "note": ""
+      },
+      {
+        "aggregate": "max_tile",
+        "classifier": "dinov2_b",
+        "gating": false,
+        "input_kind": "tiles_512",
+        "name": "adv_dinov2b_tiles_native",
+        "note": ""
+      },
+      {
+        "aggregate": "image",
+        "classifier": "forensic",
+        "gating": false,
+        "input_kind": "full_cap",
+        "name": "adv_forensic_full_cap",
+        "note": ""
+      }
+    ],
+    "P5:idea91.gate.inputs.GATE_ROWS": [
+      {
+        "aggregate": "image",
+        "classifier": "resnet18",
+        "gating": true,
+        "input_kind": "full_cap",
+        "name": "i_resnet18_full_cap",
+        "note": "P5 row (i)"
+      },
+      {
+        "aggregate": "max_tile",
+        "classifier": "vit_s16",
+        "gating": true,
+        "input_kind": "tiles_512",
+        "name": "ii_vit_s16_tiles_native",
+        "note": "P5 row (ii)"
+      },
+      {
+        "aggregate": "image",
+        "classifier": "resnet18",
+        "gating": true,
+        "input_kind": "full_1024",
+        "name": "iii_resnet18_1024",
+        "note": "P5 row (iii)"
+      },
+      {
+        "aggregate": "image",
+        "classifier": "vit_s16",
+        "gating": true,
+        "input_kind": "full_1024",
+        "name": "iii_vit_s16_1024",
+        "note": "P5 row (iii)"
+      }
+    ],
+    "P5:idea91.gate.inputs.MPX_CAP": 2457600,
+    "P5:idea91.gate.inputs.REPORTED_ROWS": [
+      {
+        "aggregate": "image",
+        "classifier": "resnet18",
+        "gating": false,
+        "input_kind": "full_512",
+        "name": "rep_resnet18_512",
+        "note": ""
+      },
+      {
+        "aggregate": "image",
+        "classifier": "vit_s16",
+        "gating": false,
+        "input_kind": "full_512",
+        "name": "rep_vit_s16_512",
+        "note": ""
+      },
+      {
+        "aggregate": "image",
+        "classifier": "resnet18",
+        "gating": false,
+        "input_kind": "shown_crop",
+        "name": "rep_resnet18_shown_crop",
+        "note": ""
+      },
+      {
+        "aggregate": "image",
+        "classifier": "vit_s16",
+        "gating": false,
+        "input_kind": "shown_crop",
+        "name": "rep_vit_s16_shown_crop",
+        "note": ""
+      },
+      {
+        "aggregate": "image",
+        "classifier": "resnet18",
+        "gating": false,
+        "input_kind": "paired_crop",
+        "name": "null_resnet18_paired_crop",
+        "note": "check 1c null"
+      }
+    ],
+    "P5:idea91.gate.inputs.SHOWN_CROP_FACTOR": 1.5,
+    "P5:idea91.gate.inputs.SHOWN_CROP_PX": 256,
+    "P5:idea91.gate.inputs.TILE_PX": 512,
+    "P6:idea91.gate.dataset.ShapeBucketSampler()": {
+      "source_sha256": "bb4907e5264eed35af70df59811e620ecd5d64b7420ee076b396d0cd15b6628a",
+      "why": "batching by exact shape, so native-resolution rows keep their pixels"
+    },
+    "P6:idea91.gate.train.ADVERSARY_SEEDS": [
+      0
+    ],
+    "P6:idea91.gate.train.BATCH_NATIVE": 8,
+    "P6:idea91.gate.train.EPOCHS": 5,
+    "P6:idea91.gate.train.LR": 0.0001,
+    "P6:idea91.gate.train.SEEDS": [
+      0,
+      1,
+      2
+    ],
+    "P7:idea91.gate.ladders.GLOBAL_LADDER_QUALITIES": [
+      75,
+      90,
+      92
+    ],
+    "P7:idea91.gate.ladders.GLOBAL_REQUIRED_Q75_AUROC": 0.9,
+    "P7:idea91.gate.ladders.GLOBAL_REQUIRED_RUNG_AUROC": 0.7,
+    "P7:idea91.gate.ladders.HOLE_AREA_BIN_EDGES": [
+      0.005,
+      0.01,
+      0.02,
+      0.05,
+      0.15
+    ],
+    "P7:idea91.gate.ladders.LADDER_IMAGES": 2000,
+    "P7:idea91.gate.ladders.LOCAL_DETECTION_AUROC": 0.7,
+    "P7:idea91.gate.ladders.LOCAL_LADDER_QUALITIES": [
+      75,
+      50,
+      30
+    ],
+    "P7:idea91.gate.ladders.SENSITIVITY_RUNG": 90,
+    "P7:idea91.gate.ladders.local_ladder_pair()": {
+      "source_sha256": "d9770691d99bca814272fc0301a075c843dff6e91fb4c6d1f61679934baf8586",
+      "why": "Q-5: the local ladder's reference class sets the local floor"
+    },
+    "P7:idea91.gate.verdict.DINOV2_REPORT_THRESHOLD": 0.7,
+    "P7:idea91.gate.verdict.GATE_THRESHOLD": 0.6
+  },
+  "values_sha256": "38589450bde7bdb9d91756cd3f6d38aad890e8a23999bcce29949d6b1a08805b"
+}
