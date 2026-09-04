@@ -4,6 +4,7 @@ model-config pinning rules, and the judge lineage rule."""
 from __future__ import annotations
 
 import json
+import re
 
 import pyarrow as pa
 import pytest
@@ -250,12 +251,30 @@ def test_the_secondary_protocol_is_the_primary_plus_one_sentence():
 # --- model configs -----------------------------------------------------------
 
 
-def test_an_unpinned_model_config_is_refused_by_a_kill_run():
+def test_an_unpinned_model_config_is_refused_by_a_kill_run(tmp_path):
+    """Against a fixture, not a real config: naming the fields that happen to be
+    unpinned today makes the test fail every time one is legitimately pinned."""
+    # Derived from a real config so it cannot drift out of SPEC's field set;
+    # only the revision is put back to PIN_REQUIRED.
+    source = (MC.paths.MODELS_ROOT / "molmo2-8b.yaml").read_text(encoding="utf-8")
+    draft = re.sub(r"^revision: .*$", "revision: PIN_REQUIRED", source, flags=re.M)
+    draft = re.sub(r"^model_id: .*$", "model_id: draft", draft, flags=re.M)
+    (tmp_path / "draft.yaml").write_text(draft, encoding="utf-8")
+
     with pytest.raises(MC.ModelConfigError, match="unpinned"):
-        MC.load("qwen3vl-8b-instruct")
-    cfg = MC.load("qwen3vl-8b-instruct", non_kill=True)
-    assert "revision" in cfg.unpinned
-    assert "abstain_protocol.primary.null_box" in cfg.unpinned
+        MC.load("draft", root=tmp_path)
+    assert "revision" in MC.load("draft", root=tmp_path, non_kill=True).unpinned
+
+
+def test_the_real_configs_report_exactly_what_is_still_open():
+    """A positive statement of the remaining work, so resolving one is a
+    one-line edit here rather than a broken assertion."""
+    still_open = {
+        "qwen3vl-8b-instruct": {"coordinate_convention"},  # Q-3, needs a GPU probe
+        "molmo2-8b": {"abstain_protocol.primary.none_patterns[0]"},  # Q-2, the p12 slice
+    }
+    for model, expected in still_open.items():
+        assert set(MC.load(model, non_kill=True).unpinned) == expected, model
 
 
 def test_the_config_hash_is_stable_and_the_fields_are_spec_fields():

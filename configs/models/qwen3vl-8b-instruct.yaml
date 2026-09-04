@@ -2,7 +2,7 @@
 # refuses the file until they are filled (shared/harness/model_config.py).
 model_id: qwen3vl-8b-instruct
 hf_path: Qwen/Qwen3-VL-8B-Instruct
-revision: PIN_REQUIRED          # commit SHA, never a branch name (SPEC Section 1)
+revision: 0c351dd01ed87e9c1b53cbc748cba10e6187ff3b   # downloaded 2026-09-03
 dtype: bfloat16
 attn_impl:
   text_config: eager_capture
@@ -27,8 +27,19 @@ parser: qwen3vl_box
 abstain_protocol:
   primary:
     prompt_suffix: ""
-    none_patterns: [PIN_REQUIRED]     # GroundingME's own null convention (P12)
-    null_box: PIN_REQUIRED
+    # GroundingME's own instruction ends: 'If no matching object is found,
+    # output {"bbox_2d": null}.' So the primary protocol's abstention is
+    # structural, not a phrase -- shared/harness/parsers.parse_qwen3vl reads the
+    # JSON null directly and returns output_type 'none'. There is no text
+    # pattern to match, and inventing one would only create a second way to
+    # abstain that the benchmark never offered.
+    #
+    # This matters beyond parsing: the design's deviation (3) assumed the
+    # primary protocol gives the models no way to abstain, which is the stated
+    # reason P16 (b) was replaced by the box-shift form (b'). It does give them
+    # one. See notes/OPEN-QUESTIONS.md Q-1.
+    none_patterns: []
+    null_box: json_null
   secondary:
     prompt_suffix: "If the object is not present, output none."
     none_patterns: ["none", "no such object", "not present"]

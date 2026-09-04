@@ -64,6 +64,36 @@ P17's 500) will be near-empty in `tiny`, so the per-bin rows of P15 will carry
 almost no tiny items from this set. Reported rather than rebalanced: the bins
 are P8's.
 
+### Q-1d. P21's cap does not apply the way the design words it -- 2026-09-03
+P21 specifies a "run-level override `max_pixels = 2,457,600`". Qwen3-VL ships a
+`Qwen2VLImageProcessor` whose size lives in a `SizeDict` of `longest_edge` and
+`shortest_edge` **areas**; it has no `max_pixels` attribute at all. So:
+
+* `processor.image_processor.max_pixels = 2_457_600` after construction **does
+  nothing**, silently. Measured on a 2643x1500 image: 3,901 visual tokens before
+  and after.
+* `AutoProcessor.from_pretrained(..., max_pixels=2_457_600)` **works** -- 2,340
+  tokens -- because transformers maps the keyword onto `size.longest_edge` while
+  building the processor. Setting `size` directly works too.
+
+This is not cosmetic. Uncapped, the largest GroundingME image (7680x7680) costs
+**16,384 visual tokens against `max_model_len` 4,096**, so vLLM refuses the
+request -- and P21 says no request may be rejected. The design anticipated the
+number exactly ("GroundingME images would otherwise reach 16k tokens"); what it
+could not anticipate is that the obvious way to set the cap has no effect. An
+ineffective cap fails silently and drops items out of every denominator in P15.
+
+`shared/harness/tokens.load_capped_processor` sets it correctly and
+`assert_cap_is_in_force` refuses a processor whose cap did not take, by pricing
+an 8000x8000 image against the ceiling the cap implies.
+
+**Measured with the cap in force**, over all 1,005 GroundingME items and the
+longest expression in the set (676 characters, 258 prompt tokens): visual tokens
+p50 2,360, p100 2,400; worst case prompt plus image **2,658 against 4,096**, so
+1,438 tokens of headroom. P21's requirement holds. The histogram is written to
+`prepared/groundingme/token_histogram_qwen3vl.json`, which is the artifact P21
+asks for before the run.
+
 ### Q-1b. P21's cap share on GroundingME -- MEASURED 2026-09-03
 **99.3% of GroundingME images exceed P21's 2.4 Mpx cap** (998/1005); median
 3.4 Mpx, max 59.0 Mpx (7680x7680), median downscale 0.85x. P21 asks for this
