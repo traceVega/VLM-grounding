@@ -398,7 +398,7 @@ def gate_resolution_note(checks: dict) -> str:
 
     lines = []
     for hole_type in sorted(checks.get("global_ladder", {})):
-        ladder, _, floors = summarise_checks(checks, hole_type)
+        ladder, _, _ = summarise_checks(checks, hole_type)
         lines.append(f"check 1a [{hole_type}]: {ladder.verdict_line()}")
         lines.append(
             f"  q75 best {max(ladder.q75_auroc_by_row.values(), default=float('nan')):.3f} "
@@ -406,8 +406,9 @@ def gate_resolution_note(checks: dict) -> str:
             f"q92 best {max(ladder.q92_auroc_by_row.values(), default=float('nan')):.3f} "
             f"(needs >= {L.GLOBAL_REQUIRED_Q92_AUROC:.2f})"
         )
-        for bin_name, floor in sorted(floors.items()):
-            lines.append("  " + L.local_floor_line(bin_name, floor))
+        # The local floors are not repeated here: K1Verdict.conditions() already
+        # reports them, prefixed by hole type, and P7 requires them beside the
+        # verdict rather than inside a resolution note.
     return "\n".join(lines) or "check 1a: not run"
 
 
