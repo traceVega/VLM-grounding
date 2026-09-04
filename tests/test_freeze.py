@@ -24,8 +24,43 @@ def isolated(tmp_path, monkeypatch):
 def test_every_registered_constant_exists():
     """A renamed constant must break the freeze loudly, not silently drop out."""
     values = F.collect(F.B0A)
-    assert len(values) == len(F.B0A_REGISTRY)
+    assert len(values) == len(F.B0A_REGISTRY) + len(F.B0A_BEHAVIOURS)
     assert all(v is not None for v in values.values())
+
+
+def test_behavioural_decisions_are_frozen_by_source(monkeypatch):
+    """Q-5 and Q-7 are behaviours, not numbers; no constant could hold them."""
+    values = F.collect(F.B0A)
+    keys = [k for k in values if k.endswith("()")]
+    assert len(keys) == len(F.B0A_BEHAVIOURS)
+    for key in keys:
+        assert values[key]["source_sha256"]
+        assert values[key]["why"], "a frozen behaviour must say why it is frozen"
+
+
+def test_editing_a_frozen_behaviour_is_detected(isolated, monkeypatch):
+    F.create(F.B0A, sign_off="A Human", tag=False)
+    real = F._source_digest
+
+    def altered(module_name, qualified_name):
+        if qualified_name == "local_ladder_pair":
+            return "0" * 64  # someone rewrites the local ladder's reference
+        return real(module_name, qualified_name)
+
+    monkeypatch.setattr(F, "_source_digest", altered)
+    _, drifts = F.verify(F.B0A)
+    assert len(drifts) == 1
+    assert "local_ladder_pair" in drifts[0].key
+
+
+def test_a_reformat_is_not_a_change_of_substance():
+    """Trailing whitespace must not read as an edit to the pre-registration."""
+    import hashlib
+
+    a = "def f():\n    return 1\n"
+    b = "def f():   \n    return 1\n   "
+    norm = lambda t: "\n".join(x.rstrip() for x in t.splitlines()).strip()  # noqa: E731
+    assert hashlib.sha256(norm(a).encode()).digest() == hashlib.sha256(norm(b).encode()).digest()
 
 
 def test_the_registry_covers_the_values_p20_names():

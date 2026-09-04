@@ -109,6 +109,39 @@ REGISTRY: dict[str, tuple[tuple[str, str, str], ...]] = {
     B0B: (),  # filled when P8 to P21 land; K2 is not yet buildable
 }
 
+#: Some pre-registered decisions are not a number but a behaviour, so no
+#: constant can hold them.  The local ladder's reference class (Q-5) and the
+#: tile sampler of gate row (ii) (Q-7) are both of that kind: each was settled
+#: before the freeze and each sets a reported floor, so each is frozen by the
+#: source text of the function that implements it.  Editing the function after
+#: the freeze breaks it, exactly as editing a constant would.
+#:
+#: ``(pre-registered definition, module, qualified name, why it is frozen)``
+B0A_BEHAVIOURS: tuple[tuple[str, str, str, str], ...] = (
+    ("P7", "idea91.gate.ladders", "local_ladder_pair",
+     "Q-5: the local ladder's reference class sets the local floor"),
+    ("P5", "idea91.gate.dataset", "ShapeBucketSampler",
+     "Q-7: the tile budget for gate row (ii) decides what one epoch means"),
+    ("P3", "idea91.edits.sampler", "exclusion_violation",
+     "Q-12/Q-13: reading B is the exclusion rule both controls are sampled under"),
+)
+
+
+def _source_digest(module_name: str, qualified_name: str) -> str:
+    """sha256 of a function or class's source text, whitespace-normalised.
+
+    Normalising trailing whitespace keeps a reformat from reading as a change of
+    substance, while any edit to the logic still breaks the digest.
+    """
+    import inspect
+
+    module = import_module(module_name)
+    obj = module
+    for part in qualified_name.split("."):
+        obj = getattr(obj, part)
+    text = "\n".join(line.rstrip() for line in inspect.getsource(obj).splitlines()).strip()
+    return hashlib.sha256(text.encode()).hexdigest()
+
 
 def _canonical(value: object) -> object:
     """A JSON-safe, order-stable form -- tuples become lists, dataclasses dicts."""
@@ -137,6 +170,10 @@ def collect(point: str = B0A) -> dict[str, object]:
                 "that renames it) or it was deleted (which forks the document under P20)."
             )
         out[f"{definition}:{module_name}.{attribute}"] = _canonical(getattr(module, attribute))
+    if point == B0A:
+        for definition, module_name, qualified_name, why in B0A_BEHAVIOURS:
+            key = f"{definition}:{module_name}.{qualified_name}()"
+            out[key] = {"source_sha256": _source_digest(module_name, qualified_name), "why": why}
     return out
 
 
