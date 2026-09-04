@@ -1,0 +1,146 @@
+{
+  "model": "Qwen/Qwen3-VL-8B-Instruct",
+  "revision": "0c351dd01ed87e9c1b53cbc748cba10e6187ff3b",
+  "max_pixels_big": 2457600,
+  "max_pixels_small": 614400,
+  "coordinate_ratio": 0.998982779584542,
+  "frame_ratio": 0.5,
+  "max_coordinate": 980.0,
+  "convention": "relative_1000",
+  "reason": "coordinates did not move when the resized frame changed",
+  "method": "same image at two caps; ground truth never used to choose",
+  "records": [
+    {
+      "id": 490,
+      "original_wh": [
+        7680,
+        7680
+      ],
+      "frame_big": [
+        1536,
+        1536
+      ],
+      "frame_small": [
+        768,
+        768
+      ],
+      "answer_big": [
+        734.0,
+        758.0,
+        743.0,
+        770.0
+      ],
+      "answer_small": [
+        733.0,
+        753.0,
+        743.0,
+        772.0
+      ],
+      "gt_bbox": [
+        5638.0,
+        5819.0,
+        5704.0,
+        5916.0
+      ]
+    },
+    {
+      "id": 473,
+      "original_wh": [
+        7680,
+        7680
+      ],
+      "frame_big": [
+        1536,
+        1536
+      ],
+      "frame_small": [
+        768,
+        768
+      ],
+      "answer_big": [
+        963.0,
+        299.0,
+        980.0,
+        327.0
+      ],
+      "answer_small": [
+        963.0,
+        297.0,
+        979.0,
+        330.0
+      ],
+      "gt_bbox": [
+        7412.0,
+        2307.0,
+        7526.0,
+        2467.0
+      ]
+    },
+    {
+      "id": 491,
+      "original_wh": [
+        7680,
+        7680
+      ],
+      "frame_big": [
+        1536,
+        1536
+      ],
+      "frame_small": [
+        768,
+        768
+      ],
+      "answer_big": [
+        734.0,
+        757.0,
+        744.0,
+        770.0
+      ],
+      "answer_small": [
+        733.0,
+        753.0,
+        743.0,
+        770.0
+      ],
+      "gt_bbox": [
+        5527.0,
+        5776.0,
+        5544.0,
+        5806.0
+      ]
+    },
+    {
+      "id": 367,
+      "original_wh": [
+        7241,
+        7680
+      ],
+      "frame_big": [
+        1504,
+        1600
+      ],
+      "frame_small": [
+        736,
+        800
+      ],
+      "answer_big": [
+        95.0,
+        957.0,
+        113.0,
+        975.0
+      ],
+      "answer_small": [
+        93.0,
+        957.0,
+        110.0,
+        975.0
+      ],
+      "gt_bbox": [
+        703.0,
+        7362.0,
+        792.0,
+        7484.0
+      ]
+    }
+  ]
+}

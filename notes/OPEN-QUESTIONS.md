@@ -131,7 +131,30 @@ channel, so P12's secondary cue genuinely introduces the first one here. The
 primary-versus-secondary contrast is real on the Molmo2 side and nearly absent
 on the Qwen3-VL side.
 
-### Q-3. Qwen3-VL's coordinate convention (SPEC Section 1) -- STILL OPEN, and now load-bearing
+### Q-3. Qwen3-VL's coordinate convention -- RESOLVED 2026-09-03: `relative_1000`
+
+Measured, not read: neither the card nor either config file states it. The same
+image was sent at two caps so the resized frame halved (1536 -> 768 px) while the
+depicted scene did not. The coordinates did not move -- median ratio **0.999**,
+where `absolute_resized` would give 0.5 -- and the largest coordinate seen was
+**980**, so the scale is 0-1000 rather than 0-100. Four items answered on both
+caps; the agreement is tight enough across sixteen coordinate pairs to be
+unambiguous. Evidence in `tables/q3_coordinate_probe.json`, method in
+`scripts/probe_coordinates.py`.
+
+Worth stating plainly because the obvious assumption is wrong: **Qwen2.5-VL moved
+to absolute pixels of the resized input, and Qwen3-VL has not inherited that.**
+Reading these answers as `absolute_resized` would misplace every box by the cap's
+downscale factor -- silently, because the numbers stay in range either way, and
+99.3% of GroundingME images are downscaled.
+
+Ground truth was deliberately not used to choose. Trying each reading and
+keeping whichever best matches the annotated box is the oracle-assisted decode
+this project refuses, and it would be circular besides.
+
+The reasoning that made this load-bearing, kept for the record:
+
+
 SPEC allows `relative_1000`, `absolute_resized`, `percent_float` or
 `loc_tokens`. Qwen2-VL used 0-1000 relative; Qwen2.5-VL moved to absolute
 coordinates of the resized input. Which applies to Qwen3-VL-8B-Instruct must be

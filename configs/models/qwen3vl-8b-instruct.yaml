@@ -22,7 +22,17 @@ prompt_templates:
   # ways instead of one. Molmo2's config already did it this way.
   t_null: grounding_qwen3vl_primary
   cocosearch18: cocosearch18_category
-coordinate_convention: PIN_REQUIRED   # read off the model card / processor before B8
+# Measured 2026-09-03, not read off the card, which does not say (Q-3). The same
+# image was sent at two caps so the resized frame halved (1536 -> 768 px) while
+# the scene did not: the coordinates did not move, ratio 0.999 where
+# absolute_resized would give 0.5, with a largest coordinate of 980. Evidence in
+# tables/q3_coordinate_probe.json.
+#
+# Worth stating because the obvious assumption is wrong: Qwen2.5-VL moved to
+# absolute pixels of the resized input, and Qwen3-VL has not inherited that.
+# Reading these as absolute_resized would misplace every box by the cap's
+# downscale factor -- silently, since the numbers stay in range.
+coordinate_convention: relative_1000
 parser: qwen3vl_box
 abstain_protocol:
   primary:

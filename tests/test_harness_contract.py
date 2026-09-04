@@ -270,7 +270,7 @@ def test_the_real_configs_report_exactly_what_is_still_open():
     """A positive statement of the remaining work, so resolving one is a
     one-line edit here rather than a broken assertion."""
     still_open = {
-        "qwen3vl-8b-instruct": {"coordinate_convention"},  # Q-3, needs a GPU probe
+        "qwen3vl-8b-instruct": set(),  # Q-3 measured 2026-09-03: relative_1000
         "molmo2-8b": {"abstain_protocol.primary.none_patterns[0]"},  # Q-2, the p12 slice
     }
     for model, expected in still_open.items():
