@@ -1,0 +1,8353 @@
+{
+  "n": 316,
+  "records": [
+    {
+      "image_id": "f5c2a80a21ddb78c",
+      "expr": "the Vehicle registration plate",
+      "gt_box": [
+        210.0,
+        230.0,
+        373.0,
+        273.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        199.68,
+        223.341,
+        374.784,
+        273.20000000000005
+      ],
+      "removed_box": [
+        206.848,
+        227.43900000000002,
+        381.952,
+        276.615
+      ],
+      "original_iou_gt": 0.8028167575838713,
+      "same_box": 0.7958282030853917,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "4c6c7b92b6213f59",
+      "expr": "the Vehicle registration plate",
+      "gt_box": [
+        156.0,
+        540.0,
+        274.0,
+        614.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        153.6,
+        540.465,
+        276.48,
+        613.842
+      ],
+      "removed_box": [
+        153.6,
+        492.336,
+        292.86400000000003,
+        552.3000000000001
+      ],
+      "original_iou_gt": 0.9525203550029124,
+      "same_box": 0.09138911454102384,
+      "verifier_answer": "No",
+      "removal_clean": true
+    },
+    {
+      "image_id": "66be6b583048fa94",
+      "expr": "the Vehicle registration plate",
+      "gt_box": [
+        0.0,
+        329.0,
+        114.0,
+        468.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        0.0,
+        329.889,
+        118.784,
+        469.90400000000005
+      ],
+      "removed_box": [
+        0.0,
+        496.54100000000005,
+        826.368,
+        633.1410000000001
+      ],
+      "original_iou_gt": 0.9409406329514513,
+      "same_box": 0.0,
+      "verifier_answer": "No",
+      "removal_clean": true
+    },
+    {
+      "image_id": "7dbe5b1ae29e7983",
+      "expr": "the Human foot",
+      "gt_box": [
+        565.0,
+        897.0,
+        815.0,
+        1021.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        556.032,
+        893.3749999999999,
+        817.152,
+        1020.9999999999999
+      ],
+      "removed_box": [
+        512.0,
+        869.8919999999999,
+        822.272,
+        1020.9999999999999
+      ],
+      "original_iou_gt": 0.9302202761613932,
+      "same_box": 0.710797431094461,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "9b17c9a1c87de744",
+      "expr": "the Person",
+      "gt_box": [
+        0.0,
+        437.0,
+        125.0,
+        533.0
+      ],
+      "original_type": "box",
+      "removed_type": "none",
+      "original_box": [
+        0.0,
+        431.73,
+        126.976,
+        533.0
+      ],
+      "removed_box": null,
+      "original_iou_gt": 0.9332087329623461,
+      "same_box": null,
+      "verifier_answer": "no",
+      "removal_clean": true
+    },
+    {
+      "image_id": "cee8149e2f125ded",
+      "expr": "the Mirror",
+      "gt_box": [
+        533.0,
+        184.0,
+        661.0,
+        320.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        532.224,
+        184.32,
+        659.712,
+        322.56
+      ],
+      "removed_box": [
+        56.832,
+        62.464,
+        719.616,
+        525.312
+      ],
+      "original_iou_gt": 0.9637115892165681,
+      "same_box": 0.05745034301008006,
+      "verifier_answer": "no",
+      "removal_clean": true
+    },
+    {
+      "image_id": "5c32020fb6f896c0",
+      "expr": "the Person",
+      "gt_box": [
+        569.0,
+        318.0,
+        646.0,
+        474.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        566.272,
+        317.756,
+        647.168,
+        475.22799999999995
+      ],
+      "removed_box": [
+        570.368,
+        314.241,
+        650.24,
+        483.664
+      ],
+      "original_iou_gt": 0.9429418957181704,
+      "same_box": 0.8530516908703155,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "abd294100359484a",
+      "expr": "the Land vehicle",
+      "gt_box": [
+        675.0,
+        0.0,
+        1024.0,
+        378.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        668.672,
+        0.0,
+        1024.0,
+        354.81600000000003
+      ],
+      "removed_box": [
+        412.672,
+        0.0,
+        1008.64,
+        741.12
+      ],
+      "original_iou_gt": 0.9229581759182568,
+      "same_box": 0.26977627691008865,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "bc2a6081aaebafbb",
+      "expr": "the Human face",
+      "gt_box": [
+        674.0,
+        0.0,
+        821.0,
+        75.0
+      ],
+      "original_type": "box",
+      "removed_type": "none",
+      "original_box": [
+        657.408,
+        0.0,
+        831.488,
+        76.8
+      ],
+      "removed_box": null,
+      "original_iou_gt": 0.8246477912454041,
+      "same_box": null,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "c7fd2be184ff6aad",
+      "expr": "the Human mouth",
+      "gt_box": [
+        273.0,
+        593.0,
+        425.0,
+        655.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        264.864,
+        591.872,
+        428.62399999999997,
+        657.408
+      ],
+      "removed_box": [
+        254.896,
+        585.7280000000001,
+        409.4,
+        662.528
+      ],
+      "original_iou_gt": 0.8781071575781625,
+      "same_box": 0.7216575015275242,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "bb34dd97cb8e3463",
+      "expr": "the Tire",
+      "gt_box": [
+        266.0,
+        526.0,
+        365.0,
+        627.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        264.192,
+        528.384,
+        363.52,
+        627.456
+      ],
+      "removed_box": [
+        713.7280000000001,
+        523.7760000000001,
+        834.5600000000001,
+        641.28
+      ],
+      "original_iou_gt": 0.9407626737227621,
+      "same_box": 0.0,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "0801961485534636",
+      "expr": "the Vehicle registration plate",
+      "gt_box": [
+        409.0,
+        646.0,
+        586.0,
+        735.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        406.528,
+        646.6560000000001,
+        585.7280000000001,
+        734.208
+      ],
+      "removed_box": [
+        378.88,
+        642.816,
+        616.448,
+        738.816
+      ],
+      "original_iou_gt": 0.9689069219582958,
+      "same_box": 0.6879310344827582,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "9fdf829563c0f284",
+      "expr": "the Person",
+      "gt_box": [
+        773.0,
+        184.0,
+        1024.0,
+        683.0
+      ],
+      "original_type": "box",
+      "removed_type": "none",
+      "original_box": [
+        770.048,
+        181.67800000000003,
+        1024.0,
+        683.0
+      ],
+      "removed_box": null,
+      "original_iou_gt": 0.9837978430392944,
+      "same_box": null,
+      "verifier_answer": "No",
+      "removal_clean": true
+    },
+    {
+      "image_id": "f8498ab39403f5e4",
+      "expr": "the Human head",
+      "gt_box": [
+        378.0,
+        57.0,
+        558.0,
+        280.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        375.808,
+        55.296,
+        557.056,
+        280.576
+      ],
+      "removed_box": [
+        381.952,
+        59.392,
+        555.008,
+        284.672
+      ],
+      "original_iou_gt": 0.9728918723630273,
+      "same_box": 0.9214458804523428,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "8d1e53413cd9c13f",
+      "expr": "the Traffic light",
+      "gt_box": [
+        178.0,
+        83.0,
+        354.0,
+        623.0
+      ],
+      "original_type": "box",
+      "removed_type": "none",
+      "original_box": [
+        173.052,
+        79.872,
+        358.248,
+        621.568
+      ],
+      "removed_box": null,
+      "original_iou_gt": 0.9424889784187229,
+      "same_box": null,
+      "verifier_answer": "No",
+      "removal_clean": true
+    },
+    {
+      "image_id": "d1ebcf19d8de4799",
+      "expr": "the Person",
+      "gt_box": [
+        690.0,
+        11.0,
+        750.0,
+        273.0
+      ],
+      "original_type": "box",
+      "removed_type": "none",
+      "original_box": [
+        684.032,
+        11.46,
+        750.592,
+        271.984
+      ],
+      "removed_box": null,
+      "original_iou_gt": 0.8968619210218424,
+      "same_box": null,
+      "verifier_answer": "no",
+      "removal_clean": true
+    },
+    {
+      "image_id": "00f3dbbbf5bdf2cf",
+      "expr": "the Couch",
+      "gt_box": [
+        0.0,
+        402.0,
+        352.0,
+        691.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        0.0,
+        399.36,
+        354.81600000000003,
+        689.664
+      ],
+      "removed_box": [
+        0.0,
+        405.504,
+        284.16,
+        681.984
+      ],
+      "original_iou_gt": 0.9785740240439978,
+      "same_box": 0.7627293341579057,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "c8fe91568b2bcda7",
+      "expr": "the Sparrow",
+      "gt_box": [
+        406.0,
+        281.0,
+        548.0,
+        483.0
+      ],
+      "original_type": "box",
+      "removed_type": "none",
+      "original_box": [
+        403.456,
+        278.784,
+        549.888,
+        485.37600000000003
+      ],
+      "removed_box": null,
+      "original_iou_gt": 0.9481787537992519,
+      "same_box": null,
+      "verifier_answer": "No",
+      "removal_clean": true
+    },
+    {
+      "image_id": "6f9f8bff2cd3112b",
+      "expr": "the Human head",
+      "gt_box": [
+        398.0,
+        207.0,
+        586.0,
+        348.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        392.192,
+        204.9,
+        595.968,
+        346.281
+      ],
+      "removed_box": [
+        427.008,
+        213.096,
+        595.968,
+        326.47400000000005
+      ],
+      "original_iou_gt": 0.8987960142275292,
+      "same_box": 0.6649187968829658,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "66a32cf3e2fc524e",
+      "expr": "the Vehicle registration plate",
+      "gt_box": [
+        371.0,
+        655.0,
+        503.0,
+        724.0
+      ],
+      "original_type": "box",
+      "removed_type": "none",
+      "original_box": [
+        369.096,
+        653.312,
+        503.62000000000006,
+        723.968
+      ],
+      "removed_box": null,
+      "original_iou_gt": 0.95736993636096,
+      "same_box": null,
+      "verifier_answer": "No",
+      "removal_clean": true
+    },
+    {
+      "image_id": "de972028b90d798f",
+      "expr": "the Human foot",
+      "gt_box": [
+        0.0,
+        782.0,
+        125.0,
+        917.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        0.0,
+        780.288,
+        136.60000000000002,
+        921.6
+      ],
+      "removed_box": [
+        25.954,
+        781.312,
+        109.28,
+        904.192
+      ],
+      "original_iou_gt": 0.8742065157712137,
+      "same_box": 0.5304347826086955,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "6a6dadb83f1298ba",
+      "expr": "the Bird",
+      "gt_box": [
+        178.0,
+        312.0,
+        384.0,
+        478.0
+      ],
+      "original_type": "box",
+      "removed_type": "none",
+      "original_box": [
+        176.12800000000001,
+        311.675,
+        386.048,
+        479.50000000000006
+      ],
+      "removed_box": null,
+      "original_iou_gt": 0.970654863333975,
+      "same_box": null,
+      "verifier_answer": "No",
+      "removal_clean": true
+    },
+    {
+      "image_id": "15328b6de1a77577",
+      "expr": "the Girl",
+      "gt_box": [
+        392.0,
+        344.0,
+        601.0,
+        515.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        391.168,
+        340.48,
+        610.304,
+        516.48
+      ],
+      "removed_box": [
+        391.168,
+        343.68,
+        619.52,
+        513.28
+      ],
+      "original_iou_gt": 0.9266505731600471,
+      "same_box": 0.9261043520862252,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "e786d714873d23cd",
+      "expr": "the Clothing",
+      "gt_box": [
+        199.0,
+        158.0,
+        334.0,
+        279.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        199.68,
+        154.36,
+        319.488,
+        280.16
+      ],
+      "removed_box": [
+        242.68800000000002,
+        178.16000000000003,
+        319.488,
+        234.60000000000002
+      ],
+      "original_iou_gt": 0.857285676451979,
+      "same_box": 0.2875952875952875,
+      "verifier_answer": "yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "4b3aba5dfb7a0492",
+      "expr": "the Vehicle registration plate",
+      "gt_box": [
+        171.0,
+        397.0,
+        281.0,
+        467.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        169.984,
+        393.216,
+        280.576,
+        470.016
+      ],
+      "removed_box": [
+        155.648,
+        385.536,
+        285.696,
+        476.16
+      ],
+      "original_iou_gt": 0.8999400409163492,
+      "same_box": 0.7206726277859333,
+      "verifier_answer": "No",
+      "removal_clean": true
+    },
+    {
+      "image_id": "19f5c53f1ef6768c",
+      "expr": "the Plant",
+      "gt_box": [
+        907.0,
+        0.0,
+        1024.0,
+        619.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        899.072,
+        0.0,
+        1024.0,
+        619.0
+      ],
+      "removed_box": [
+        926.72,
+        602.906,
+        989.184,
+        619.0
+      ],
+      "original_iou_gt": 0.9365394467213115,
+      "same_box": 0.013000000000000029,
+      "verifier_answer": "No",
+      "removal_clean": true
+    },
+    {
+      "image_id": "b7754acd42fdd8a6",
+      "expr": "the Kite",
+      "gt_box": [
+        293.0,
+        196.0,
+        419.0,
+        444.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        293.37600000000003,
+        194.56,
+        420.096,
+        447.488
+      ],
+      "removed_box": [
+        291.84000000000003,
+        336.896,
+        316.416,
+        370.688
+      ],
+      "original_iou_gt": 0.969215921714898,
+      "same_box": 0.024252223120452658,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "3306bc374696e203",
+      "expr": "the Wheel",
+      "gt_box": [
+        564.0,
+        566.0,
+        747.0,
+        637.0
+      ],
+      "original_type": "box",
+      "removed_type": "none",
+      "original_box": [
+        645.12,
+        565.8100000000001,
+        749.568,
+        634.3100000000001
+      ],
+      "removed_box": null,
+      "original_iou_gt": 0.5276981236319095,
+      "same_box": null,
+      "verifier_answer": "No",
+      "removal_clean": true
+    },
+    {
+      "image_id": "a51fc84ad9e6f883",
+      "expr": "the Human hair",
+      "gt_box": [
+        227.0,
+        309.0,
+        338.0,
+        452.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        225.06000000000003,
+        306.176,
+        332.81600000000003,
+        416.76800000000003
+      ],
+      "removed_box": [
+        246.88400000000001,
+        314.368,
+        321.904,
+        375.808
+      ],
+      "original_iou_gt": 0.6959184184715503,
+      "same_box": 0.38677918424753843,
+      "verifier_answer": "No",
+      "removal_clean": true
+    },
+    {
+      "image_id": "22ca76cda674da23",
+      "expr": "the Person",
+      "gt_box": [
+        774.0,
+        0.0,
+        1024.0,
+        214.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        771.072,
+        0.0,
+        1024.0,
+        214.34400000000002
+      ],
+      "removed_box": [
+        773.12,
+        0.0,
+        1024.0,
+        217.77900000000002
+      ],
+      "original_iou_gt": 0.9868372651491695,
+      "same_box": 0.9763823781118676,
+      "verifier_answer": "no",
+      "removal_clean": true
+    },
+    {
+      "image_id": "efde2a25c1c9c924",
+      "expr": "the Vehicle registration plate",
+      "gt_box": [
+        636.0,
+        434.0,
+        804.0,
+        477.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        634.88,
+        429.76000000000005,
+        805.888,
+        472.6
+      ],
+      "removed_box": [
+        633.856,
+        428.40000000000003,
+        716.8000000000001,
+        472.6
+      ],
+      "original_iou_gt": 0.8040487395182052,
+      "same_box": 0.46901172529313256,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "1cb33c5b3eafd486",
+      "expr": "the Wheel",
+      "gt_box": [
+        60.0,
+        680.0,
+        372.0,
+        987.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        55.404,
+        675.84,
+        372.78000000000003,
+        989.184
+      ],
+      "removed_box": [
+        69.084,
+        672.768,
+        370.728,
+        991.232
+      ],
+      "original_iou_gt": 0.9631579287164554,
+      "same_box": 0.9358966356656885,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "8408424dae2d7f4a",
+      "expr": "the Tree",
+      "gt_box": [
+        279.0,
+        0.0,
+        564.0,
+        89.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        334.848,
+        0.0,
+        570.368,
+        116.45100000000001
+      ],
+      "removed_box": [
+        337.92,
+        0.0,
+        512.0,
+        116.45100000000001
+      ],
+      "original_iou_gt": 0.6295188056901365,
+      "same_box": 0.7391304347826085,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "419db62743171bce",
+      "expr": "the Human head",
+      "gt_box": [
+        444.0,
+        195.0,
+        719.0,
+        435.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        437.248,
+        194.304,
+        718.8480000000001,
+        470.016
+      ],
+      "removed_box": [
+        457.728,
+        239.616,
+        626.688,
+        470.016
+      ],
+      "original_iou_gt": 0.8492029514968576,
+      "same_box": 0.501392757660167,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "25883211f830e4c9",
+      "expr": "the Drink",
+      "gt_box": [
+        896.0,
+        56.0,
+        967.0,
+        167.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        893.952,
+        53.76,
+        968.7040000000001,
+        171.264
+      ],
+      "removed_box": [
+        870.4,
+        146.68800000000002,
+        888.832,
+        171.264
+      ],
+      "original_iou_gt": 0.8972342838926372,
+      "same_box": 0.0,
+      "verifier_answer": "No",
+      "removal_clean": true
+    },
+    {
+      "image_id": "5f35130b3d0e988a",
+      "expr": "the Person",
+      "gt_box": [
+        141.0,
+        732.0,
+        257.0,
+        923.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        136.468,
+        730.112,
+        251.652,
+        926.72
+      ],
+      "removed_box": [
+        121.444,
+        817.152,
+        165.89,
+        865.28
+      ],
+      "original_iou_gt": 0.8929745416258612,
+      "same_box": 0.06059359227561983,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "0ef307374d0efc50",
+      "expr": "the Car",
+      "gt_box": [
+        644.0,
+        110.0,
+        796.0,
+        170.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        647.168,
+        108.288,
+        798.72,
+        168.96
+      ],
+      "removed_box": [
+        970.7520000000001,
+        55.296,
+        1024.0,
+        125.952
+      ],
+      "original_iou_gt": 0.9198420049035883,
+      "same_box": 0.0,
+      "verifier_answer": "No",
+      "removal_clean": true
+    },
+    {
+      "image_id": "8d6097473203d652",
+      "expr": "the Person",
+      "gt_box": [
+        498.0,
+        2.0,
+        668.0,
+        341.0
+      ],
+      "original_type": "box",
+      "removed_type": "none",
+      "original_box": [
+        497.664,
+        3.41,
+        677.888,
+        341.0
+      ],
+      "removed_box": null,
+      "original_iou_gt": 0.9395689539105928,
+      "same_box": null,
+      "verifier_answer": "No",
+      "removal_clean": true
+    },
+    {
+      "image_id": "329f259f5094b9aa",
+      "expr": "the Human head",
+      "gt_box": [
+        280.0,
+        3.0,
+        794.0,
+        610.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        273.408,
+        0.0,
+        1021.952,
+        768.0
+      ],
+      "removed_box": [
+        272.384,
+        0.0,
+        744.448,
+        632.064
+      ],
+      "original_iou_gt": 0.5427167886367846,
+      "same_box": 0.5173108798165675,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "426ef0a291c7f843",
+      "expr": "the Man",
+      "gt_box": [
+        277.0,
+        100.0,
+        401.0,
+        352.0
+      ],
+      "original_type": "box",
+      "removed_type": "none",
+      "original_box": [
+        276.615,
+        99.328,
+        401.60400000000004,
+        352.25600000000003
+      ],
+      "removed_box": null,
+      "original_iou_gt": 0.9884473072496773,
+      "same_box": null,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "0f1ff2eae5a3c919",
+      "expr": "the Clothing",
+      "gt_box": [
+        734.0,
+        358.0,
+        1024.0,
+        586.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        716.8000000000001,
+        374.016,
+        1024.0,
+        587.52
+      ],
+      "removed_box": [
+        836.6080000000001,
+        162.048,
+        1024.0,
+        284.16
+      ],
+      "original_iou_gt": 0.8753050528813001,
+      "same_box": 0.0,
+      "verifier_answer": "No",
+      "removal_clean": true
+    },
+    {
+      "image_id": "5b66429a5324f077",
+      "expr": "the Vehicle registration plate",
+      "gt_box": [
+        389.0,
+        568.0,
+        633.0,
+        623.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        387.072,
+        566.784,
+        634.88,
+        623.616
+      ],
+      "removed_box": [
+        385.024,
+        564.48,
+        638.976,
+        621.312
+      ],
+      "original_iou_gt": 0.9528932563600533,
+      "same_box": 0.9006185134710144,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "5c97d9fe11d0ed35",
+      "expr": "the Plant",
+      "gt_box": [
+        648.0,
+        674.0,
+        768.0,
+        829.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        596.736,
+        672.768,
+        768.0,
+        834.5600000000001
+      ],
+      "removed_box": [
+        0.0,
+        0.0,
+        768.0,
+        657.408
+      ],
+      "original_iou_gt": 0.6712585300242662,
+      "same_box": 0.0,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "c794f43f106b2508",
+      "expr": "the Person",
+      "gt_box": [
+        860.0,
+        313.0,
+        953.0,
+        472.0
+      ],
+      "original_type": "box",
+      "removed_type": "none",
+      "original_box": [
+        857.088,
+        311.10799999999995,
+        954.368,
+        473.54999999999995
+      ],
+      "removed_box": null,
+      "original_iou_gt": 0.9357464388909005,
+      "same_box": null,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "6b03453a0561b8bf",
+      "expr": "the Person",
+      "gt_box": [
+        239.0,
+        55.0,
+        579.0,
+        535.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        235.52,
+        52.875,
+        581.6320000000001,
+        542.85
+      ],
+      "removed_box": [
+        319.488,
+        364.48499999999996,
+        396.288,
+        547.0799999999999
+      ],
+      "original_iou_gt": 0.9623423004011491,
+      "same_box": 0.08062117607070023,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "5f5f6c65e8abb49d",
+      "expr": "the Building",
+      "gt_box": [
+        0.0,
+        307.0,
+        533.0,
+        360.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        0.0,
+        305.664,
+        537.6,
+        362.496
+      ],
+      "removed_box": [
+        452.608,
+        324.86400000000003,
+        532.48,
+        362.496
+      ],
+      "original_iou_gt": 0.9245935912195679,
+      "same_box": 0.09837837837837829,
+      "verifier_answer": "No",
+      "removal_clean": true
+    },
+    {
+      "image_id": "1ead26febde18ce9",
+      "expr": "the Vehicle registration plate",
+      "gt_box": [
+        417.0,
+        270.0,
+        678.0,
+        397.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        412.672,
+        268.8,
+        681.984,
+        397.824
+      ],
+      "removed_box": [
+        406.528,
+        268.8,
+        684.032,
+        396.288
+      ],
+      "original_iou_gt": 0.9539333262694781,
+      "same_box": 0.9592634909474423,
+      "verifier_answer": "No",
+      "removal_clean": true
+    },
+    {
+      "image_id": "5117eab116392c51",
+      "expr": "the Bird",
+      "gt_box": [
+        196.0,
+        375.0,
+        415.0,
+        566.0
+      ],
+      "original_type": "box",
+      "removed_type": "none",
+      "original_box": [
+        195.584,
+        373.60100000000006,
+        415.744,
+        566.89
+      ],
+      "removed_box": null,
+      "original_iou_gt": 0.9829511301127956,
+      "same_box": null,
+      "verifier_answer": "no",
+      "removal_clean": true
+    },
+    {
+      "image_id": "a6d5e2668f0dbdcc",
+      "expr": "the Land vehicle",
+      "gt_box": [
+        266.0,
+        408.0,
+        444.0,
+        507.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        262.144,
+        409.20000000000005,
+        437.248,
+        508.09000000000003
+      ],
+      "removed_box": [
+        180.224,
+        465.124,
+        271.36,
+        550.374
+      ],
+      "original_iou_gt": 0.9207296683494558,
+      "same_box": 0.016038242864820546,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "381e05a98aaf2646",
+      "expr": "the Human head",
+      "gt_box": [
+        390.0,
+        189.0,
+        496.0,
+        325.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        388.048,
+        187.392,
+        497.34,
+        327.68
+      ],
+      "removed_box": [
+        378.838,
+        162.816,
+        529.268,
+        329.728
+      ],
+      "original_iou_gt": 0.9402338368439629,
+      "same_box": 0.6106422937273067,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "dbe8e2cbfcd9c8f3",
+      "expr": "the Bird",
+      "gt_box": [
+        123.0,
+        67.0,
+        434.0,
+        258.0
+      ],
+      "original_type": "box",
+      "removed_type": "none",
+      "original_box": [
+        118.784,
+        65.994,
+        435.2,
+        260.741
+      ],
+      "removed_box": null,
+      "original_iou_gt": 0.9639722765440777,
+      "same_box": null,
+      "verifier_answer": "no",
+      "removal_clean": true
+    },
+    {
+      "image_id": "0d0883e0e0436553",
+      "expr": "the Flowerpot",
+      "gt_box": [
+        284.0,
+        610.0,
+        754.0,
+        683.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        280.576,
+        596.259,
+        755.712,
+        683.0
+      ],
+      "removed_box": [
+        268.288,
+        660.461,
+        770.048,
+        683.0
+      ],
+      "original_iou_gt": 0.8324887172782314,
+      "same_box": 0.2561134713812598,
+      "verifier_answer": "No",
+      "removal_clean": true
+    },
+    {
+      "image_id": "28e26a4eb646c67a",
+      "expr": "the Vehicle registration plate",
+      "gt_box": [
+        455.0,
+        336.0,
+        651.0,
+        394.0
+      ],
+      "original_type": "box",
+      "removed_type": "none",
+      "original_box": [
+        453.632,
+        335.311,
+        652.288,
+        394.159
+      ],
+      "removed_box": null,
+      "original_iou_gt": 0.9724128087457882,
+      "same_box": null,
+      "verifier_answer": "No",
+      "removal_clean": true
+    },
+    {
+      "image_id": "d179910533756d52",
+      "expr": "the Weapon",
+      "gt_box": [
+        71.0,
+        398.0,
+        563.0,
+        537.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        72.70400000000001,
+        393.104,
+        568.32,
+        529.944
+      ],
+      "removed_box": [
+        350.208,
+        393.104,
+        530.432,
+        542.384
+      ],
+      "original_iou_gt": 0.9045693694469527,
+      "same_box": 0.3519999999999999,
+      "verifier_answer": "No",
+      "removal_clean": true
+    },
+    {
+      "image_id": "4cb48c8bf41b70a4",
+      "expr": "the Vehicle registration plate",
+      "gt_box": [
+        388.0,
+        412.0,
+        626.0,
+        514.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        391.168,
+        404.736,
+        626.688,
+        514.5600000000001
+      ],
+      "removed_box": [
+        343.04,
+        389.37600000000003,
+        670.72,
+        523.7760000000001
+      ],
+      "original_iou_gt": 0.9146194836321637,
+      "same_box": 0.5873214285714288,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "844adfe06e003c09",
+      "expr": "the Door",
+      "gt_box": [
+        13.0,
+        356.0,
+        288.0,
+        690.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        13.312000000000001,
+        350.976,
+        292.86400000000003,
+        692.736
+      ],
+      "removed_box": [
+        406.528,
+        253.44,
+        860.16,
+        693.504
+      ],
+      "original_iou_gt": 0.9592435321064585,
+      "same_box": 0.0,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "8f2e423a486c893b",
+      "expr": "the Computer keyboard",
+      "gt_box": [
+        200.0,
+        445.0,
+        412.0,
+        521.0
+      ],
+      "original_type": "box",
+      "removed_type": "none",
+      "original_box": [
+        201.728,
+        438.08,
+        416.76800000000003,
+        520.22
+      ],
+      "removed_box": null,
+      "original_iou_gt": 0.8807228336449637,
+      "same_box": null,
+      "verifier_answer": "No",
+      "removal_clean": true
+    },
+    {
+      "image_id": "ce97f7bc90e97109",
+      "expr": "the Truck",
+      "gt_box": [
+        814.0,
+        94.0,
+        903.0,
+        165.0
+      ],
+      "original_type": "box",
+      "removed_type": "none",
+      "original_box": [
+        801.792,
+        93.84,
+        903.168,
+        163.20000000000002
+      ],
+      "removed_box": null,
+      "original_iou_gt": 0.8563833212014683,
+      "same_box": null,
+      "verifier_answer": "no",
+      "removal_clean": true
+    },
+    {
+      "image_id": "f1278dbae97e2d31",
+      "expr": "the Car",
+      "gt_box": [
+        863.0,
+        344.0,
+        1024.0,
+        472.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        860.16,
+        341.76,
+        1024.0,
+        472.32
+      ],
+      "removed_box": [
+        344.064,
+        138.24,
+        974.8480000000001,
+        595.2
+      ],
+      "original_iou_gt": 0.9633980545343137,
+      "same_box": 0.050816696914700574,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "ab18b23ced0e9411",
+      "expr": "the Clothing",
+      "gt_box": [
+        534.0,
+        0.0,
+        683.0,
+        857.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        531.374,
+        0.0,
+        683.0,
+        865.28
+      ],
+      "removed_box": [
+        478.1,
+        923.648,
+        650.216,
+        1024.0
+      ],
+      "original_iou_gt": 0.9732776412758676,
+      "same_box": 0.0,
+      "verifier_answer": "No",
+      "removal_clean": true
+    },
+    {
+      "image_id": "3c61d3599b621d1f",
+      "expr": "the Vehicle registration plate",
+      "gt_box": [
+        405.0,
+        780.0,
+        730.0,
+        862.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        400.384,
+        775.971,
+        734.208,
+        863.28
+      ],
+      "removed_box": [
+        397.312,
+        772.047,
+        738.304,
+        860.337
+      ],
+      "original_iou_gt": 0.9143672081887853,
+      "same_box": 0.9059066821765546,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "bd24922f1aff6df7",
+      "expr": "the Person",
+      "gt_box": [
+        459.0,
+        274.0,
+        707.0,
+        398.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        456.704,
+        271.945,
+        708.6080000000001,
+        400.725
+      ],
+      "removed_box": [
+        498.688,
+        278.795,
+        846.8480000000001,
+        397.3
+      ],
+      "original_iou_gt": 0.9479597144938677,
+      "same_box": 0.5095326350875681,
+      "verifier_answer": "No",
+      "removal_clean": true
+    },
+    {
+      "image_id": "8b09742b62d60334",
+      "expr": "the Car",
+      "gt_box": [
+        971.0,
+        521.0,
+        1024.0,
+        676.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        968.7040000000001,
+        519.23,
+        1024.0,
+        682.945
+      ],
+      "removed_box": [
+        121.85600000000001,
+        166.455,
+        863.232,
+        658.97
+      ],
+      "original_iou_gt": 0.9074555870579075,
+      "same_box": 0.0,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "f24d1bab9b70c34e",
+      "expr": "the Human mouth",
+      "gt_box": [
+        317.0,
+        486.0,
+        416.0,
+        565.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        314.368,
+        486.472,
+        419.84000000000003,
+        566.4399999999999
+      ],
+      "removed_box": [
+        314.368,
+        478.856,
+        404.48,
+        571.1999999999999
+      ],
+      "original_iou_gt": 0.9166570584936596,
+      "same_box": 0.754593711719069,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "d39cf578fcdcc58a",
+      "expr": "the Wheel",
+      "gt_box": [
+        868.0,
+        373.0,
+        1024.0,
+        678.0
+      ],
+      "original_type": "box",
+      "removed_type": "none",
+      "original_box": [
+        876.544,
+        377.646,
+        1024.0,
+        678.0
+      ],
+      "removed_box": null,
+      "original_iou_gt": 0.9308322703656997,
+      "same_box": null,
+      "verifier_answer": "no",
+      "removal_clean": true
+    },
+    {
+      "image_id": "0d0719cfd8e417b7",
+      "expr": "the Tap",
+      "gt_box": [
+        288.0,
+        0.0,
+        684.0,
+        236.0
+      ],
+      "original_type": "box",
+      "removed_type": "none",
+      "original_box": [
+        285.696,
+        0.0,
+        687.36,
+        238.592
+      ],
+      "removed_box": null,
+      "original_iou_gt": 0.9751881208507373,
+      "same_box": null,
+      "verifier_answer": "no",
+      "removal_clean": true
+    },
+    {
+      "image_id": "a50c1e4bea745d6b",
+      "expr": "the Vehicle registration plate",
+      "gt_box": [
+        348.0,
+        435.0,
+        626.0,
+        509.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        346.112,
+        432.225,
+        626.688,
+        510.255
+      ],
+      "removed_box": [
+        343.04,
+        426.87,
+        631.808,
+        491.895
+      ],
+      "original_iou_gt": 0.9396462594865724,
+      "same_box": 0.6996660773914746,
+      "verifier_answer": "No",
+      "removal_clean": true
+    },
+    {
+      "image_id": "ce7ee590cc097ae0",
+      "expr": "the Human mouth",
+      "gt_box": [
+        523.0,
+        453.0,
+        647.0,
+        509.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        524.288,
+        453.88800000000003,
+        647.168,
+        508.416
+      ],
+      "removed_box": [
+        514.048,
+        451.584,
+        653.312,
+        511.488
+      ],
+      "original_iou_gt": 0.9623306897179393,
+      "same_box": 0.8031674208144793,
+      "verifier_answer": "No",
+      "removal_clean": true
+    },
+    {
+      "image_id": "da18b0ddaea31637",
+      "expr": "the Human nose",
+      "gt_box": [
+        269.0,
+        271.0,
+        358.0,
+        351.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        269.67600000000004,
+        256.0,
+        359.56800000000004,
+        353.28000000000003
+      ],
+      "removed_box": [
+        260.142,
+        273.408,
+        374.55,
+        375.808
+      ],
+      "original_iou_gt": 0.8030573569378823,
+      "same_box": 0.5406427221172023,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "f0985bab4d514cae",
+      "expr": "the Palm tree",
+      "gt_box": [
+        622.0,
+        0.0,
+        754.0,
+        768.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        621.568,
+        0.0,
+        755.712,
+        767.232
+      ],
+      "removed_box": [
+        212.99200000000002,
+        435.456,
+        314.368,
+        524.544
+      ],
+      "original_iou_gt": 0.9830488702944442,
+      "same_box": 0.0,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "34e6e3ad05e112b7",
+      "expr": "the Human hand",
+      "gt_box": [
+        763.0,
+        478.0,
+        970.0,
+        768.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        750.592,
+        467.968,
+        974.8480000000001,
+        771.072
+      ],
+      "removed_box": [
+        795.648,
+        447.488,
+        959.488,
+        754.688
+      ],
+      "original_iou_gt": 0.883146199152585,
+      "same_box": 0.6585910854992354,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "a410b4794cb9350b",
+      "expr": "the Human mouth",
+      "gt_box": [
+        425.0,
+        699.0,
+        784.0,
+        822.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        370.884,
+        670.72,
+        812.555,
+        857.088
+      ],
+      "removed_box": [
+        353.935,
+        626.688,
+        829.504,
+        865.28
+      ],
+      "original_iou_gt": 0.5364501003382237,
+      "same_box": 0.7254388569474808,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "a8e1f123462f278a",
+      "expr": "the Person",
+      "gt_box": [
+        341.0,
+        125.0,
+        466.0,
+        242.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        340.5,
+        124.928,
+        466.485,
+        245.76
+      ],
+      "removed_box": [
+        392.25600000000003,
+        182.272,
+        463.08000000000004,
+        248.832
+      ],
+      "original_iou_gt": 0.9607161037129116,
+      "same_box": 0.29121127269442687,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "fdef6eed1051dd32",
+      "expr": "the Human hair",
+      "gt_box": [
+        507.0,
+        89.0,
+        712.0,
+        163.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        539.648,
+        102.45,
+        713.7280000000001,
+        182.36100000000002
+      ],
+      "removed_box": [
+        539.648,
+        133.86800000000002,
+        723.968,
+        179.62900000000002
+      ],
+      "original_iou_gt": 0.5597166726358827,
+      "same_box": 0.5539883268482491,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "22513a42eab3d90e",
+      "expr": "the Human head",
+      "gt_box": [
+        291.0,
+        127.0,
+        688.0,
+        489.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        397.424,
+        123.904,
+        650.024,
+        502.784
+      ],
+      "removed_box": [
+        384.794,
+        121.85600000000001,
+        673.6,
+        503.808
+      ],
+      "original_iou_gt": 0.617938269263581,
+      "same_box": 0.8676009660854,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "fea5f652c7bb7ef3",
+      "expr": "the Person",
+      "gt_box": [
+        417.0,
+        429.0,
+        491.0,
+        605.0
+      ],
+      "original_type": "box",
+      "removed_type": "none",
+      "original_box": [
+        416.76800000000003,
+        427.776,
+        489.47200000000004,
+        607.488
+      ],
+      "removed_box": null,
+      "original_iou_gt": 0.9565316920511837,
+      "same_box": null,
+      "verifier_answer": "no",
+      "removal_clean": true
+    },
+    {
+      "image_id": "4c9154ccd94191ff",
+      "expr": "the Man",
+      "gt_box": [
+        654.0,
+        418.0,
+        821.0,
+        699.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        650.073,
+        416.25600000000003,
+        822.954,
+        700.416
+      ],
+      "removed_box": [
+        692.535,
+        439.296,
+        817.8989999999999,
+        638.976
+      ],
+      "original_iou_gt": 0.9552401782281005,
+      "same_box": 0.5095621937727198,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "20754bdec19ac6e1",
+      "expr": "the Person",
+      "gt_box": [
+        0.0,
+        59.0,
+        114.0,
+        650.0
+      ],
+      "original_type": "box",
+      "removed_type": "none",
+      "original_box": [
+        0.0,
+        60.593,
+        114.688,
+        743.99
+      ],
+      "removed_box": null,
+      "original_iou_gt": 0.8553108649190511,
+      "same_box": null,
+      "verifier_answer": "no",
+      "removal_clean": true
+    },
+    {
+      "image_id": "f4b4e8594afb03f2",
+      "expr": "the Spice rack",
+      "gt_box": [
+        693.0,
+        608.0,
+        814.0,
+        725.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        689.152,
+        602.862,
+        804.864,
+        725.582
+      ],
+      "removed_box": [
+        140.288,
+        56.758,
+        240.64000000000001,
+        147.264
+      ],
+      "original_iou_gt": 0.857162356482332,
+      "same_box": 0.0,
+      "verifier_answer": "No",
+      "removal_clean": true
+    },
+    {
+      "image_id": "15932ce01f712852",
+      "expr": "the Window",
+      "gt_box": [
+        589.0,
+        152.0,
+        913.0,
+        405.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        569.8109999999999,
+        130.048,
+        927.8609999999999,
+        409.6
+      ],
+      "removed_box": [
+        574.9259999999999,
+        133.12,
+        927.8609999999999,
+        408.576
+      ],
+      "original_iou_gt": 0.8189535119258622,
+      "same_box": 0.9712715855572996,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "0173241beb1633e9",
+      "expr": "the Spoon",
+      "gt_box": [
+        0.0,
+        381.0,
+        205.0,
+        576.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        0.0,
+        380.16,
+        204.8,
+        576.0
+      ],
+      "removed_box": [
+        1.024,
+        274.176,
+        242.68800000000002,
+        566.016
+      ],
+      "original_iou_gt": 0.9947435217627045,
+      "same_box": 0.5205032316638204,
+      "verifier_answer": "no",
+      "removal_clean": true
+    },
+    {
+      "image_id": "8545bd276f287ca7",
+      "expr": "the Mobile phone",
+      "gt_box": [
+        256.0,
+        218.0,
+        476.0,
+        593.0
+      ],
+      "original_type": "box",
+      "removed_type": "none",
+      "original_box": [
+        256.512,
+        222.208,
+        446.976,
+        598.016
+      ],
+      "removed_box": null,
+      "original_iou_gt": 0.8462311013406488,
+      "same_box": null,
+      "verifier_answer": "No",
+      "removal_clean": true
+    },
+    {
+      "image_id": "2dfb0cd7ac014fc1",
+      "expr": "the Woman",
+      "gt_box": [
+        627.0,
+        190.0,
+        690.0,
+        293.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        602.112,
+        195.84,
+        692.224,
+        295.68
+      ],
+      "removed_box": [
+        234.496,
+        678.144,
+        289.79200000000003,
+        766.464
+      ],
+      "original_iou_gt": 0.6536331799676424,
+      "same_box": 0.0,
+      "verifier_answer": "No",
+      "removal_clean": true
+    },
+    {
+      "image_id": "98446db70cf10bda",
+      "expr": "the Tower",
+      "gt_box": [
+        348.0,
+        80.0,
+        388.0,
+        768.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        346.112,
+        78.336,
+        389.12,
+        767.232
+      ],
+      "removed_box": [
+        363.52,
+        584.448,
+        384.0,
+        768.0
+      ],
+      "original_iou_gt": 0.9268519914905703,
+      "same_box": 0.12628004456942768,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "bda964a599c33855",
+      "expr": "the Human head",
+      "gt_box": [
+        610.0,
+        748.0,
+        766.0,
+        994.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        606.208,
+        745.472,
+        770.048,
+        954.368
+      ],
+      "removed_box": [
+        610.304,
+        757.76,
+        762.88,
+        995.328
+      ],
+      "original_iou_gt": 0.7967065496677451,
+      "same_box": 0.7411398963730571,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "ecbfd9984a9c4f94",
+      "expr": "the Surfboard",
+      "gt_box": [
+        468.0,
+        433.0,
+        658.0,
+        521.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        457.728,
+        431.118,
+        658.432,
+        520.902
+      ],
+      "removed_box": [
+        525.312,
+        446.598,
+        590.848,
+        508.51800000000003
+      ],
+      "original_iou_gt": 0.9258675360041534,
+      "same_box": 0.22519352568613626,
+      "verifier_answer": "No",
+      "removal_clean": true
+    },
+    {
+      "image_id": "dcdbabe52cb921f4",
+      "expr": "the Coffee",
+      "gt_box": [
+        114.0,
+        391.0,
+        463.0,
+        502.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        108.93599999999999,
+        387.072,
+        466.35999999999996,
+        503.808
+      ],
+      "removed_box": [
+        43.431999999999995,
+        289.79200000000003,
+        705.592,
+        1011.712
+      ],
+      "original_iou_gt": 0.928452921202535,
+      "same_box": 0.08728437428506061,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "1a50a731357933ae",
+      "expr": "the Human head",
+      "gt_box": [
+        235.0,
+        391.0,
+        446.0,
+        562.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        228.352,
+        389.37600000000003,
+        409.6,
+        581.376
+      ],
+      "removed_box": [
+        217.088,
+        397.056,
+        452.608,
+        623.616
+      ],
+      "original_iou_gt": 0.7277834525025538,
+      "same_box": 0.6101694915254238,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "14a04785175a312c",
+      "expr": "the Girl",
+      "gt_box": [
+        128.0,
+        143.0,
+        274.0,
+        473.0
+      ],
+      "original_type": "box",
+      "removed_type": "none",
+      "original_box": [
+        129.024,
+        142.06400000000002,
+        276.48,
+        474.68500000000006
+      ],
+      "removed_box": null,
+      "original_iou_gt": 0.968759626265753,
+      "same_box": null,
+      "verifier_answer": "No",
+      "removal_clean": true
+    },
+    {
+      "image_id": "814d7c00652e7cec",
+      "expr": "the Flowerpot",
+      "gt_box": [
+        441.0,
+        335.0,
+        732.0,
+        560.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        437.248,
+        330.044,
+        735.232,
+        560.8439999999999
+      ],
+      "removed_box": [
+        443.392,
+        396.976,
+        713.7280000000001,
+        553.92
+      ],
+      "original_iou_gt": 0.952021501299827,
+      "same_box": 0.6169072164948456,
+      "verifier_answer": "No",
+      "removal_clean": true
+    },
+    {
+      "image_id": "f1b2b23a01e52c39",
+      "expr": "the Window",
+      "gt_box": [
+        611.0,
+        153.0,
+        768.0,
+        513.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        608.256,
+        148.48,
+        768.0,
+        512.0
+      ],
+      "removed_box": [
+        603.648,
+        148.48,
+        768.0,
+        519.168
+      ],
+      "original_iou_gt": 0.9679850510284936,
+      "same_box": 0.9531677595910572,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "bc80d4fcae620e56",
+      "expr": "the House",
+      "gt_box": [
+        0.0,
+        245.0,
+        226.0,
+        381.0
+      ],
+      "original_type": "box",
+      "removed_type": "none",
+      "original_box": [
+        0.0,
+        232.448,
+        239.71200000000002,
+        384.0
+      ],
+      "removed_box": null,
+      "original_iou_gt": 0.8460497473093841,
+      "same_box": null,
+      "verifier_answer": "no",
+      "removal_clean": true
+    },
+    {
+      "image_id": "66846e4e61194ec5",
+      "expr": "the Human hair",
+      "gt_box": [
+        233.0,
+        195.0,
+        378.0,
+        367.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        236.083,
+        192.512,
+        378.348,
+        370.688
+      ],
+      "removed_box": [
+        228.393,
+        198.656,
+        328.363,
+        276.48
+      ],
+      "original_iou_gt": 0.9432439472236427,
+      "same_box": 0.2767830045523521,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "53f1101f35de7efa",
+      "expr": "the Coffee cup",
+      "gt_box": [
+        238.0,
+        480.0,
+        331.0,
+        616.0
+      ],
+      "original_type": "box",
+      "removed_type": "none",
+      "original_box": [
+        233.472,
+        477.696,
+        332.8,
+        618.24
+      ],
+      "removed_box": null,
+      "original_iou_gt": 0.906020149392992,
+      "same_box": null,
+      "verifier_answer": "no",
+      "removal_clean": true
+    },
+    {
+      "image_id": "217a79d30eb9e89a",
+      "expr": "the Human hand",
+      "gt_box": [
+        0.0,
+        0.0,
+        301.0,
+        279.0
+      ],
+      "original_type": "box",
+      "removed_type": "none",
+      "original_box": [
+        0.0,
+        0.0,
+        303.104,
+        278.016
+      ],
+      "removed_box": null,
+      "original_iou_gt": 0.9895803151439859,
+      "same_box": null,
+      "verifier_answer": "no",
+      "removal_clean": true
+    },
+    {
+      "image_id": "f04b1b8d0d4abb46",
+      "expr": "the Human body",
+      "gt_box": [
+        331.0,
+        320.0,
+        473.0,
+        466.0
+      ],
+      "original_type": "box",
+      "removed_type": "none",
+      "original_box": [
+        324.096,
+        317.44,
+        473.088,
+        462.848
+      ],
+      "removed_box": null,
+      "original_iou_gt": 0.9173399443184516,
+      "same_box": null,
+      "verifier_answer": "no",
+      "removal_clean": true
+    },
+    {
+      "image_id": "5a956a5c6b517601",
+      "expr": "the Vehicle registration plate",
+      "gt_box": [
+        263.0,
+        323.0,
+        363.0,
+        379.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        245.76,
+        320.25600000000003,
+        362.496,
+        377.856
+      ],
+      "removed_box": [
+        218.112,
+        320.25600000000003,
+        396.288,
+        381.696
+      ],
+      "original_iou_gt": 0.7949198900679336,
+      "same_box": 0.6142241379310339,
+      "verifier_answer": "No",
+      "removal_clean": true
+    },
+    {
+      "image_id": "b19b0ed41580dafd",
+      "expr": "the Vehicle registration plate",
+      "gt_box": [
+        224.0,
+        486.0,
+        451.0,
+        540.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        222.208,
+        486.29600000000005,
+        450.56,
+        536.8380000000001
+      ],
+      "removed_box": [
+        259.072,
+        333.987,
+        416.76800000000003,
+        346.281
+      ],
+      "original_iou_gt": 0.9272971969949841,
+      "same_box": 0.0,
+      "verifier_answer": "No",
+      "removal_clean": true
+    },
+    {
+      "image_id": "3695e224e626d444",
+      "expr": "the Vehicle registration plate",
+      "gt_box": [
+        647.0,
+        348.0,
+        864.0,
+        482.0
+      ],
+      "original_type": "box",
+      "removed_type": "none",
+      "original_box": [
+        652.288,
+        349.16200000000003,
+        863.232,
+        481.558
+      ],
+      "removed_box": null,
+      "original_iou_gt": 0.9604560775844275,
+      "same_box": null,
+      "verifier_answer": "No",
+      "removal_clean": true
+    },
+    {
+      "image_id": "46da83ccb945db5a",
+      "expr": "the Microphone",
+      "gt_box": [
+        283.0,
+        0.0,
+        483.0,
+        341.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        280.32,
+        0.0,
+        485.37600000000003,
+        345.088
+      ],
+      "removed_box": [
+        99.84,
+        45.056,
+        240.38400000000001,
+        171.008
+      ],
+      "original_iou_gt": 0.9637891564165895,
+      "same_box": 0.0,
+      "verifier_answer": "No",
+      "removal_clean": true
+    },
+    {
+      "image_id": "377fe9c5109dd72c",
+      "expr": "the Human face",
+      "gt_box": [
+        300.0,
+        157.0,
+        446.0,
+        379.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        305.30100000000004,
+        157.696,
+        435.754,
+        351.232
+      ],
+      "removed_box": [
+        329.889,
+        160.768,
+        439.16900000000004,
+        337.92
+      ],
+      "original_iou_gt": 0.7789507530544243,
+      "same_box": 0.7254355589221946,
+      "verifier_answer": "No",
+      "removal_clean": true
+    },
+    {
+      "image_id": "5fa430d1bcde3073",
+      "expr": "the Land vehicle",
+      "gt_box": [
+        83.0,
+        149.0,
+        763.0,
+        368.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        80.896,
+        143.948,
+        764.928,
+        371.413
+      ],
+      "removed_box": [
+        93.184,
+        154.133,
+        740.352,
+        393.82000000000005
+      ],
+      "original_iou_gt": 0.9571103819222826,
+      "same_box": 0.8266976242253798,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "f60a3625d9c4d171",
+      "expr": "the Dolphin",
+      "gt_box": [
+        511.0,
+        396.0,
+        883.0,
+        550.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        508.928,
+        393.61800000000005,
+        892.928,
+        555.015
+      ],
+      "removed_box": [
+        93.184,
+        288.744,
+        583.6800000000001,
+        433.797
+      ],
+      "original_iou_gt": 0.924351134159867,
+      "same_box": 0.023082076154237796,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "790cf23cc5bbdf9e",
+      "expr": "the Bee",
+      "gt_box": [
+        452.0,
+        258.0,
+        593.0,
+        416.0
+      ],
+      "original_type": "box",
+      "removed_type": "none",
+      "original_box": [
+        448.512,
+        253.44,
+        595.968,
+        437.76
+      ],
+      "removed_box": null,
+      "original_iou_gt": 0.8196742446334276,
+      "same_box": null,
+      "verifier_answer": "No",
+      "removal_clean": true
+    },
+    {
+      "image_id": "2eee97a5faae44d0",
+      "expr": "the Wheel",
+      "gt_box": [
+        168.0,
+        211.0,
+        426.0,
+        466.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        167.936,
+        209.067,
+        427.008,
+        468.528
+      ],
+      "removed_box": [
+        0.0,
+        212.472,
+        56.32,
+        317.346
+      ],
+      "original_iou_gt": 0.9787399621072158,
+      "same_box": 0.0,
+      "verifier_answer": "No",
+      "removal_clean": true
+    },
+    {
+      "image_id": "039beb511fd1e7f7",
+      "expr": "the Footwear",
+      "gt_box": [
+        732.0,
+        543.0,
+        963.0,
+        740.0
+      ],
+      "original_type": "box",
+      "removed_type": "none",
+      "original_box": [
+        731.136,
+        541.62,
+        967.6800000000001,
+        738.99
+      ],
+      "removed_box": null,
+      "original_iou_gt": 0.9649124188989114,
+      "same_box": null,
+      "verifier_answer": "no",
+      "removal_clean": true
+    },
+    {
+      "image_id": "f5fda4d654b833f6",
+      "expr": "the Table",
+      "gt_box": [
+        670.0,
+        307.0,
+        907.0,
+        538.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        668.672,
+        301.056,
+        912.384,
+        534.528
+      ],
+      "removed_box": [
+        816.128,
+        596.736,
+        975.8720000000001,
+        767.232
+      ],
+      "original_iou_gt": 0.9341914012096254,
+      "same_box": 0.0,
+      "verifier_answer": "no",
+      "removal_clean": true
+    },
+    {
+      "image_id": "5185dcc8fbb1641b",
+      "expr": "the Bird",
+      "gt_box": [
+        63.0,
+        52.0,
+        223.0,
+        271.0
+      ],
+      "original_type": "box",
+      "removed_type": "none",
+      "original_box": [
+        60.062,
+        53.248000000000005,
+        225.996,
+        276.48
+      ],
+      "removed_box": null,
+      "original_iou_gt": 0.9355251170982269,
+      "same_box": null,
+      "verifier_answer": "no",
+      "removal_clean": true
+    },
+    {
+      "image_id": "83e48c35b3f13432",
+      "expr": "the Human head",
+      "gt_box": [
+        394.0,
+        45.0,
+        704.0,
+        419.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        365.568,
+        48.493,
+        760.832,
+        537.5210000000001
+      ],
+      "removed_box": [
+        375.808,
+        38.931000000000004,
+        755.712,
+        496.54100000000005
+      ],
+      "original_iou_gt": 0.5908959548129955,
+      "same_box": 0.8643534467450368,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "29e6f784388bb2e9",
+      "expr": "the Person",
+      "gt_box": [
+        444.0,
+        181.0,
+        519.0,
+        397.0
+      ],
+      "original_type": "box",
+      "removed_type": "none",
+      "original_box": [
+        441.344,
+        178.47600000000003,
+        520.192,
+        395.872
+      ],
+      "removed_box": null,
+      "original_iou_gt": 0.9355363906563042,
+      "same_box": null,
+      "verifier_answer": "No",
+      "removal_clean": true
+    },
+    {
+      "image_id": "e7c10f2e1cfc866c",
+      "expr": "the Human nose",
+      "gt_box": [
+        346.0,
+        369.0,
+        458.0,
+        469.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        345.87,
+        365.568,
+        449.55,
+        473.088
+      ],
+      "removed_box": [
+        345.87,
+        386.048,
+        467.37,
+        473.088
+      ],
+      "original_iou_gt": 0.8634438279050636,
+      "same_box": 0.7106466361854995,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "7772aaad3a1b72cc",
+      "expr": "the Sports uniform",
+      "gt_box": [
+        554.0,
+        123.0,
+        697.0,
+        414.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        558.08,
+        120.57499999999999,
+        700.416,
+        416.15599999999995
+      ],
+      "removed_box": [
+        545.792,
+        119.19699999999999,
+        691.2,
+        430.62499999999994
+      ],
+      "original_iou_gt": 0.9345021649006569,
+      "same_box": 0.8196046733779117,
+      "verifier_answer": "No",
+      "removal_clean": true
+    },
+    {
+      "image_id": "24766458a9f83849",
+      "expr": "the Drink",
+      "gt_box": [
+        515.0,
+        123.0,
+        735.0,
+        698.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        512.0,
+        201.216,
+        735.232,
+        536.064
+      ],
+      "removed_box": [
+        228.352,
+        7.68,
+        425.98400000000004,
+        686.592
+      ],
+      "original_iou_gt": 0.5774045549277463,
+      "same_box": 0.0,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "4027b103c11f03c5",
+      "expr": "the Bird",
+      "gt_box": [
+        366.0,
+        290.0,
+        589.0,
+        557.0
+      ],
+      "original_type": "box",
+      "removed_type": "none",
+      "original_box": [
+        364.544,
+        288.76800000000003,
+        588.8000000000001,
+        559.104
+      ],
+      "removed_box": null,
+      "original_iou_gt": 0.9803837871091036,
+      "same_box": null,
+      "verifier_answer": "no",
+      "removal_clean": true
+    },
+    {
+      "image_id": "520f0d566cf8d662",
+      "expr": "the Girl",
+      "gt_box": [
+        274.0,
+        0.0,
+        353.0,
+        187.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        265.216,
+        0.0,
+        355.32800000000003,
+        184.08
+      ],
+      "removed_box": [
+        51.2,
+        28.379,
+        135.168,
+        253.11
+      ],
+      "original_iou_gt": 0.8646622843043875,
+      "same_box": 0.0,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "7cc08ffdbac357c1",
+      "expr": "the Insect",
+      "gt_box": [
+        162.0,
+        81.0,
+        302.0,
+        400.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        153.6,
+        66.048,
+        406.528,
+        402.432
+      ],
+      "removed_box": [
+        279.552,
+        205.056,
+        360.448,
+        293.37600000000003
+      ],
+      "original_iou_gt": 0.5249119722293472,
+      "same_box": 0.08397574547538494,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "c4c46ca2ec6e1cc5",
+      "expr": "the Wheel",
+      "gt_box": [
+        46.0,
+        16.0,
+        479.0,
+        478.0
+      ],
+      "original_type": "box",
+      "removed_type": "none",
+      "original_box": [
+        44.032000000000004,
+        16.128,
+        479.232,
+        480.76800000000003
+      ],
+      "removed_box": null,
+      "original_iou_gt": 0.988746662625007,
+      "same_box": null,
+      "verifier_answer": "No",
+      "removal_clean": true
+    },
+    {
+      "image_id": "51e0e6787107cb46",
+      "expr": "the Human hair",
+      "gt_box": [
+        174.0,
+        49.0,
+        586.0,
+        532.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        165.896,
+        44.032000000000004,
+        618.016,
+        667.648
+      ],
+      "removed_box": [
+        162.33599999999998,
+        41.984,
+        623.0,
+        667.648
+      ],
+      "original_iou_gt": 0.7057865511750009,
+      "same_box": 0.9782402476999474,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "5f65d9fe040855b5",
+      "expr": "the Dog",
+      "gt_box": [
+        469.0,
+        328.0,
+        647.0,
+        429.0
+      ],
+      "original_type": "box",
+      "removed_type": "none",
+      "original_box": [
+        467.968,
+        325.632,
+        646.144,
+        431.616
+      ],
+      "removed_box": null,
+      "original_iou_gt": 0.9431364084270062,
+      "same_box": null,
+      "verifier_answer": "no",
+      "removal_clean": true
+    },
+    {
+      "image_id": "772dd24cae083cd0",
+      "expr": "the Flower",
+      "gt_box": [
+        325.0,
+        132.0,
+        496.0,
+        310.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        322.56,
+        134.144,
+        499.2,
+        312.32
+      ],
+      "removed_box": [
+        374.784,
+        37.888,
+        454.656,
+        191.488
+      ],
+      "original_iou_gt": 0.9444636607465582,
+      "same_box": 0.11695718531608965,
+      "verifier_answer": "No",
+      "removal_clean": true
+    },
+    {
+      "image_id": "1fe4f3b33573cf79",
+      "expr": "the Wheel",
+      "gt_box": [
+        63.0,
+        791.0,
+        229.0,
+        1020.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        59.67,
+        788.48,
+        231.03,
+        1018.88
+      ],
+      "removed_box": [
+        544.6800000000001,
+        121.85600000000001,
+        735.9300000000001,
+        233.472
+      ],
+      "original_iou_gt": 0.9536347150133674,
+      "same_box": 0.0,
+      "verifier_answer": "No",
+      "removal_clean": true
+    },
+    {
+      "image_id": "61b9f3a4db94791b",
+      "expr": "the Vehicle",
+      "gt_box": [
+        493.0,
+        301.0,
+        870.0,
+        637.0
+      ],
+      "original_type": "box",
+      "removed_type": "none",
+      "original_box": [
+        493.568,
+        293.26000000000005,
+        870.4,
+        637.6700000000001
+      ],
+      "removed_box": null,
+      "original_iou_gt": 0.9731149056220333,
+      "same_box": null,
+      "verifier_answer": "no",
+      "removal_clean": true
+    },
+    {
+      "image_id": "a1c025399898eebd",
+      "expr": "the Person",
+      "gt_box": [
+        0.0,
+        0.0,
+        175.0,
+        520.0
+      ],
+      "original_type": "box",
+      "removed_type": "none",
+      "original_box": [
+        0.0,
+        0.0,
+        167.936,
+        511.488
+      ],
+      "removed_box": null,
+      "original_iou_gt": 0.9439258106373628,
+      "same_box": null,
+      "verifier_answer": "no",
+      "removal_clean": true
+    },
+    {
+      "image_id": "0cf1810cce054319",
+      "expr": "the Furniture",
+      "gt_box": [
+        0.0,
+        599.0,
+        1024.0,
+        683.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        0.0,
+        594.21,
+        1024.0,
+        683.0
+      ],
+      "removed_box": [
+        0.0,
+        536.8380000000001,
+        1024.0,
+        683.0
+      ],
+      "original_iou_gt": 0.9460524833877693,
+      "same_box": 0.6074766355140188,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "cc914f54569bbcc7",
+      "expr": "the Wheel",
+      "gt_box": [
+        958.0,
+        632.0,
+        1024.0,
+        768.0
+      ],
+      "original_type": "box",
+      "removed_type": "none",
+      "original_box": [
+        979.9680000000001,
+        635.136,
+        1022.976,
+        767.232
+      ],
+      "removed_box": null,
+      "original_iou_gt": 0.6329305668449187,
+      "same_box": null,
+      "verifier_answer": "no",
+      "removal_clean": true
+    },
+    {
+      "image_id": "13b1f505c1c210d3",
+      "expr": "the Human head",
+      "gt_box": [
+        185.0,
+        217.0,
+        451.0,
+        490.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        176.21400000000003,
+        118.784,
+        486.29600000000005,
+        494.592
+      ],
+      "removed_box": [
+        178.94600000000003,
+        118.784,
+        486.29600000000005,
+        478.208
+      ],
+      "original_iou_gt": 0.6231630672027388,
+      "same_box": 0.9479768092282947,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "214f355fcd5f4a91",
+      "expr": "the Person",
+      "gt_box": [
+        637.0,
+        0.0,
+        875.0,
+        254.0
+      ],
+      "original_type": "box",
+      "removed_type": "none",
+      "original_box": [
+        634.88,
+        0.0,
+        874.496,
+        254.07600000000002
+      ],
+      "removed_box": null,
+      "original_iou_gt": 0.9887768970806954,
+      "same_box": null,
+      "verifier_answer": "No",
+      "removal_clean": true
+    },
+    {
+      "image_id": "9e0d20b6184e1da5",
+      "expr": "the Furniture",
+      "gt_box": [
+        0.0,
+        0.0,
+        305.0,
+        342.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        0.0,
+        1.024,
+        304.128,
+        344.064
+      ],
+      "removed_box": [
+        39.936,
+        99.328,
+        296.448,
+        278.528
+      ],
+      "original_iou_gt": 0.9882085177595239,
+      "same_box": 0.44060003015226895,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "647ff22cf6950211",
+      "expr": "the Vehicle registration plate",
+      "gt_box": [
+        470.0,
+        469.0,
+        619.0,
+        549.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        471.04,
+        467.20799999999997,
+        619.52,
+        547.9599999999999
+      ],
+      "removed_box": [
+        447.488,
+        463.08799999999997,
+        693.248,
+        545.4879999999999
+      ],
+      "original_iou_gt": 0.9554913114170339,
+      "same_box": 0.5637405361162264,
+      "verifier_answer": "No",
+      "removal_clean": true
+    },
+    {
+      "image_id": "95a2301dfa7e1c94",
+      "expr": "the Human face",
+      "gt_box": [
+        152.0,
+        191.0,
+        316.0,
+        439.0
+      ],
+      "original_type": "box",
+      "removed_type": "none",
+      "original_box": [
+        133.12,
+        141.328,
+        374.784,
+        423.4
+      ],
+      "removed_box": null,
+      "original_iou_gt": 0.5388981864454648,
+      "same_box": null,
+      "verifier_answer": "No",
+      "removal_clean": true
+    },
+    {
+      "image_id": "5cc19b450a51ee4c",
+      "expr": "the Vehicle registration plate",
+      "gt_box": [
+        705.0,
+        625.0,
+        853.0,
+        741.0
+      ],
+      "original_type": "box",
+      "removed_type": "none",
+      "original_box": [
+        708.6080000000001,
+        635.136,
+        851.9680000000001,
+        743.424
+      ],
+      "removed_box": null,
+      "original_iou_gt": 0.8664702132156217,
+      "same_box": null,
+      "verifier_answer": "No",
+      "removal_clean": true
+    },
+    {
+      "image_id": "3bdd9ceedcfbd1c9",
+      "expr": "the Car",
+      "gt_box": [
+        0.0,
+        357.0,
+        88.0,
+        456.0
+      ],
+      "original_type": "box",
+      "removed_type": "none",
+      "original_box": [
+        0.0,
+        353.974,
+        88.06400000000001,
+        453.77599999999995
+      ],
+      "removed_box": null,
+      "original_iou_gt": 0.947868196579089,
+      "same_box": null,
+      "verifier_answer": "No",
+      "removal_clean": true
+    },
+    {
+      "image_id": "c8dd79406a936789",
+      "expr": "the Bed",
+      "gt_box": [
+        115.0,
+        633.0,
+        261.0,
+        760.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        112.65,
+        631.808,
+        260.597,
+        759.808
+      ],
+      "removed_box": [
+        222.296,
+        387.072,
+        512.933,
+        669.696
+      ],
+      "original_iou_gt": 0.9708941410558761,
+      "same_box": 0.01456580470860672,
+      "verifier_answer": "No",
+      "removal_clean": true
+    },
+    {
+      "image_id": "c7df5232291486a3",
+      "expr": "the Vehicle registration plate",
+      "gt_box": [
+        604.0,
+        630.0,
+        853.0,
+        715.0
+      ],
+      "original_type": "box",
+      "removed_type": "none",
+      "original_box": [
+        601.088,
+        629.76,
+        854.016,
+        714.7520000000001
+      ],
+      "removed_box": null,
+      "original_iou_gt": 0.9788780164362317,
+      "same_box": null,
+      "verifier_answer": "No",
+      "removal_clean": true
+    },
+    {
+      "image_id": "cc687f4313e3fa71",
+      "expr": "the Houseplant",
+      "gt_box": [
+        77.0,
+        234.0,
+        418.0,
+        596.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        76.741,
+        232.448,
+        420.056,
+        598.016
+      ],
+      "removed_box": [
+        238.878,
+        470.016,
+        355.43199999999996,
+        598.016
+      ],
+      "original_iou_gt": 0.9835625809096196,
+      "same_box": 0.11887107784290178,
+      "verifier_answer": "No",
+      "removal_clean": true
+    },
+    {
+      "image_id": "bddbc90ab03ee834",
+      "expr": "the Person",
+      "gt_box": [
+        693.0,
+        212.0,
+        764.0,
+        312.0
+      ],
+      "original_type": "box",
+      "removed_type": "none",
+      "original_box": [
+        692.224,
+        214.669,
+        764.928,
+        310.856
+      ],
+      "removed_box": null,
+      "original_iou_gt": 0.9401663721195846,
+      "same_box": null,
+      "verifier_answer": "No",
+      "removal_clean": true
+    },
+    {
+      "image_id": "df7c076ae9d89bbf",
+      "expr": "the Wheel",
+      "gt_box": [
+        409.0,
+        24.0,
+        705.0,
+        351.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        412.672,
+        22.506,
+        708.6080000000001,
+        345.774
+      ],
+      "removed_box": [
+        294.91200000000003,
+        8.184000000000001,
+        585.7280000000001,
+        184.14000000000001
+      ],
+      "original_iou_gt": 0.9559780965790216,
+      "same_box": 0.2353221115713405,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "bc6b86f27e8186c2",
+      "expr": "the Human nose",
+      "gt_box": [
+        462.0,
+        209.0,
+        537.0,
+        292.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        457.728,
+        209.681,
+        529.408,
+        293.69
+      ],
+      "removed_box": [
+        457.728,
+        193.972,
+        542.72,
+        273.20000000000005
+      ],
+      "original_iou_gt": 0.8284741568375038,
+      "same_box": 0.5550818553888134,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "b7a57b5acaced15c",
+      "expr": "the Ladybug",
+      "gt_box": [
+        159.0,
+        99.0,
+        462.0,
+        334.0
+      ],
+      "original_type": "box",
+      "removed_type": "none",
+      "original_box": [
+        144.38400000000001,
+        96.624,
+        465.92,
+        334.524
+      ],
+      "removed_box": null,
+      "original_iou_gt": 0.9308644483779246,
+      "same_box": null,
+      "verifier_answer": "No",
+      "removal_clean": true
+    },
+    {
+      "image_id": "d58b1b738c6fea6f",
+      "expr": "the Human hand",
+      "gt_box": [
+        0.0,
+        434.0,
+        139.0,
+        881.0
+      ],
+      "original_type": "box",
+      "removed_type": "none",
+      "original_box": [
+        0.0,
+        430.08,
+        142.08,
+        882.688
+      ],
+      "removed_box": null,
+      "original_iou_gt": 0.9662002576538995,
+      "same_box": null,
+      "verifier_answer": "no",
+      "removal_clean": true
+    },
+    {
+      "image_id": "3a2c78c96e08f5f4",
+      "expr": "the Car",
+      "gt_box": [
+        15.0,
+        356.0,
+        199.0,
+        427.0
+      ],
+      "original_type": "box",
+      "removed_type": "none",
+      "original_box": [
+        13.312000000000001,
+        354.30400000000003,
+        197.632,
+        427.008
+      ],
+      "removed_box": null,
+      "original_iou_gt": 0.9606563889183459,
+      "same_box": null,
+      "verifier_answer": "no",
+      "removal_clean": true
+    },
+    {
+      "image_id": "fa897478280a2758",
+      "expr": "the Vehicle registration plate",
+      "gt_box": [
+        532.0,
+        464.0,
+        708.0,
+        547.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        529.408,
+        462.336,
+        704.5120000000001,
+        541.44
+      ],
+      "removed_box": [
+        498.688,
+        443.136,
+        759.808,
+        546.816
+      ],
+      "original_iou_gt": 0.8847180786846024,
+      "same_box": 0.511633986928105,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "2198fe9e2f288fe0",
+      "expr": "the Car",
+      "gt_box": [
+        381.0,
+        253.0,
+        839.0,
+        513.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        378.88,
+        250.97600000000003,
+        842.7520000000001,
+        512.864
+      ],
+      "removed_box": [
+        391.168,
+        248.24800000000002,
+        759.808,
+        352.59400000000005
+      ],
+      "original_iou_gt": 0.9792086015148579,
+      "same_box": 0.3058292282430213,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "64fe2faade1a1e6c",
+      "expr": "the Vehicle registration plate",
+      "gt_box": [
+        633.0,
+        541.0,
+        823.0,
+        587.0
+      ],
+      "original_type": "box",
+      "removed_type": "none",
+      "original_box": [
+        630.784,
+        538.6080000000001,
+        822.272,
+        585.3240000000001
+      ],
+      "removed_box": null,
+      "original_iou_gt": 0.9024372137698808,
+      "same_box": null,
+      "verifier_answer": "No",
+      "removal_clean": true
+    },
+    {
+      "image_id": "40aac64aefb75657",
+      "expr": "the Table",
+      "gt_box": [
+        946.0,
+        779.0,
+        1024.0,
+        1024.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        949.248,
+        776.192,
+        1024.0,
+        1024.0
+      ],
+      "removed_box": [
+        0.0,
+        606.208,
+        1021.952,
+        1021.952
+      ],
+      "original_iou_gt": 0.9479467581211347,
+      "same_box": 0.04198968000118278,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "7e88944e5a0c1cdc",
+      "expr": "the Airplane",
+      "gt_box": [
+        284.0,
+        365.0,
+        539.0,
+        429.0
+      ],
+      "original_type": "box",
+      "removed_type": "none",
+      "original_box": [
+        282.624,
+        369.644,
+        538.624,
+        431.706
+      ],
+      "removed_box": null,
+      "original_iou_gt": 0.8841172214374684,
+      "same_box": null,
+      "verifier_answer": "no",
+      "removal_clean": true
+    },
+    {
+      "image_id": "5c8ace72a20ac3bb",
+      "expr": "the Ball",
+      "gt_box": [
+        455.0,
+        375.0,
+        559.0,
+        479.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        454.656,
+        374.28400000000005,
+        560.128,
+        479.466
+      ],
+      "removed_box": [
+        454.656,
+        387.261,
+        555.008,
+        481.51500000000004
+      ],
+      "original_iou_gt": 0.9749628614146946,
+      "same_box": 0.818890814558059,
+      "verifier_answer": "No",
+      "removal_clean": true
+    },
+    {
+      "image_id": "2eeec709f51ecd0d",
+      "expr": "the Table",
+      "gt_box": [
+        0.0,
+        482.0,
+        131.0,
+        907.0
+      ],
+      "original_type": "box",
+      "removed_type": "none",
+      "original_box": [
+        0.0,
+        477.184,
+        132.096,
+        909.312
+      ],
+      "removed_box": null,
+      "original_iou_gt": 0.9753447512016967,
+      "same_box": null,
+      "verifier_answer": "No",
+      "removal_clean": true
+    },
+    {
+      "image_id": "81ff99f3f7f1be9f",
+      "expr": "the Bicycle helmet",
+      "gt_box": [
+        398.0,
+        187.0,
+        590.0,
+        317.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        396.288,
+        185.856,
+        591.872,
+        304.896
+      ],
+      "removed_box": [
+        391.168,
+        381.696,
+        416.76800000000003,
+        408.576
+      ],
+      "original_iou_gt": 0.884002888890489,
+      "same_box": 0.0,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "d52823dcd422317b",
+      "expr": "the Fish",
+      "gt_box": [
+        370.0,
+        323.0,
+        498.0,
+        480.0
+      ],
+      "original_type": "box",
+      "removed_type": "none",
+      "original_box": [
+        370.688,
+        320.25600000000003,
+        499.712,
+        489.98400000000004
+      ],
+      "removed_box": null,
+      "original_iou_gt": 0.9082556760597831,
+      "same_box": null,
+      "verifier_answer": "No",
+      "removal_clean": true
+    },
+    {
+      "image_id": "fb87e3d8d7d99885",
+      "expr": "the Person",
+      "gt_box": [
+        837.0,
+        24.0,
+        881.0,
+        188.0
+      ],
+      "original_type": "box",
+      "removed_type": "none",
+      "original_box": [
+        822.272,
+        26.45,
+        883.712,
+        191.475
+      ],
+      "removed_box": null,
+      "original_iou_gt": 0.6936902894679938,
+      "same_box": null,
+      "verifier_answer": "no",
+      "removal_clean": true
+    },
+    {
+      "image_id": "6cf48055b8a6bd80",
+      "expr": "the Wheel",
+      "gt_box": [
+        0.0,
+        302.0,
+        96.0,
+        683.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        0.0,
+        300.52000000000004,
+        97.28,
+        683.0
+      ],
+      "removed_box": [
+        0.0,
+        537.5210000000001,
+        102.4,
+        683.0
+      ],
+      "original_iou_gt": 0.9830235361463688,
+      "same_box": 0.37289228784667816,
+      "verifier_answer": "No",
+      "removal_clean": true
+    },
+    {
+      "image_id": "52db0342612d8e96",
+      "expr": "the Human head",
+      "gt_box": [
+        458.0,
+        72.0,
+        643.0,
+        305.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        455.68,
+        71.424,
+        647.168,
+        288.0
+      ],
+      "removed_box": [
+        508.928,
+        205.056,
+        621.568,
+        289.536
+      ],
+      "original_iou_gt": 0.8956286646713308,
+      "same_box": 0.22434565849605312,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "42ffc037f379a1d3",
+      "expr": "the Man",
+      "gt_box": [
+        395.0,
+        333.0,
+        508.0,
+        609.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        396.288,
+        329.238,
+        508.928,
+        610.155
+      ],
+      "removed_box": [
+        591.872,
+        223.587,
+        647.168,
+        272.727
+      ],
+      "original_iou_gt": 0.9635768595144467,
+      "same_box": 0.0,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "16c8d0a232023cb8",
+      "expr": "the Car",
+      "gt_box": [
+        82.0,
+        123.0,
+        784.0,
+        315.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        79.872,
+        120.351,
+        786.432,
+        317.81
+      ],
+      "removed_box": [
+        83.968,
+        251.122,
+        714.7520000000001,
+        319.373
+      ],
+      "original_iou_gt": 0.9660783735621946,
+      "same_box": 0.29939474023952184,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "a2e2c091e710b1a2",
+      "expr": "the Bird",
+      "gt_box": [
+        298.0,
+        313.0,
+        373.0,
+        427.0
+      ],
+      "original_type": "box",
+      "removed_type": "none",
+      "original_box": [
+        296.258,
+        312.32,
+        374.314,
+        428.032
+      ],
+      "removed_box": null,
+      "original_iou_gt": 0.9466325260239752,
+      "same_box": null,
+      "verifier_answer": "No",
+      "removal_clean": true
+    },
+    {
+      "image_id": "9e6aa51118c2d456",
+      "expr": "the Vehicle",
+      "gt_box": [
+        395.0,
+        526.0,
+        640.0,
+        627.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        393.216,
+        524.0250000000001,
+        641.024,
+        626.7750000000001
+      ],
+      "removed_box": [
+        155.648,
+        80.14500000000001,
+        952.32,
+        390.45000000000005
+      ],
+      "original_iou_gt": 0.9675702815612441,
+      "same_box": 0.0,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "07074bd106e55c19",
+      "expr": "the Flower",
+      "gt_box": [
+        665.0,
+        11.0,
+        828.0,
+        185.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        660.48,
+        11.666,
+        829.44,
+        187.27
+      ],
+      "removed_box": [
+        512.0,
+        0.0,
+        1024.0,
+        613.386
+      ],
+      "original_iou_gt": 0.9487831081371927,
+      "same_box": 0.0944744744744745,
+      "verifier_answer": "no",
+      "removal_clean": true
+    },
+    {
+      "image_id": "fbc149f1360df342",
+      "expr": "the Sports equipment",
+      "gt_box": [
+        651.0,
+        370.0,
+        821.0,
+        512.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        652.288,
+        367.872,
+        824.32,
+        519.936
+      ],
+      "removed_box": [
+        826.368,
+        255.744,
+        836.6080000000001,
+        266.496
+      ],
+      "original_iou_gt": 0.9094375404085062,
+      "same_box": 0.0,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "90d897807f1416d4",
+      "expr": "the Toy",
+      "gt_box": [
+        576.0,
+        661.0,
+        743.0,
+        768.0
+      ],
+      "original_type": "box",
+      "removed_type": "none",
+      "original_box": [
+        575.488,
+        658.176,
+        745.472,
+        767.232
+      ],
+      "removed_box": null,
+      "original_iou_gt": 0.9504293602188573,
+      "same_box": null,
+      "verifier_answer": "no",
+      "removal_clean": true
+    },
+    {
+      "image_id": "4a201b3ba4178db8",
+      "expr": "the Clothing",
+      "gt_box": [
+        409.0,
+        522.0,
+        786.0,
+        683.0
+      ],
+      "original_type": "box",
+      "removed_type": "none",
+      "original_box": [
+        406.528,
+        514.2990000000001,
+        770.048,
+        683.0
+      ],
+      "removed_box": null,
+      "original_iou_gt": 0.9097616356204532,
+      "same_box": null,
+      "verifier_answer": "no",
+      "removal_clean": true
+    },
+    {
+      "image_id": "19822f5f6db7de1f",
+      "expr": "the Person",
+      "gt_box": [
+        360.0,
+        423.0,
+        450.0,
+        548.0
+      ],
+      "original_type": "box",
+      "removed_type": "none",
+      "original_box": [
+        357.88800000000003,
+        421.88800000000003,
+        459.264,
+        548.864
+      ],
+      "removed_box": null,
+      "original_iou_gt": 0.8739683984661385,
+      "same_box": null,
+      "verifier_answer": "no",
+      "removal_clean": true
+    },
+    {
+      "image_id": "ddf76797a8a358f8",
+      "expr": "the Human nose",
+      "gt_box": [
+        445.0,
+        341.0,
+        541.0,
+        475.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        447.488,
+        335.54400000000004,
+        537.6,
+        469.216
+      ],
+      "removed_box": [
+        447.488,
+        400.334,
+        544.768,
+        477.40000000000003
+      ],
+      "original_iou_gt": 0.8650870054715971,
+      "same_box": 0.4654621628698611,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "f99176d8f48f7abb",
+      "expr": "the Human arm",
+      "gt_box": [
+        0.0,
+        470.0,
+        227.0,
+        1024.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        0.0,
+        462.848,
+        184.41000000000003,
+        1021.952
+      ],
+      "removed_box": [
+        0.0,
+        463.872,
+        240.41600000000003,
+        1020.928
+      ],
+      "original_iou_gt": 0.8009753784022737,
+      "same_box": 0.7648884537671591,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "bcbf9efe5bcfcacc",
+      "expr": "the Human nose",
+      "gt_box": [
+        347.0,
+        358.0,
+        439.0,
+        462.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        338.76800000000003,
+        345.088,
+        441.218,
+        466.944
+      ],
+      "removed_box": [
+        336.036,
+        337.92,
+        431.656,
+        462.848
+      ],
+      "original_iou_gt": 0.7664119820695482,
+      "same_box": 0.8107827890098493,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "188aa5e0034f3945",
+      "expr": "the Plant",
+      "gt_box": [
+        452.0,
+        41.0,
+        807.0,
+        88.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        447.488,
+        38.817,
+        795.648,
+        88.53
+      ],
+      "removed_box": [
+        363.52,
+        335.733,
+        462.848,
+        375.91200000000003
+      ],
+      "original_iou_gt": 0.9052683622362658,
+      "same_box": 0.0,
+      "verifier_answer": "no",
+      "removal_clean": true
+    },
+    {
+      "image_id": "ef3d8c9f559e2a6f",
+      "expr": "the Brassiere",
+      "gt_box": [
+        149.0,
+        441.0,
+        538.0,
+        850.0
+      ],
+      "original_type": "box",
+      "removed_type": "none",
+      "original_box": [
+        145.98000000000002,
+        437.248,
+        433.88500000000005,
+        855.04
+      ],
+      "removed_box": null,
+      "original_iou_gt": 0.7154159508879364,
+      "same_box": null,
+      "verifier_answer": "no",
+      "removal_clean": true
+    },
+    {
+      "image_id": "bb09dda759bf5f42",
+      "expr": "the Vehicle registration plate",
+      "gt_box": [
+        172.0,
+        471.0,
+        289.0,
+        514.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        172.032,
+        469.404,
+        289.79200000000003,
+        513.89
+      ],
+      "removed_box": [
+        201.728,
+        467.87,
+        304.128,
+        511.589
+      ],
+      "original_iou_gt": 0.9550427958285332,
+      "same_box": 0.6191099476439796,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "deaa0a53a0435084",
+      "expr": "the Insect",
+      "gt_box": [
+        544.0,
+        217.0,
+        742.0,
+        483.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        542.72,
+        215.145,
+        743.424,
+        409.8
+      ],
+      "removed_box": [
+        569.344,
+        286.86,
+        589.8240000000001,
+        321.01000000000005
+      ],
+      "original_iou_gt": 0.7127190663435794,
+      "same_box": 0.017901897601145758,
+      "verifier_answer": "No",
+      "removal_clean": true
+    },
+    {
+      "image_id": "fe27ce461d0c2f2c",
+      "expr": "the Human face",
+      "gt_box": [
+        284.0,
+        87.0,
+        419.0,
+        231.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        286.068,
+        53.248000000000005,
+        422.95,
+        225.28
+      ],
+      "removed_box": [
+        298.372,
+        73.72800000000001,
+        420.64300000000003,
+        217.088
+      ],
+      "original_iou_gt": 0.747039431197354,
+      "same_box": 0.7443820224719103,
+      "verifier_answer": "No",
+      "removal_clean": true
+    },
+    {
+      "image_id": "f9aedf7c8e3b586b",
+      "expr": "the Watercraft",
+      "gt_box": [
+        114.0,
+        676.0,
+        352.0,
+        753.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        113.664,
+        676.608,
+        351.232,
+        755.898
+      ],
+      "removed_box": [
+        197.632,
+        704.8,
+        294.91200000000003,
+        741.802
+      ],
+      "original_iou_gt": 0.9518116545994839,
+      "same_box": 0.1910919540229887,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "6bb7e70c38657568",
+      "expr": "the Human hair",
+      "gt_box": [
+        228.0,
+        156.0,
+        355.0,
+        270.0
+      ],
+      "original_type": "box",
+      "removed_type": "none",
+      "original_box": [
+        216.15,
+        160.768,
+        368.11,
+        263.168
+      ],
+      "removed_box": null,
+      "original_iou_gt": 0.7634656153985604,
+      "same_box": null,
+      "verifier_answer": "no",
+      "removal_clean": true
+    },
+    {
+      "image_id": "7d6b65618e74f496",
+      "expr": "the Wheel",
+      "gt_box": [
+        20.0,
+        349.0,
+        162.0,
+        927.0
+      ],
+      "original_type": "box",
+      "removed_type": "none",
+      "original_box": [
+        17.64,
+        340.992,
+        130.536,
+        926.72
+      ],
+      "removed_box": null,
+      "original_iou_gt": 0.7571284712237628,
+      "same_box": null,
+      "verifier_answer": "no",
+      "removal_clean": true
+    },
+    {
+      "image_id": "f409699c1efaf59c",
+      "expr": "the Bicycle",
+      "gt_box": [
+        459.0,
+        316.0,
+        595.0,
+        624.0
+      ],
+      "original_type": "box",
+      "removed_type": "none",
+      "original_box": [
+        433.152,
+        312.13100000000003,
+        621.568,
+        624.945
+      ],
+      "removed_box": null,
+      "original_iou_gt": 0.7106989331901913,
+      "same_box": null,
+      "verifier_answer": "No",
+      "removal_clean": true
+    },
+    {
+      "image_id": "399eb56dbffa49a2",
+      "expr": "the Tennis ball",
+      "gt_box": [
+        502.0,
+        539.0,
+        636.0,
+        631.0
+      ],
+      "original_type": "box",
+      "removed_type": "none",
+      "original_box": [
+        503.808,
+        536.8380000000001,
+        640.0,
+        630.409
+      ],
+      "removed_box": null,
+      "original_iou_gt": 0.9303558062604779,
+      "same_box": null,
+      "verifier_answer": "no",
+      "removal_clean": true
+    },
+    {
+      "image_id": "246a0e4264a39433",
+      "expr": "the Vehicle registration plate",
+      "gt_box": [
+        306.0,
+        453.0,
+        398.0,
+        500.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        309.248,
+        454.656,
+        397.312,
+        499.968
+      ],
+      "removed_box": [
+        242.68800000000002,
+        423.93600000000004,
+        462.848,
+        515.328
+      ],
+      "original_iou_gt": 0.92283903052729,
+      "same_box": 0.19831932773109268,
+      "verifier_answer": "No",
+      "removal_clean": true
+    },
+    {
+      "image_id": "9bf02cc9cf9f8f97",
+      "expr": "the Sewing machine",
+      "gt_box": [
+        410.0,
+        192.0,
+        669.0,
+        460.0
+      ],
+      "original_type": "box",
+      "removed_type": "none",
+      "original_box": [
+        408.576,
+        188.16,
+        672.768,
+        460.8
+      ],
+      "removed_box": null,
+      "original_iou_gt": 0.9636633060434637,
+      "same_box": null,
+      "verifier_answer": "No",
+      "removal_clean": true
+    },
+    {
+      "image_id": "2e8a83cfb1afe7ba",
+      "expr": "the Vehicle registration plate",
+      "gt_box": [
+        334.0,
+        483.0,
+        501.0,
+        528.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        329.728,
+        485.37600000000003,
+        503.808,
+        527.616
+      ],
+      "removed_box": [
+        304.128,
+        476.16,
+        529.408,
+        531.456
+      ],
+      "original_iou_gt": 0.9027420729036699,
+      "same_box": 0.590277777777777,
+      "verifier_answer": "No",
+      "removal_clean": true
+    },
+    {
+      "image_id": "6b702616395248f3",
+      "expr": "the Human nose",
+      "gt_box": [
+        294.0,
+        481.0,
+        399.0,
+        551.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        294.624,
+        483.32800000000003,
+        396.92400000000004,
+        552.96
+      ],
+      "removed_box": [
+        325.99600000000004,
+        483.32800000000003,
+        409.20000000000005,
+        560.128
+      ],
+      "original_iou_gt": 0.9168715005665836,
+      "same_box": 0.5759895748493238,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "930d9ff5d46b1269",
+      "expr": "the Human face",
+      "gt_box": [
+        551.0,
+        310.0,
+        636.0,
+        380.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        549.888,
+        297.984,
+        631.808,
+        377.856
+      ],
+      "removed_box": [
+        529.408,
+        284.16,
+        691.2,
+        366.336
+      ],
+      "original_iou_gt": 0.7822338000392007,
+      "same_box": 0.39323981000773234,
+      "verifier_answer": "No",
+      "removal_clean": true
+    },
+    {
+      "image_id": "342f8a76e32c1297",
+      "expr": "the Fashion accessory",
+      "gt_box": [
+        516.0,
+        175.0,
+        796.0,
+        417.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        512.0,
+        172.032,
+        796.672,
+        422.40000000000003
+      ],
+      "removed_box": [
+        534.528,
+        217.344,
+        760.832,
+        412.416
+      ],
+      "original_iou_gt": 0.9507138585527283,
+      "same_box": 0.6193891512556824,
+      "verifier_answer": "no",
+      "removal_clean": true
+    },
+    {
+      "image_id": "69e8dc2d99fe5bc1",
+      "expr": "the Truck",
+      "gt_box": [
+        313.0,
+        285.0,
+        430.0,
+        371.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        313.344,
+        282.624,
+        430.08,
+        370.944
+      ],
+      "removed_box": [
+        151.552,
+        288.0,
+        165.888,
+        301.056
+      ],
+      "original_iou_gt": 0.9690363857717091,
+      "same_box": 0.0,
+      "verifier_answer": "No",
+      "removal_clean": true
+    },
+    {
+      "image_id": "1430bdaa35b7fbb6",
+      "expr": "the Person",
+      "gt_box": [
+        199.0,
+        0.0,
+        300.0,
+        120.0
+      ],
+      "original_type": "box",
+      "removed_type": "none",
+      "original_box": [
+        191.488,
+        0.0,
+        303.104,
+        121.34400000000001
+      ],
+      "removed_box": null,
+      "original_iou_gt": 0.8948656923194171,
+      "same_box": null,
+      "verifier_answer": "no",
+      "removal_clean": true
+    },
+    {
+      "image_id": "e413b37d89b07f1d",
+      "expr": "the Person",
+      "gt_box": [
+        295.0,
+        396.0,
+        722.0,
+        576.0
+      ],
+      "original_type": "box",
+      "removed_type": "none",
+      "original_box": [
+        411.648,
+        393.984,
+        749.568,
+        576.0
+      ],
+      "removed_box": null,
+      "original_iou_gt": 0.677103019774047,
+      "same_box": null,
+      "verifier_answer": "no",
+      "removal_clean": true
+    },
+    {
+      "image_id": "a5dc9b8e19130d1e",
+      "expr": "the Bottle",
+      "gt_box": [
+        861.0,
+        115.0,
+        1024.0,
+        397.0
+      ],
+      "original_type": "box",
+      "removed_type": "none",
+      "original_box": [
+        836.6080000000001,
+        112.896,
+        1024.0,
+        400.896
+      ],
+      "removed_box": null,
+      "original_iou_gt": 0.8517128088000914,
+      "same_box": null,
+      "verifier_answer": "no",
+      "removal_clean": true
+    },
+    {
+      "image_id": "e384f3cab5573d3c",
+      "expr": "the Human head",
+      "gt_box": [
+        124.0,
+        91.0,
+        629.0,
+        617.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        160.506,
+        87.04,
+        575.5079999999999,
+        612.352
+      ],
+      "removed_box": [
+        126.52499999999999,
+        86.016,
+        601.536,
+        614.4
+      ],
+      "original_iou_gt": 0.8095160846258272,
+      "same_box": 0.8685887225230965,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "5c69fa8f2af309ab",
+      "expr": "the Human hand",
+      "gt_box": [
+        495.0,
+        544.0,
+        578.0,
+        644.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        488.994,
+        541.696,
+        577.654,
+        642.048
+      ],
+      "removed_box": [
+        429.66,
+        602.112,
+        569.47,
+        755.712
+      ],
+      "original_iou_gt": 0.8912269507701177,
+      "same_box": 0.1183398477679491,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "a359ca53d4609faa",
+      "expr": "the Table",
+      "gt_box": [
+        0.0,
+        386.0,
+        262.0,
+        584.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        0.0,
+        381.696,
+        260.096,
+        582.144
+      ],
+      "removed_box": [
+        0.0,
+        384.0,
+        138.24,
+        577.5360000000001
+      ],
+      "original_iou_gt": 0.9626537138360101,
+      "same_box": 0.5131686125441218,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "963538aa15e79704",
+      "expr": "the Flowerpot",
+      "gt_box": [
+        156.0,
+        790.0,
+        517.0,
+        902.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        154.358,
+        762.88,
+        516.3480000000001,
+        901.12
+      ],
+      "removed_box": [
+        164.603,
+        762.88,
+        507.46900000000005,
+        890.88
+      ],
+      "original_iou_gt": 0.7939832893563805,
+      "same_box": 0.8770090845562543,
+      "verifier_answer": "no",
+      "removal_clean": true
+    },
+    {
+      "image_id": "fce8194fab48c500",
+      "expr": "the Table",
+      "gt_box": [
+        0.0,
+        402.0,
+        220.0,
+        680.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        0.0,
+        428.40000000000003,
+        222.208,
+        679.32
+      ],
+      "removed_box": [
+        0.0,
+        297.16,
+        66.56,
+        419.56
+      ],
+      "original_iou_gt": 0.8944870199450214,
+      "same_box": 0.0,
+      "verifier_answer": "No",
+      "removal_clean": true
+    },
+    {
+      "image_id": "6bab709b1b7b49ff",
+      "expr": "the Person",
+      "gt_box": [
+        373.0,
+        131.0,
+        594.0,
+        480.0
+      ],
+      "original_type": "box",
+      "removed_type": "none",
+      "original_box": [
+        371.712,
+        132.516,
+        595.968,
+        476.89399999999995
+      ],
+      "removed_box": null,
+      "original_iou_gt": 0.9726166300797596,
+      "same_box": null,
+      "verifier_answer": "no",
+      "removal_clean": true
+    },
+    {
+      "image_id": "8c63cf76166c3bd7",
+      "expr": "the Vehicle registration plate",
+      "gt_box": [
+        757.0,
+        449.0,
+        837.0,
+        512.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        752.64,
+        450.659,
+        836.6080000000001,
+        514.818
+      ],
+      "removed_box": [
+        741.376,
+        449.886,
+        842.7520000000001,
+        517.91
+      ],
+      "original_iou_gt": 0.8808033764396168,
+      "same_box": 0.7812213039485773,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "cb104afb886ce6d7",
+      "expr": "the Cat",
+      "gt_box": [
+        529.0,
+        234.0,
+        694.0,
+        373.0
+      ],
+      "original_type": "box",
+      "removed_type": "none",
+      "original_box": [
+        525.312,
+        230.854,
+        695.296,
+        372.235
+      ],
+      "removed_box": null,
+      "original_iou_gt": 0.9441213283261024,
+      "same_box": null,
+      "verifier_answer": "No",
+      "removal_clean": true
+    },
+    {
+      "image_id": "3728914be4a6f601",
+      "expr": "the Clothing",
+      "gt_box": [
+        432.0,
+        264.0,
+        587.0,
+        387.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        427.008,
+        263.16,
+        585.7280000000001,
+        374.0
+      ],
+      "removed_box": [
+        483.32800000000003,
+        286.96000000000004,
+        598.016,
+        425.00000000000006
+      ],
+      "original_iou_gt": 0.8563173702351613,
+      "same_box": 0.36362603335132515,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "02f3a888909fa7d0",
+      "expr": "the Boat",
+      "gt_box": [
+        640.0,
+        291.0,
+        970.0,
+        494.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        637.952,
+        288.0,
+        969.7280000000001,
+        495.36
+      ],
+      "removed_box": [
+        0.0,
+        374.016,
+        22.528,
+        389.37600000000003
+      ],
+      "original_iou_gt": 0.9721504770063172,
+      "same_box": 0.0,
+      "verifier_answer": "No",
+      "removal_clean": true
+    },
+    {
+      "image_id": "2f6298d36fa50adb",
+      "expr": "the Human nose",
+      "gt_box": [
+        447.0,
+        457.0,
+        582.0,
+        583.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        439.26599999999996,
+        421.88800000000003,
+        582.4159999999999,
+        583.6800000000001
+      ],
+      "removed_box": [
+        435.176,
+        437.248,
+        529.246,
+        532.48
+      ],
+      "original_iou_gt": 0.7344393163318994,
+      "same_box": 0.36386270674017446,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "50c7b63d8e6fa9ba",
+      "expr": "the Food",
+      "gt_box": [
+        718.0,
+        493.0,
+        892.0,
+        579.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        715.7760000000001,
+        493.12600000000003,
+        893.952,
+        580.5500000000001
+      ],
+      "removed_box": [
+        760.832,
+        499.956,
+        844.8000000000001,
+        563.475
+      ],
+      "original_iou_gt": 0.9579001361946274,
+      "same_box": 0.34240301724137967,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "a2cf714ac833bbc0",
+      "expr": "the Bee",
+      "gt_box": [
+        246.0,
+        476.0,
+        396.0,
+        649.0
+      ],
+      "original_type": "box",
+      "removed_type": "none",
+      "original_box": [
+        242.46500000000003,
+        473.088,
+        392.725,
+        655.36
+      ],
+      "removed_box": null,
+      "original_iou_gt": 0.9080178047008153,
+      "same_box": null,
+      "verifier_answer": "No",
+      "removal_clean": true
+    },
+    {
+      "image_id": "2fba54286aaac20e",
+      "expr": "the Houseplant",
+      "gt_box": [
+        0.0,
+        193.0,
+        244.0,
+        616.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        0.0,
+        183.60000000000002,
+        273.408,
+        618.8000000000001
+      ],
+      "removed_box": [
+        130.048,
+        195.84,
+        268.288,
+        558.96
+      ],
+      "original_iou_gt": 0.8674213134604262,
+      "same_box": 0.42187499999999994,
+      "verifier_answer": "No",
+      "removal_clean": true
+    },
+    {
+      "image_id": "f295f93afde70b46",
+      "expr": "the Human head",
+      "gt_box": [
+        613.0,
+        72.0,
+        846.0,
+        381.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        609.28,
+        69.768,
+        844.8000000000001,
+        367.30800000000005
+      ],
+      "removed_box": [
+        609.28,
+        62.928000000000004,
+        844.8000000000001,
+        365.94000000000005
+      ],
+      "original_iou_gt": 0.929791552616679,
+      "same_box": 0.9730337078651684,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "e4591d6eaa05e4dd",
+      "expr": "the Human head",
+      "gt_box": [
+        180.0,
+        132.0,
+        494.0,
+        523.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        164.84400000000002,
+        63.488,
+        495.90000000000003,
+        479.232
+      ],
+      "removed_box": [
+        164.84400000000002,
+        63.488,
+        492.48,
+        526.336
+      ],
+      "original_iou_gt": 0.7202570106595646,
+      "same_box": 0.8898864270744674,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "2a3e44107826e876",
+      "expr": "the Vehicle registration plate",
+      "gt_box": [
+        605.0,
+        244.0,
+        715.0,
+        294.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        606.208,
+        241.27999999999997,
+        714.7520000000001,
+        291.15999999999997
+      ],
+      "removed_box": [
+        549.888,
+        381.05999999999995,
+        573.44,
+        402.52
+      ],
+      "original_iou_gt": 0.8832999707787752,
+      "same_box": 0.0,
+      "verifier_answer": "No",
+      "removal_clean": true
+    },
+    {
+      "image_id": "3e2306f2cf4b2c67",
+      "expr": "the Vehicle registration plate",
+      "gt_box": [
+        564.0,
+        522.0,
+        700.0,
+        595.0
+      ],
+      "original_type": "box",
+      "removed_type": "none",
+      "original_box": [
+        561.152,
+        519.693,
+        701.44,
+        593.583
+      ],
+      "removed_box": null,
+      "original_iou_gt": 0.9220251814779792,
+      "same_box": null,
+      "verifier_answer": "No",
+      "removal_clean": true
+    },
+    {
+      "image_id": "f4360a78d152b01d",
+      "expr": "the Bus",
+      "gt_box": [
+        576.0,
+        44.0,
+        728.0,
+        137.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        512.0,
+        43.089999999999996,
+        732.16,
+        139.0
+      ],
+      "removed_box": [
+        0.0,
+        0.0,
+        211.96800000000002,
+        369.73999999999995
+      ],
+      "original_iou_gt": 0.6694593768867616,
+      "same_box": 0.0,
+      "verifier_answer": "No",
+      "removal_clean": true
+    },
+    {
+      "image_id": "b810effde85dbb32",
+      "expr": "the Musical keyboard",
+      "gt_box": [
+        231.0,
+        575.0,
+        415.0,
+        681.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        238.592,
+        571.671,
+        414.72,
+        682.317
+      ],
+      "removed_box": [
+        796.672,
+        544.351,
+        962.5600000000001,
+        683.0
+      ],
+      "original_iou_gt": 0.918674389940899,
+      "same_box": 0.0,
+      "verifier_answer": "No",
+      "removal_clean": true
+    },
+    {
+      "image_id": "749b4451492fc250",
+      "expr": "the Vehicle registration plate",
+      "gt_box": [
+        164.0,
+        454.0,
+        320.0,
+        520.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        173.056,
+        456.27000000000004,
+        314.368,
+        514.836
+      ],
+      "removed_box": [
+        363.52,
+        508.70700000000005,
+        430.08,
+        544.8000000000001
+      ],
+      "original_iou_gt": 0.8038149370629366,
+      "same_box": 0.0,
+      "verifier_answer": "No",
+      "removal_clean": true
+    },
+    {
+      "image_id": "b5be42aef68ebf08",
+      "expr": "the Tableware",
+      "gt_box": [
+        179.0,
+        679.0,
+        376.0,
+        917.0
+      ],
+      "original_type": "box",
+      "removed_type": "none",
+      "original_box": [
+        169.533,
+        675.84,
+        378.378,
+        917.504
+      ],
+      "removed_box": null,
+      "original_iou_gt": 0.9289816625621711,
+      "same_box": null,
+      "verifier_answer": "no",
+      "removal_clean": true
+    },
+    {
+      "image_id": "9abeed7d14b78323",
+      "expr": "the Car",
+      "gt_box": [
+        0.0,
+        292.0,
+        273.0,
+        661.0
+      ],
+      "original_type": "box",
+      "removed_type": "none",
+      "original_box": [
+        0.0,
+        290.30400000000003,
+        276.48,
+        660.48
+      ],
+      "removed_box": null,
+      "original_iou_gt": 0.9815278236744346,
+      "same_box": null,
+      "verifier_answer": "No",
+      "removal_clean": true
+    },
+    {
+      "image_id": "8719d979f72d838c",
+      "expr": "the Boat",
+      "gt_box": [
+        157.0,
+        313.0,
+        920.0,
+        342.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        155.648,
+        314.88,
+        919.552,
+        342.40000000000003
+      ],
+      "removed_box": [
+        171.008,
+        318.08,
+        916.48,
+        352.0
+      ],
+      "original_iou_gt": 0.920388114236149,
+      "same_box": 0.6433787618028757,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "291e81d6cb3dd7f2",
+      "expr": "the Tire",
+      "gt_box": [
+        910.0,
+        449.0,
+        999.0,
+        663.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        906.24,
+        414.7,
+        1001.472,
+        665.782
+      ],
+      "removed_box": [
+        952.32,
+        397.358,
+        1001.472,
+        668.798
+      ],
+      "original_iou_gt": 0.7965357920168822,
+      "same_box": 0.4953974895397484,
+      "verifier_answer": "No",
+      "removal_clean": true
+    },
+    {
+      "image_id": "838de5e8518cde16",
+      "expr": "the Person",
+      "gt_box": [
+        0.0,
+        594.0,
+        265.0,
+        911.0
+      ],
+      "original_type": "box",
+      "removed_type": "none",
+      "original_box": [
+        0.0,
+        586.7520000000001,
+        268.288,
+        911.36
+      ],
+      "removed_box": null,
+      "original_iou_gt": 0.9645942513269323,
+      "same_box": null,
+      "verifier_answer": "no",
+      "removal_clean": true
+    },
+    {
+      "image_id": "98d5640bd8b7ac4c",
+      "expr": "the Motorcycle",
+      "gt_box": [
+        711.0,
+        0.0,
+        1024.0,
+        133.0
+      ],
+      "original_type": "box",
+      "removed_type": "none",
+      "original_box": [
+        706.5600000000001,
+        0.0,
+        1024.0,
+        136.4
+      ],
+      "removed_box": null,
+      "original_iou_gt": 0.9614350655685368,
+      "same_box": null,
+      "verifier_answer": "no",
+      "removal_clean": true
+    },
+    {
+      "image_id": "55709f00b158ee38",
+      "expr": "the Computer keyboard",
+      "gt_box": [
+        15.0,
+        691.0,
+        960.0,
+        768.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        0.0,
+        686.592,
+        990.208,
+        768.0
+      ],
+      "removed_box": [
+        0.0,
+        619.7760000000001,
+        1021.952,
+        768.0
+      ],
+      "original_iou_gt": 0.9026700179287659,
+      "same_box": 0.5321627711381315,
+      "verifier_answer": "No",
+      "removal_clean": true
+    },
+    {
+      "image_id": "a6c901e7d9249908",
+      "expr": "the Vehicle registration plate",
+      "gt_box": [
+        0.0,
+        501.0,
+        237.0,
+        683.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        0.0,
+        496.54100000000005,
+        239.616,
+        683.0
+      ],
+      "removed_box": [
+        78.848,
+        652.9480000000001,
+        240.64000000000001,
+        683.0
+      ],
+      "original_iou_gt": 0.9654295090788503,
+      "same_box": 0.10806244720458001,
+      "verifier_answer": "no",
+      "removal_clean": true
+    },
+    {
+      "image_id": "6b9b9ba4d7e4173a",
+      "expr": "the Human nose",
+      "gt_box": [
+        586.0,
+        370.0,
+        692.0,
+        442.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        580.32,
+        366.592,
+        694.4,
+        445.44
+      ],
+      "removed_box": [
+        577.344,
+        387.072,
+        694.4,
+        462.848
+      ],
+      "original_iou_gt": 0.8484732746215919,
+      "same_box": 0.594180565627266,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "663dd90964656275",
+      "expr": "the Human nose",
+      "gt_box": [
+        475.0,
+        442.0,
+        624.0,
+        618.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        473.088,
+        442.368,
+        634.88,
+        618.496
+      ],
+      "removed_box": [
+        462.848,
+        442.368,
+        595.968,
+        619.52
+      ],
+      "original_iou_gt": 0.9165783708492659,
+      "same_box": 0.7110866120030316,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "5e505f5851035415",
+      "expr": "the Human nose",
+      "gt_box": [
+        452.0,
+        413.0,
+        535.0,
+        529.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        447.336,
+        416.76800000000003,
+        536.2560000000001,
+        532.48
+      ],
+      "removed_box": [
+        424.08000000000004,
+        409.6,
+        513.0,
+        539.648
+      ],
+      "original_iou_gt": 0.8786439698386962,
+      "same_box": 0.5330188679245281,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "c1ac7bc9ec634013",
+      "expr": "the Person",
+      "gt_box": [
+        544.0,
+        96.0,
+        619.0,
+        325.0
+      ],
+      "original_type": "box",
+      "removed_type": "none",
+      "original_box": [
+        542.72,
+        94.367,
+        621.568,
+        323.54400000000004
+      ],
+      "removed_box": null,
+      "original_iou_gt": 0.9387465331474125,
+      "same_box": null,
+      "verifier_answer": "no",
+      "removal_clean": true
+    },
+    {
+      "image_id": "d44c949a2e41e235",
+      "expr": "the Vehicle registration plate",
+      "gt_box": [
+        407.0,
+        475.0,
+        598.0,
+        521.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        405.504,
+        471.21000000000004,
+        596.992,
+        519.3480000000001
+      ],
+      "removed_box": [
+        483.32800000000003,
+        479.34600000000006,
+        614.4,
+        513.246
+      ],
+      "original_iou_gt": 0.8796921287597216,
+      "same_box": 0.39286472711828285,
+      "verifier_answer": "No",
+      "removal_clean": true
+    },
+    {
+      "image_id": "f76903f01b94dd98",
+      "expr": "the Human head",
+      "gt_box": [
+        580.0,
+        99.0,
+        708.0,
+        291.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        578.5600000000001,
+        96.768,
+        711.6800000000001,
+        281.856
+      ],
+      "removed_box": [
+        580.6080000000001,
+        94.464,
+        698.368,
+        266.496
+      ],
+      "original_iou_gt": 0.9068640287187494,
+      "same_box": 0.8023677979479082,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "d6ee61462973e10d",
+      "expr": "the Window",
+      "gt_box": [
+        287.0,
+        126.0,
+        477.0,
+        496.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        281.152,
+        121.85600000000001,
+        479.028,
+        503.808
+      ],
+      "removed_box": [
+        281.152,
+        121.85600000000001,
+        479.79200000000003,
+        504.832
+      ],
+      "original_iou_gt": 0.9301509070565328,
+      "same_box": 0.9934903331962156,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "af757195968fcade",
+      "expr": "the Dairy Product",
+      "gt_box": [
+        389.0,
+        292.0,
+        701.0,
+        411.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        384.0,
+        292.11,
+        657.408,
+        420.938
+      ],
+      "removed_box": [
+        380.928,
+        163.282,
+        712.7040000000001,
+        374.5
+      ],
+      "original_iou_gt": 0.7891038468420934,
+      "same_box": 0.2721409907155167,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "757f227c20580793",
+      "expr": "the Human arm",
+      "gt_box": [
+        0.0,
+        103.0,
+        418.0,
+        395.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        0.0,
+        97.66900000000001,
+        421.88800000000003,
+        400.23800000000006
+      ],
+      "removed_box": [
+        0.0,
+        55.32300000000001,
+        137.216,
+        155.04100000000003
+      ],
+      "original_iou_gt": 0.9561753217359676,
+      "same_box": 0.05898629103257452,
+      "verifier_answer": "No",
+      "removal_clean": true
+    },
+    {
+      "image_id": "5ad4c95662d2601e",
+      "expr": "the Human leg",
+      "gt_box": [
+        160.0,
+        613.0,
+        424.0,
+        1022.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        116.11000000000001,
+        465.92,
+        454.87800000000004,
+        1024.0
+      ],
+      "removed_box": [
+        116.11000000000001,
+        465.92,
+        454.87800000000004,
+        1024.0
+      ],
+      "original_iou_gt": 0.5711213503479635,
+      "same_box": 1.0,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "ca8ea3ff453bd74b",
+      "expr": "the Missile",
+      "gt_box": [
+        347.0,
+        27.0,
+        382.0,
+        277.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        344.052,
+        22.528,
+        383.04,
+        278.528
+      ],
+      "removed_box": [
+        358.41600000000005,
+        263.168,
+        369.36,
+        290.81600000000003
+      ],
+      "original_iou_gt": 0.876671988817072,
+      "same_box": 0.016618196925633523,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "90a58c6c6379337c",
+      "expr": "the Person",
+      "gt_box": [
+        583.0,
+        242.0,
+        724.0,
+        323.0
+      ],
+      "original_type": "box",
+      "removed_type": "none",
+      "original_box": [
+        580.6080000000001,
+        245.436,
+        726.016,
+        322.728
+      ],
+      "removed_box": null,
+      "original_iou_gt": 0.9265811144852896,
+      "same_box": null,
+      "verifier_answer": "No",
+      "removal_clean": true
+    },
+    {
+      "image_id": "efec755800aeed4c",
+      "expr": "the Van",
+      "gt_box": [
+        551.0,
+        132.0,
+        986.0,
+        385.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        546.816,
+        130.9,
+        989.184,
+        382.69
+      ],
+      "removed_box": [
+        52.224000000000004,
+        159.39000000000001,
+        831.488,
+        639.1
+      ],
+      "original_iou_gt": 0.9702947088535084,
+      "same_box": 0.15076288413025224,
+      "verifier_answer": "No",
+      "removal_clean": true
+    },
+    {
+      "image_id": "c3d34fc865c14178",
+      "expr": "the Bench",
+      "gt_box": [
+        875.0,
+        136.0,
+        1024.0,
+        245.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        872.448,
+        134.4,
+        1024.0,
+        248.064
+      ],
+      "removed_box": [
+        259.072,
+        243.45600000000002,
+        703.488,
+        456.192
+      ],
+      "original_iou_gt": 0.942818637250664,
+      "same_box": 0.0,
+      "verifier_answer": "No",
+      "removal_clean": true
+    },
+    {
+      "image_id": "496d476360a82865",
+      "expr": "the Vehicle registration plate",
+      "gt_box": [
+        75.0,
+        489.0,
+        259.0,
+        557.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        74.752,
+        487.66200000000003,
+        259.072,
+        556.6450000000001
+      ],
+      "removed_box": [
+        71.68,
+        603.089,
+        277.504,
+        650.216
+      ],
+      "original_iou_gt": 0.9738983096765726,
+      "same_box": 0.0,
+      "verifier_answer": "No",
+      "removal_clean": true
+    },
+    {
+      "image_id": "fa7294ff486dc283",
+      "expr": "the Person",
+      "gt_box": [
+        406.0,
+        288.0,
+        534.0,
+        472.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        405.504,
+        285.696,
+        535.552,
+        473.856
+      ],
+      "removed_box": [
+        442.368,
+        381.696,
+        481.28000000000003,
+        439.296
+      ],
+      "original_iou_gt": 0.962491295730891,
+      "same_box": 0.09159569339546846,
+      "verifier_answer": "no",
+      "removal_clean": true
+    },
+    {
+      "image_id": "d9032b832491e0f3",
+      "expr": "the Building",
+      "gt_box": [
+        0.0,
+        0.0,
+        214.0,
+        130.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        0.0,
+        0.0,
+        222.208,
+        140.544
+      ],
+      "removed_box": [
+        0.0,
+        0.0,
+        1024.0,
+        767.232
+      ],
+      "original_iou_gt": 0.8908100856159713,
+      "same_box": 0.039750750750750755,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "b100c522db2d030d",
+      "expr": "the Bicycle wheel",
+      "gt_box": [
+        430.0,
+        512.0,
+        452.0,
+        768.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        421.88800000000003,
+        481.536,
+        450.56,
+        768.0
+      ],
+      "removed_box": [
+        396.288,
+        669.696,
+        467.968,
+        768.0
+      ],
+      "original_iou_gt": 0.6132925553442846,
+      "same_box": 0.2265486725663715,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "8df23bc49861cf2d",
+      "expr": "the Human hair",
+      "gt_box": [
+        696.0,
+        130.0,
+        914.0,
+        329.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        689.152,
+        132.502,
+        916.48,
+        328.523
+      ],
+      "removed_box": [
+        729.088,
+        153.675,
+        878.592,
+        322.37600000000003
+      ],
+      "original_iou_gt": 0.9451917857340675,
+      "same_box": 0.565998053802932,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "b8ef7f41044f7a37",
+      "expr": "the Human head",
+      "gt_box": [
+        253.0,
+        14.0,
+        517.0,
+        257.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        250.66100000000003,
+        13.312000000000001,
+        520.446,
+        353.28000000000003
+      ],
+      "removed_box": [
+        250.66100000000003,
+        13.312000000000001,
+        513.616,
+        353.28000000000003
+      ],
+      "original_iou_gt": 0.699446273706126,
+      "same_box": 0.9746835443037974,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "6237880a579aba5c",
+      "expr": "the Human head",
+      "gt_box": [
+        259.0,
+        80.0,
+        457.0,
+        418.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        240.06400000000002,
+        12.288,
+        477.40000000000003,
+        345.088
+      ],
+      "removed_box": [
+        175.95600000000002,
+        12.288,
+        647.9000000000001,
+        549.888
+      ],
+      "original_iou_gt": 0.5618315364460289,
+      "same_box": 0.3113129644921552,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "42ce10063c404333",
+      "expr": "the Human ear",
+      "gt_box": [
+        727.0,
+        569.0,
+        896.0,
+        708.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        713.7280000000001,
+        545.28,
+        899.072,
+        708.096
+      ],
+      "removed_box": [
+        749.568,
+        536.832,
+        890.88,
+        708.096
+      ],
+      "original_iou_gt": 0.7784413414885583,
+      "same_box": 0.7334168964652799,
+      "verifier_answer": "No",
+      "removal_clean": true
+    },
+    {
+      "image_id": "d0fb126ba870cfda",
+      "expr": "the Human mouth",
+      "gt_box": [
+        491.0,
+        542.0,
+        587.0,
+        625.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        486.29600000000005,
+        537.6,
+        588.7460000000001,
+        626.688
+      ],
+      "removed_box": [
+        476.05100000000004,
+        529.408,
+        584.648,
+        611.328
+      ],
+      "original_iou_gt": 0.8730078591743659,
+      "same_box": 0.673159329957148,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "9cd50c9012e9b324",
+      "expr": "the Ladybug",
+      "gt_box": [
+        437.0,
+        269.0,
+        548.0,
+        352.0
+      ],
+      "original_type": "box",
+      "removed_type": "none",
+      "original_box": [
+        436.224,
+        267.264,
+        548.864,
+        339.456
+      ],
+      "removed_box": null,
+      "original_iou_gt": 0.8211404215412106,
+      "same_box": null,
+      "verifier_answer": "No",
+      "removal_clean": true
+    },
+    {
+      "image_id": "f875b252a59ee1e9",
+      "expr": "the Human face",
+      "gt_box": [
+        301.0,
+        85.0,
+        566.0,
+        476.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        320.488,
+        75.776,
+        568.3230000000001,
+        479.232
+      ],
+      "removed_box": [
+        286.538,
+        73.72800000000001,
+        609.7420000000001,
+        409.6
+      ],
+      "original_iou_gt": 0.8920630183212629,
+      "same_box": 0.6575922364436193,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "1477b3b65431eebf",
+      "expr": "the Tire",
+      "gt_box": [
+        513.0,
+        427.0,
+        643.0,
+        597.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        508.928,
+        426.87500000000006,
+        645.12,
+        599.6740000000001
+      ],
+      "removed_box": [
+        806.912,
+        400.92100000000005,
+        939.008,
+        587.38
+      ],
+      "original_iou_gt": 0.939073210227694,
+      "same_box": 0.0,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "1b7b604aa0d293cd",
+      "expr": "the Plant",
+      "gt_box": [
+        182.0,
+        449.0,
+        381.0,
+        662.0
+      ],
+      "original_type": "box",
+      "removed_type": "none",
+      "original_box": [
+        126.976,
+        448.17400000000004,
+        384.0,
+        662.0
+      ],
+      "removed_box": null,
+      "original_iou_gt": 0.7712558833255458,
+      "same_box": null,
+      "verifier_answer": "No",
+      "removal_clean": true
+    },
+    {
+      "image_id": "8e562fee6ff208f7",
+      "expr": "the Human leg",
+      "gt_box": [
+        231.0,
+        629.0,
+        375.0,
+        731.0
+      ],
+      "original_type": "box",
+      "removed_type": "none",
+      "original_box": [
+        230.4,
+        623.616,
+        360.448,
+        731.904
+      ],
+      "removed_box": null,
+      "original_iou_gt": 0.8481881765398186,
+      "same_box": null,
+      "verifier_answer": "No",
+      "removal_clean": true
+    },
+    {
+      "image_id": "9cb13283b31bd94d",
+      "expr": "the Fashion accessory",
+      "gt_box": [
+        699.0,
+        407.0,
+        938.0,
+        517.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        698.368,
+        401.03000000000003,
+        941.056,
+        514.936
+      ],
+      "removed_box": [
+        829.44,
+        506.848,
+        911.36,
+        570.878
+      ],
+      "original_iou_gt": 0.9168277225587995,
+      "same_box": 0.020559826954789844,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "e5c67a5fb7c58b74",
+      "expr": "the Insect",
+      "gt_box": [
+        460.0,
+        255.0,
+        786.0,
+        466.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        447.488,
+        252.263,
+        789.504,
+        470.16200000000003
+      ],
+      "removed_box": [
+        500.736,
+        248.358,
+        528.384,
+        278.817
+      ],
+      "original_iou_gt": 0.9229929732730919,
+      "same_box": 0.009837014176873379,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "a1dd4eb01f30e61b",
+      "expr": "the Bird",
+      "gt_box": [
+        423.0,
+        256.0,
+        635.0,
+        448.0
+      ],
+      "original_type": "box",
+      "removed_type": "none",
+      "original_box": [
+        421.88800000000003,
+        255.442,
+        636.928,
+        452.146
+      ],
+      "removed_box": null,
+      "original_iou_gt": 0.9622870622138558,
+      "same_box": null,
+      "verifier_answer": "no",
+      "removal_clean": true
+    },
+    {
+      "image_id": "c55679ffc17d6f2e",
+      "expr": "the Human hand",
+      "gt_box": [
+        946.0,
+        451.0,
+        1024.0,
+        614.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        946.176,
+        447.29999999999995,
+        1024.0,
+        626.93
+      ],
+      "removed_box": [
+        989.184,
+        511.2,
+        1024.0,
+        568.0
+      ],
+      "original_iou_gt": 0.9055624647720947,
+      "same_box": 0.14146037029332248,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "9d13634a0b51d56e",
+      "expr": "the Table",
+      "gt_box": [
+        509.0,
+        597.0,
+        889.0,
+        768.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        508.928,
+        592.896,
+        892.928,
+        767.232
+      ],
+      "removed_box": [
+        272.384,
+        546.816,
+        1024.0,
+        629.76
+      ],
+      "original_iou_gt": 0.9620936514826148,
+      "same_box": 0.1229533392077708,
+      "verifier_answer": "No",
+      "removal_clean": true
+    },
+    {
+      "image_id": "5eb101576c071932",
+      "expr": "the Human head",
+      "gt_box": [
+        327.0,
+        160.0,
+        525.0,
+        373.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        307.125,
+        49.152,
+        525.798,
+        350.208
+      ],
+      "removed_box": [
+        307.125,
+        49.152,
+        511.87499999999994,
+        314.368
+      ],
+      "original_iou_gt": 0.5353734338603456,
+      "same_box": 0.8248617799179595,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "f2f6d0d08ab8b377",
+      "expr": "the Human nose",
+      "gt_box": [
+        492.0,
+        655.0,
+        641.0,
+        798.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        488.44800000000004,
+        647.168,
+        641.024,
+        800.768
+      ],
+      "removed_box": [
+        483.32800000000003,
+        653.312,
+        653.312,
+        811.008
+      ],
+      "original_iou_gt": 0.9091695149739586,
+      "same_box": 0.8109456497089725,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "b1cae8a8600781c6",
+      "expr": "the Kitchen knife",
+      "gt_box": [
+        808.0,
+        115.0,
+        920.0,
+        647.0
+      ],
+      "original_type": "box",
+      "removed_type": "none",
+      "original_box": [
+        806.912,
+        113.03999999999999,
+        921.6,
+        649.4399999999999
+      ],
+      "removed_box": null,
+      "original_iou_gt": 0.9685519202087995,
+      "same_box": null,
+      "verifier_answer": "No",
+      "removal_clean": true
+    },
+    {
+      "image_id": "859dfc18978e1bf3",
+      "expr": "the Window",
+      "gt_box": [
+        299.0,
+        55.0,
+        412.0,
+        227.0
+      ],
+      "original_type": "box",
+      "removed_type": "none",
+      "original_box": [
+        297.984,
+        56.274,
+        413.696,
+        225.77400000000003
+      ],
+      "removed_box": null,
+      "original_iou_gt": 0.9626962310016584,
+      "same_box": null,
+      "verifier_answer": "No",
+      "removal_clean": true
+    },
+    {
+      "image_id": "4285819d7ab87d7a",
+      "expr": "the Human hair",
+      "gt_box": [
+        305.0,
+        89.0,
+        456.0,
+        265.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        301.48400000000004,
+        87.04,
+        456.89500000000004,
+        250.88
+      ],
+      "removed_box": [
+        318.826,
+        108.544,
+        445.55600000000004,
+        238.592
+      ],
+      "original_iou_gt": 0.8858192693456604,
+      "same_box": 0.6472639484978543,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "24696f73f763df37",
+      "expr": "the Furniture",
+      "gt_box": [
+        0.0,
+        583.0,
+        1024.0,
+        685.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        0.0,
+        568.5500000000001,
+        1024.0,
+        685.0
+      ],
+      "removed_box": [
+        0.0,
+        596.635,
+        1024.0,
+        685.0
+      ],
+      "original_iou_gt": 0.8759124087591246,
+      "same_box": 0.7588235294117652,
+      "verifier_answer": "No",
+      "removal_clean": true
+    },
+    {
+      "image_id": "de046443b2e3ff24",
+      "expr": "the Person",
+      "gt_box": [
+        341.0,
+        340.0,
+        409.0,
+        457.0
+      ],
+      "original_type": "box",
+      "removed_type": "none",
+      "original_box": [
+        337.92,
+        338.832,
+        408.576,
+        456.12
+      ],
+      "removed_box": null,
+      "original_iou_gt": 0.9345832316330652,
+      "same_box": null,
+      "verifier_answer": "no",
+      "removal_clean": true
+    },
+    {
+      "image_id": "79ca3f2ab67af190",
+      "expr": "the Musical keyboard",
+      "gt_box": [
+        413.0,
+        300.0,
+        1024.0,
+        531.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        406.528,
+        293.76000000000005,
+        1024.0,
+        535.84
+      ],
+      "removed_box": [
+        319.488,
+        290.36,
+        1021.952,
+        679.32
+      ],
+      "original_iou_gt": 0.9442282954341806,
+      "same_box": 0.5442732711954088,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "741518caaf3bcbc1",
+      "expr": "the Human hand",
+      "gt_box": [
+        555.0,
+        320.0,
+        820.0,
+        475.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        552.96,
+        318.494,
+        815.104,
+        482.17400000000004
+      ],
+      "removed_box": [
+        764.928,
+        387.37600000000003,
+        990.208,
+        600.1600000000001
+      ],
+      "original_iou_gt": 0.9232711234937105,
+      "same_box": 0.05525314555971093,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "e10f579980df69e4",
+      "expr": "the Human arm",
+      "gt_box": [
+        0.0,
+        781.0,
+        223.0,
+        977.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        0.0,
+        776.192,
+        233.909,
+        978.9440000000001
+      ],
+      "removed_box": [
+        0.0,
+        900.096,
+        210.23399999999998,
+        1024.0
+      ],
+      "original_iou_gt": 0.9216135582986579,
+      "same_box": 0.2913385826771656,
+      "verifier_answer": "No",
+      "removal_clean": true
+    },
+    {
+      "image_id": "289f58e856b6cb6a",
+      "expr": "the Insect",
+      "gt_box": [
+        420.0,
+        460.0,
+        704.0,
+        664.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        414.72,
+        457.61,
+        704.5120000000001,
+        665.9250000000001
+      ],
+      "removed_box": [
+        409.6,
+        469.90400000000005,
+        645.12,
+        606.504
+      ],
+      "original_iou_gt": 0.9597134300468615,
+      "same_box": 0.5153753650575498,
+      "verifier_answer": "No",
+      "removal_clean": true
+    },
+    {
+      "image_id": "8cac5e7e744d570b",
+      "expr": "the Person",
+      "gt_box": [
+        50.0,
+        273.0,
+        85.0,
+        414.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        47.104,
+        271.46599999999995,
+        99.328,
+        434.07
+      ],
+      "removed_box": [
+        572.416,
+        245.97299999999998,
+        614.4,
+        289.38
+      ],
+      "original_iou_gt": 0.5811467312503706,
+      "same_box": 0.0,
+      "verifier_answer": "No",
+      "removal_clean": true
+    },
+    {
+      "image_id": "a9399b00de635490",
+      "expr": "the Fashion accessory",
+      "gt_box": [
+        697.0,
+        235.0,
+        815.0,
+        480.0
+      ],
+      "original_type": "box",
+      "removed_type": "none",
+      "original_box": [
+        693.8729999999999,
+        242.68800000000002,
+        812.42,
+        481.28000000000003
+      ],
+      "removed_box": null,
+      "original_iou_gt": 0.9190283605810228,
+      "same_box": null,
+      "verifier_answer": "no",
+      "removal_clean": true
+    },
+    {
+      "image_id": "4c40d7e310fa9d21",
+      "expr": "the Fruit",
+      "gt_box": [
+        512.0,
+        240.0,
+        735.0,
+        479.0
+      ],
+      "original_type": "box",
+      "removed_type": "none",
+      "original_box": [
+        509.952,
+        234.58800000000002,
+        742.4,
+        482.73600000000005
+      ],
+      "removed_box": null,
+      "original_iou_gt": 0.9239876593913436,
+      "same_box": null,
+      "verifier_answer": "no",
+      "removal_clean": true
+    },
+    {
+      "image_id": "68aae543ea6fccad",
+      "expr": "the Hat",
+      "gt_box": [
+        174.0,
+        29.0,
+        563.0,
+        202.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        173.76,
+        31.744,
+        565.625,
+        201.728
+      ],
+      "removed_box": [
+        246.16,
+        37.888,
+        404.535,
+        151.552
+      ],
+      "original_iou_gt": 0.9755070804598507,
+      "same_box": 0.2702495895823478,
+      "verifier_answer": "no",
+      "removal_clean": true
+    },
+    {
+      "image_id": "59a3d81898663feb",
+      "expr": "the Human head",
+      "gt_box": [
+        413.0,
+        165.0,
+        508.0,
+        285.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        408.576,
+        162.61,
+        512.0,
+        283.36
+      ],
+      "removed_box": [
+        427.008,
+        206.88500000000002,
+        542.72,
+        283.36
+      ],
+      "original_iou_gt": 0.8892739212328012,
+      "same_box": 0.4380555555555557,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "50c532b8fc3c8d01",
+      "expr": "the Dress",
+      "gt_box": [
+        213.0,
+        422.0,
+        453.0,
+        758.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        230.17100000000002,
+        422.91200000000003,
+        456.244,
+        755.712
+      ],
+      "removed_box": [
+        341.5,
+        370.688,
+        418.67900000000003,
+        450.56
+      ],
+      "original_iou_gt": 0.9074626931130275,
+      "same_box": 0.026919479786126434,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "fee1eec3d9515c12",
+      "expr": "the Bee",
+      "gt_box": [
+        203.0,
+        484.0,
+        427.0,
+        645.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        199.68,
+        460.8,
+        427.008,
+        648.96
+      ],
+      "removed_box": [
+        276.48,
+        454.656,
+        373.76,
+        542.976
+      ],
+      "original_iou_gt": 0.8431282845345344,
+      "same_box": 0.184315503173164,
+      "verifier_answer": "No",
+      "removal_clean": true
+    },
+    {
+      "image_id": "649179f339158a5a",
+      "expr": "the Human foot",
+      "gt_box": [
+        452.0,
+        910.0,
+        520.0,
+        999.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        450.328,
+        925.696,
+        523.452,
+        999.424
+      ],
+      "removed_box": [
+        464.808,
+        908.288,
+        521.28,
+        979.9680000000001
+      ],
+      "original_iou_gt": 0.7717866077883029,
+      "same_box": 0.4808094905792048,
+      "verifier_answer": "No",
+      "removal_clean": true
+    },
+    {
+      "image_id": "80b0465320aad7b5",
+      "expr": "the Tire",
+      "gt_box": [
+        0.0,
+        446.0,
+        184.0,
+        685.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        0.0,
+        443.19500000000005,
+        184.32,
+        685.0
+      ],
+      "removed_box": [
+        0.0,
+        437.03000000000003,
+        204.8,
+        684.315
+      ],
+      "original_iou_gt": 0.9866837718179712,
+      "same_box": 0.8753799392097266,
+      "verifier_answer": "no",
+      "removal_clean": true
+    },
+    {
+      "image_id": "46a0cd25a1f06d65",
+      "expr": "the Watch",
+      "gt_box": [
+        586.0,
+        396.0,
+        996.0,
+        647.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        583.6800000000001,
+        393.216,
+        999.424,
+        662.784
+      ],
+      "removed_box": [
+        84.992,
+        38.4,
+        518.144,
+        577.5360000000001
+      ],
+      "original_iou_gt": 0.9182548936079157,
+      "same_box": 0.0,
+      "verifier_answer": "No",
+      "removal_clean": true
+    },
+    {
+      "image_id": "0d0e5d41f87736e6",
+      "expr": "the Human head",
+      "gt_box": [
+        363.0,
+        366.0,
+        841.0,
+        654.0
+      ],
+      "original_type": "box",
+      "removed_type": "none",
+      "original_box": [
+        359.42400000000004,
+        363.264,
+        844.8000000000001,
+        655.104
+      ],
+      "removed_box": null,
+      "original_iou_gt": 0.9718455925216519,
+      "same_box": null,
+      "verifier_answer": "No",
+      "removal_clean": true
+    },
+    {
+      "image_id": "28b715a0889c17c8",
+      "expr": "the Frog",
+      "gt_box": [
+        371.0,
+        258.0,
+        665.0,
+        600.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        366.592,
+        256.846,
+        668.672,
+        601.3580000000001
+      ],
+      "removed_box": [
+        360.448,
+        273.764,
+        649.216,
+        562.908
+      ],
+      "original_iou_gt": 0.9661556769467277,
+      "same_box": 0.7720509463159145,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "11f80fda2c38011c",
+      "expr": "the Vehicle registration plate",
+      "gt_box": [
+        540.0,
+        452.0,
+        654.0,
+        493.0
+      ],
+      "original_type": "box",
+      "removed_type": "none",
+      "original_box": [
+        542.72,
+        453.492,
+        645.12,
+        489.06000000000006
+      ],
+      "removed_box": null,
+      "original_iou_gt": 0.7792390243902446,
+      "same_box": null,
+      "verifier_answer": "No",
+      "removal_clean": true
+    },
+    {
+      "image_id": "e2f2a77011a52689",
+      "expr": "the Human nose",
+      "gt_box": [
+        253.0,
+        154.0,
+        323.0,
+        263.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        248.20000000000002,
+        140.288,
+        320.96000000000004,
+        264.192
+      ],
+      "removed_box": [
+        246.16000000000003,
+        140.288,
+        320.96000000000004,
+        264.192
+      ],
+      "original_iou_gt": 0.8018996210519727,
+      "same_box": 0.9727272727272729,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "1203f70f16f36d18",
+      "expr": "the Bird",
+      "gt_box": [
+        223.0,
+        266.0,
+        509.0,
+        445.0
+      ],
+      "original_type": "box",
+      "removed_type": "none",
+      "original_box": [
+        219.136,
+        266.454,
+        509.952,
+        471.21000000000004
+      ],
+      "removed_box": null,
+      "original_iou_gt": 0.8556876282011668,
+      "same_box": null,
+      "verifier_answer": "No",
+      "removal_clean": true
+    },
+    {
+      "image_id": "8e0b8fe0e2215fe0",
+      "expr": "the Human hair",
+      "gt_box": [
+        291.0,
+        192.0,
+        432.0,
+        300.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        288.226,
+        191.488,
+        430.29,
+        307.2
+      ],
+      "removed_box": [
+        295.05600000000004,
+        210.94400000000002,
+        426.87500000000006,
+        268.288
+      ],
+      "original_iou_gt": 0.9049599018565436,
+      "same_box": 0.4598366235534377,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "6fce9e3e38858d53",
+      "expr": "the Human head",
+      "gt_box": [
+        312.0,
+        158.0,
+        512.0,
+        383.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        316.20000000000005,
+        90.112,
+        520.2,
+        380.928
+      ],
+      "removed_box": [
+        320.96000000000004,
+        90.112,
+        518.84,
+        389.12
+      ],
+      "original_iou_gt": 0.7193695494154422,
+      "same_box": 0.9442007129147243,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "1fdd5de5adf9e25b",
+      "expr": "the Flower",
+      "gt_box": [
+        210.0,
+        291.0,
+        501.0,
+        560.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        205.824,
+        288.76800000000003,
+        502.784,
+        559.104
+      ],
+      "removed_box": [
+        579.5840000000001,
+        381.696,
+        630.784,
+        439.296
+      ],
+      "original_iou_gt": 0.9686930780202656,
+      "same_box": 0.0,
+      "verifier_answer": "No",
+      "removal_clean": true
+    },
+    {
+      "image_id": "dd145a9901838e64",
+      "expr": "the Human face",
+      "gt_box": [
+        505.0,
+        193.0,
+        643.0,
+        338.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        503.808,
+        202.168,
+        614.4,
+        336.036
+      ],
+      "removed_box": [
+        539.648,
+        277.981,
+        652.288,
+        349.696
+      ],
+      "original_iou_gt": 0.7261016830640064,
+      "same_box": 0.23403613321766667,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "3f85aab38e4fee07",
+      "expr": "the Human arm",
+      "gt_box": [
+        574.0,
+        534.0,
+        828.0,
+        1024.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        585.429,
+        532.48,
+        831.7860000000001,
+        1021.952
+      ],
+      "removed_box": [
+        580.131,
+        498.688,
+        794.7,
+        1021.952
+      ],
+      "original_iou_gt": 0.9343327841245928,
+      "same_box": 0.7853503317180707,
+      "verifier_answer": "No",
+      "removal_clean": true
+    },
+    {
+      "image_id": "8cab7c2f0b4e13e6",
+      "expr": "the Flower",
+      "gt_box": [
+        457.0,
+        315.0,
+        563.0,
+        418.0
+      ],
+      "original_type": "box",
+      "removed_type": "none",
+      "original_box": [
+        453.12,
+        311.808,
+        562.944,
+        422.40000000000003
+      ],
+      "removed_box": null,
+      "original_iou_gt": 0.8980208552034723,
+      "same_box": null,
+      "verifier_answer": "no",
+      "removal_clean": true
+    },
+    {
+      "image_id": "5ad0bacd174019cb",
+      "expr": "the Food",
+      "gt_box": [
+        356.0,
+        512.0,
+        609.0,
+        615.0
+      ],
+      "original_type": "box",
+      "removed_type": "none",
+      "original_box": [
+        353.071,
+        508.928,
+        608.908,
+        615.424
+      ],
+      "removed_box": null,
+      "original_iou_gt": 0.9557671975187682,
+      "same_box": null,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "d213ece8466847a6",
+      "expr": "the Vehicle registration plate",
+      "gt_box": [
+        672.0,
+        382.0,
+        787.0,
+        423.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        669.696,
+        380.98800000000006,
+        786.432,
+        422.028
+      ],
+      "removed_box": [
+        394.24,
+        242.82000000000002,
+        421.88800000000003,
+        256.5
+      ],
+      "original_iou_gt": 0.9299793002151783,
+      "same_box": 0.0,
+      "verifier_answer": "No",
+      "removal_clean": true
+    },
+    {
+      "image_id": "d3c089a8999ef98d",
+      "expr": "the Human nose",
+      "gt_box": [
+        632.0,
+        325.0,
+        722.0,
+        459.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        630.784,
+        320.976,
+        724.992,
+        460.65999999999997
+      ],
+      "removed_box": [
+        626.688,
+        319.49,
+        727.04,
+        480.721
+      ],
+      "original_iou_gt": 0.916458620731515,
+      "same_box": 0.8133170318818769,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "4022308193f73760",
+      "expr": "the Person",
+      "gt_box": [
+        0.0,
+        494.0,
+        99.0,
+        683.0
+      ],
+      "original_type": "box",
+      "removed_type": "none",
+      "original_box": [
+        0.0,
+        493.12600000000003,
+        102.4,
+        683.0
+      ],
+      "removed_box": null,
+      "original_iou_gt": 0.9623466581785819,
+      "same_box": null,
+      "verifier_answer": "no",
+      "removal_clean": true
+    },
+    {
+      "image_id": "e51e3156ed41b3a8",
+      "expr": "the Bottle",
+      "gt_box": [
+        0.0,
+        0.0,
+        156.0,
+        678.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        0.0,
+        0.0,
+        279.552,
+        679.32
+      ],
+      "removed_box": [
+        0.0,
+        0.0,
+        161.792,
+        679.32
+      ],
+      "original_iou_gt": 0.5569513841572663,
+      "same_box": 0.5787545787545786,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "b01d46f9911d558b",
+      "expr": "the Vehicle registration plate",
+      "gt_box": [
+        402.0,
+        143.0,
+        629.0,
+        244.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        391.168,
+        139.37800000000001,
+        634.88,
+        243.344
+      ],
+      "removed_box": [
+        375.808,
+        141.648,
+        657.408,
+        244.252
+      ],
+      "original_iou_gt": 0.8937254106163438,
+      "same_box": 0.8416798231765076,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "e26a461655d1856f",
+      "expr": "the Door",
+      "gt_box": [
+        0.0,
+        469.0,
+        46.0,
+        589.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        0.0,
+        470.016,
+        44.032000000000004,
+        593.664
+      ],
+      "removed_box": [
+        0.0,
+        466.176,
+        45.056,
+        593.664
+      ],
+      "original_iou_gt": 0.9150688665374036,
+      "same_box": 0.9478368017524642,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "aa72b894ee823df8",
+      "expr": "the Guacamole",
+      "gt_box": [
+        391.0,
+        0.0,
+        653.0,
+        127.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        380.928,
+        0.0,
+        688.128,
+        170.496
+      ],
+      "removed_box": [
+        0.0,
+        78.336,
+        488.44800000000004,
+        767.232
+      ],
+      "original_iou_gt": 0.6352864705525837,
+      "same_box": 0.026148185502698883,
+      "verifier_answer": "No",
+      "removal_clean": true
+    },
+    {
+      "image_id": "e0c995e9359596dd",
+      "expr": "the Vegetable",
+      "gt_box": [
+        403.0,
+        310.0,
+        593.0,
+        520.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        396.288,
+        309.504,
+        595.968,
+        522.24
+      ],
+      "removed_box": [
+        343.04,
+        111.36,
+        675.84,
+        366.336
+      ],
+      "original_iou_gt": 0.9392848955440621,
+      "same_box": 0.09784045835169676,
+      "verifier_answer": "No",
+      "removal_clean": true
+    },
+    {
+      "image_id": "3ec724375056fed7",
+      "expr": "the Woman",
+      "gt_box": [
+        48.0,
+        163.0,
+        195.0,
+        655.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        46.08,
+        161.196,
+        204.8,
+        654.682
+      ],
+      "removed_box": [
+        104.44800000000001,
+        195.839,
+        299.008,
+        530.25
+      ],
+      "original_iou_gt": 0.9222231883505189,
+      "same_box": 0.30555152729621765,
+      "verifier_answer": "No",
+      "removal_clean": true
+    },
+    {
+      "image_id": "a1050e384e51e229",
+      "expr": "the Vehicle registration plate",
+      "gt_box": [
+        235.0,
+        463.0,
+        491.0,
+        545.0
+      ],
+      "original_type": "box",
+      "removed_type": "none",
+      "original_box": [
+        235.52,
+        461.708,
+        493.568,
+        546.4000000000001
+      ],
+      "removed_box": null,
+      "original_iou_gt": 0.9567122996614107,
+      "same_box": null,
+      "verifier_answer": "No",
+      "removal_clean": true
+    },
+    {
+      "image_id": "0f36e5a806cffa1a",
+      "expr": "the Person",
+      "gt_box": [
+        550.0,
+        410.0,
+        656.0,
+        725.0
+      ],
+      "original_type": "box",
+      "removed_type": "none",
+      "original_box": [
+        549.236,
+        410.624,
+        655.616,
+        729.088
+      ],
+      "removed_box": null,
+      "original_iou_gt": 0.9746975649249597,
+      "same_box": null,
+      "verifier_answer": "no",
+      "removal_clean": true
+    },
+    {
+      "image_id": "5e2e72b27dcda54a",
+      "expr": "the Human nose",
+      "gt_box": [
+        88.0,
+        457.0,
+        165.0,
+        565.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        86.058,
+        430.08,
+        166.65200000000002,
+        568.32
+      ],
+      "removed_box": [
+        114.74400000000001,
+        421.88800000000003,
+        170.75,
+        575.488
+      ],
+      "original_iou_gt": 0.7464110231530879,
+      "same_box": 0.5709515859766279,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "8f28c2c23a4f63b6",
+      "expr": "the Ladybug",
+      "gt_box": [
+        228.0,
+        358.0,
+        391.0,
+        470.0
+      ],
+      "original_type": "box",
+      "removed_type": "none",
+      "original_box": [
+        227.328,
+        357.84000000000003,
+        391.168,
+        474.13800000000003
+      ],
+      "removed_box": null,
+      "original_iou_gt": 0.9581057391356687,
+      "same_box": null,
+      "verifier_answer": "No",
+      "removal_clean": true
+    },
+    {
+      "image_id": "c0956222b572b19e",
+      "expr": "the Ladder",
+      "gt_box": [
+        128.0,
+        257.0,
+        288.0,
+        608.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        124.928,
+        253.44,
+        293.88800000000003,
+        609.024
+      ],
+      "removed_box": [
+        235.52,
+        316.416,
+        535.552,
+        751.8720000000001
+      ],
+      "original_iou_gt": 0.9347618667779302,
+      "same_box": 0.09835196934907547,
+      "verifier_answer": "No",
+      "removal_clean": true
+    },
+    {
+      "image_id": "0bc24867cc06ebb6",
+      "expr": "the Vehicle registration plate",
+      "gt_box": [
+        57.0,
+        422.0,
+        185.0,
+        484.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        56.32,
+        417.99600000000004,
+        186.368,
+        479.466
+      ],
+      "removed_box": [
+        71.68,
+        359.94100000000003,
+        107.52,
+        389.31
+      ],
+      "original_iou_gt": 0.8578612852065585,
+      "same_box": 0.0,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "d0e398ed03a21739",
+      "expr": "the Rose",
+      "gt_box": [
+        249.0,
+        130.0,
+        555.0,
+        384.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        243.71200000000002,
+        128.352,
+        557.056,
+        391.168
+      ],
+      "removed_box": [
+        24.576,
+        21.392,
+        176.12800000000001,
+        139.048
+      ],
+      "original_iou_gt": 0.943804315566784,
+      "same_box": 0.0,
+      "verifier_answer": "No",
+      "removal_clean": true
+    },
+    {
+      "image_id": "853db3ecad5ee768",
+      "expr": "the Wheel",
+      "gt_box": [
+        360.0,
+        232.0,
+        640.0,
+        567.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        358.40000000000003,
+        225.28,
+        645.12,
+        571.52
+      ],
+      "removed_box": [
+        324.608,
+        460.8,
+        583.6800000000001,
+        532.48
+      ],
+      "original_iou_gt": 0.944860320875693,
+      "same_box": 0.15878744135691092,
+      "verifier_answer": "No",
+      "removal_clean": true
+    },
+    {
+      "image_id": "efd6e2c6544a1fff",
+      "expr": "the Human hair",
+      "gt_box": [
+        458.0,
+        142.0,
+        626.0,
+        343.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        452.608,
+        140.812,
+        642.048,
+        346.766
+      ],
+      "removed_box": [
+        556.032,
+        164.5,
+        645.12,
+        263.2
+      ],
+      "original_iou_gt": 0.8654927274497665,
+      "same_box": 0.21591980121669083,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "f95720addcc4372d",
+      "expr": "the Human nose",
+      "gt_box": [
+        321.0,
+        504.0,
+        435.0,
+        661.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        316.129,
+        498.688,
+        438.022,
+        663.552
+      ],
+      "removed_box": [
+        309.192,
+        498.688,
+        452.887,
+        688.128
+      ],
+      "original_iou_gt": 0.8906353018707527,
+      "same_box": 0.738229263746505,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "a7d23d18c22afa38",
+      "expr": "the Boat",
+      "gt_box": [
+        413.0,
+        173.0,
+        768.0,
+        256.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        408.576,
+        172.116,
+        770.048,
+        258.17400000000004
+      ],
+      "removed_box": [
+        531.456,
+        170.75,
+        560.128,
+        199.436
+      ],
+      "original_iou_gt": 0.9471974814304365,
+      "same_box": 0.025149324111914506,
+      "verifier_answer": "No",
+      "removal_clean": true
+    },
+    {
+      "image_id": "47826d736bad6e67",
+      "expr": "the Human hair",
+      "gt_box": [
+        497.0,
+        0.0,
+        679.0,
+        61.0
+      ],
+      "original_type": "box",
+      "removed_type": "none",
+      "original_box": [
+        494.592,
+        0.0,
+        681.984,
+        59.05200000000001
+      ],
+      "removed_box": null,
+      "original_iou_gt": 0.9410752784512685,
+      "same_box": null,
+      "verifier_answer": "No",
+      "removal_clean": true
+    },
+    {
+      "image_id": "c7d70fd32f33ed8d",
+      "expr": "the Person",
+      "gt_box": [
+        668.0,
+        500.0,
+        1024.0,
+        768.0
+      ],
+      "original_type": "box",
+      "removed_type": "none",
+      "original_box": [
+        662.528,
+        496.896,
+        1024.0,
+        768.0
+      ],
+      "removed_box": null,
+      "original_iou_gt": 0.973585740780495,
+      "same_box": null,
+      "verifier_answer": "no",
+      "removal_clean": true
+    },
+    {
+      "image_id": "37a01d37850c3df3",
+      "expr": "the Person",
+      "gt_box": [
+        749.0,
+        0.0,
+        1024.0,
+        266.0
+      ],
+      "original_type": "box",
+      "removed_type": "none",
+      "original_box": [
+        745.472,
+        0.0,
+        1024.0,
+        268.288
+      ],
+      "removed_box": null,
+      "original_iou_gt": 0.9789132836371407,
+      "same_box": null,
+      "verifier_answer": "no",
+      "removal_clean": true
+    },
+    {
+      "image_id": "eb13c121a0995f2a",
+      "expr": "the Barrel",
+      "gt_box": [
+        364.0,
+        89.0,
+        456.0,
+        281.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        362.496,
+        87.04,
+        454.656,
+        280.576
+      ],
+      "removed_box": [
+        0.0,
+        0.0,
+        149.76,
+        138.24
+      ],
+      "original_iou_gt": 0.9577973853268342,
+      "same_box": 0.0,
+      "verifier_answer": "No",
+      "removal_clean": true
+    },
+    {
+      "image_id": "1ee71a89f4028586",
+      "expr": "the Flowerpot",
+      "gt_box": [
+        239.0,
+        693.0,
+        534.0,
+        816.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        235.008,
+        642.048,
+        537.6,
+        815.104
+      ],
+      "removed_box": [
+        241.92000000000002,
+        760.832,
+        529.92,
+        851.9680000000001
+      ],
+      "original_iou_gt": 0.6844175988064328,
+      "same_box": 0.2481707164797843,
+      "verifier_answer": "No",
+      "removal_clean": true
+    },
+    {
+      "image_id": "932eef14e5ee78b2",
+      "expr": "the Vehicle registration plate",
+      "gt_box": [
+        371.0,
+        415.0,
+        693.0,
+        478.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        364.544,
+        410.564,
+        695.296,
+        480.81000000000006
+      ],
+      "removed_box": [
+        363.52,
+        409.882,
+        700.416,
+        480.81000000000006
+      ],
+      "original_iou_gt": 0.873116796135015,
+      "same_box": 0.9723228898760811,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "08481c03daf6f35d",
+      "expr": "the Vehicle registration plate",
+      "gt_box": [
+        320.0,
+        600.0,
+        703.0,
+        681.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        317.44,
+        600.642,
+        702.464,
+        681.0
+      ],
+      "removed_box": [
+        316.416,
+        657.1650000000001,
+        695.296,
+        681.0
+      ],
+      "original_iou_gt": 0.9841596317825991,
+      "same_box": 0.29085872576177213,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "b94993a2d67b455e",
+      "expr": "the Vehicle registration plate",
+      "gt_box": [
+        255.0,
+        225.0,
+        412.0,
+        275.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        249.856,
+        222.65800000000002,
+        412.672,
+        274.56600000000003
+      ],
+      "removed_box": [
+        183.296,
+        209.681,
+        237.568,
+        233.586
+      ],
+      "original_iou_gt": 0.9134079400954079,
+      "same_box": 0.0,
+      "verifier_answer": "No",
+      "removal_clean": true
+    },
+    {
+      "image_id": "b4c2dc20a767b75d",
+      "expr": "the Clock",
+      "gt_box": [
+        275.0,
+        548.0,
+        436.0,
+        679.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        270.64000000000004,
+        542.72,
+        438.6,
+        681.984
+      ],
+      "removed_box": [
+        263.84000000000003,
+        538.624,
+        435.20000000000005,
+        655.36
+      ],
+      "original_iou_gt": 0.9016800081733396,
+      "same_box": 0.7456582633053219,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "bc5d652301e9a4ac",
+      "expr": "the Vehicle registration plate",
+      "gt_box": [
+        953.0,
+        401.0,
+        1024.0,
+        522.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        949.248,
+        404.336,
+        1024.0,
+        525.9100000000001
+      ],
+      "removed_box": [
+        942.08,
+        417.99600000000004,
+        1024.0,
+        517.0310000000001
+      ],
+      "original_iou_gt": 0.8959102324350793,
+      "same_box": 0.7555856949104144,
+      "verifier_answer": "No",
+      "removal_clean": true
+    },
+    {
+      "image_id": "e3d1cf39905a683e",
+      "expr": "the Boy",
+      "gt_box": [
+        259.0,
+        541.0,
+        391.0,
+        772.0
+      ],
+      "original_type": "box",
+      "removed_type": "none",
+      "original_box": [
+        255.744,
+        539.6,
+        390.144,
+        772.3499999999999
+      ],
+      "removed_box": null,
+      "original_iou_gt": 0.9623539708715588,
+      "same_box": null,
+      "verifier_answer": "No",
+      "removal_clean": true
+    },
+    {
+      "image_id": "3fde0a96ded34165",
+      "expr": "the Human nose",
+      "gt_box": [
+        328.0,
+        369.0,
+        416.0,
+        454.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        324.03200000000004,
+        355.32800000000003,
+        415.0,
+        457.728
+      ],
+      "removed_box": [
+        324.03200000000004,
+        355.32800000000003,
+        419.648,
+        460.8
+      ],
+      "original_iou_gt": 0.7866918169753354,
+      "same_box": 0.9236785329018335,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "3f2fee7cf68ec3ff",
+      "expr": "the Fork",
+      "gt_box": [
+        790.0,
+        339.0,
+        1006.0,
+        918.0
+      ],
+      "original_type": "box",
+      "removed_type": "none",
+      "original_box": [
+        791.552,
+        335.872,
+        1006.592,
+        928.768
+      ],
+      "removed_box": null,
+      "original_iou_gt": 0.9670581172851087,
+      "same_box": null,
+      "verifier_answer": "no",
+      "removal_clean": true
+    },
+    {
+      "image_id": "bbc06934e9a0df08",
+      "expr": "the Human face",
+      "gt_box": [
+        490.0,
+        410.0,
+        815.0,
+        628.0
+      ],
+      "original_type": "box",
+      "removed_type": "none",
+      "original_box": [
+        488.44800000000004,
+        407.06800000000004,
+        818.176,
+        614.7
+      ],
+      "removed_box": null,
+      "original_iou_gt": 0.9140328384957571,
+      "same_box": null,
+      "verifier_answer": "No",
+      "removal_clean": true
+    },
+    {
+      "image_id": "1c76a12e613c1df3",
+      "expr": "the Vehicle",
+      "gt_box": [
+        0.0,
+        339.0,
+        121.0,
+        411.0
+      ],
+      "original_type": "box",
+      "removed_type": "box",
+      "original_box": [
+        0.0,
+        337.095,
+        124.928,
+        409.96200000000005
+      ],
+      "removed_box": [
+        161.792,
+        0.0,
+        796.672,
+        433.797
+      ],
+      "original_iou_gt": 0.9303994358582033,
+      "same_box": 0.0,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    },
+    {
+      "image_id": "e13a9cb8305a87b3",
+      "expr": "the Bird",
+      "gt_box": [
+        456.0,
+        267.0,
+        715.0,
+        455.0
+      ],
+      "original_type": "box",
+      "removed_type": "none",
+      "original_box": [
+        453.632,
+        264.192,
+        718.8480000000001,
+        462.848
+      ],
+      "removed_box": null,
+      "original_iou_gt": 0.924179234455541,
+      "same_box": null,
+      "verifier_answer": "Yes",
+      "removal_clean": false
+    }
+  ]
+}

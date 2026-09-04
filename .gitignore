@@ -6,3 +6,4 @@ __pycache__/
 # data, edits and results live on the ext4 volume (shared/paths.py), never here
 tables/*.md
 !tables/.gitkeep
+tables/contact_sheets/
