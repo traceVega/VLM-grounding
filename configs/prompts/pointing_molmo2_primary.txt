@@ -1,9 +1,14 @@
-# status: UNVERIFIED
-# source: Molmo2's native pointing instruction and abstention (design P12, P19)
-# todo: confirm the exact instruction string and the abstention form against the
-#   Molmo2-8B model card at the pinned revision, and set none_patterns in the model
-#   YAML from the card's wording. The instruction below is the design's paraphrase
-#   ("Point to the {expr}.") and must be checked before a kill run.
+# status: VERIFIED
+# source: the Molmo2-8B card at revision e28fa28597e5ec5e0cca2201dd8ab33d48bc4a1b,
+#   read 2026-09-03, whose own worked example passes the literal text
+#   "Point to the penguins." So P12's "Point to the {expr}." is the model's
+#   native pointing form, not a paraphrase of it.
+# note: the card documents the instruction and the decode (points are 0-1000
+#   integers against the original image size) but never shows a no-such-object
+#   answer, and no abstention string appears in the shipped code. So the
+#   instruction is verified here while none_patterns in configs/models/molmo2-8b.yaml
+#   stays PIN_REQUIRED, to be measured on P12's p12 dev slice. See
+#   notes/OPEN-QUESTIONS.md Q-2.
 # role: Molmo2 primary pointing prompt
 # fields: expr
 Point to the {expr}.

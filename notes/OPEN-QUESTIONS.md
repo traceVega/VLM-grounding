@@ -48,11 +48,36 @@ Q-3.
 share to be reported per set; on this set it is very nearly everything, so the
 token-count histogram is the informative artifact rather than the share.
 
-### Q-2. Molmo2's native pointing instruction and abstention (P12, P19)
-Same, from the Molmo2-8B model card at the pinned revision: the exact
-instruction string, the form of the no-such-object sentence, and how an empty
-point list is emitted, which becomes `none_patterns` in the model YAML.
-**Blocks B8 and B11.**
+### Q-2. Molmo2's pointing instruction and abstention -- MOSTLY RESOLVED 2026-09-03
+Read from the Molmo2-8B card and its shipped processor code at revision
+`e28fa2859`. Three of the four parts are settled:
+
+* **Instruction.** The card's own worked example passes the literal text
+  `"Point to the penguins."`, so P12's `"Point to the {expr}."` is Molmo2's
+  native form rather than a paraphrase. Both prompt files are now `VERIFIED`.
+* **Coordinate convention.** The card's decoder is explicit --
+  `POINTS_REGEX = r"([0-9]+) ([0-9]{3,4}) ([0-9]{3,4})"`, the comment "our
+  points format assume coordinates are scaled by 1000", and
+  `x, y = float(x)/1000*image_w`. So points are **0-1000 integers against the
+  original image size**: SPEC's `relative_1000`.
+  `configs/models/molmo2-8b.yaml` said `percent_float`, which was Molmo v1's
+  convention and would have divided every coordinate by the wrong constant --
+  silently, since both produce in-range points. Corrected.
+* **Resolution policy (P19).** `max_crops: 8`, `crop_size: 378`,
+  `patch_size: 14`, `pooling_size: [2, 2]`, `overlap_margins: [4, 4]`, read from
+  `preprocessor_config.json` and recorded in the model config as P19 requires.
+
+**Still open: the abstention form.** The card documents pointing but never shows
+a no-such-object answer, and no abstention string appears in the shipped
+processor or modeling code. So `none_patterns` stays `PIN_REQUIRED`. P12 already
+names where this gets settled -- the `p12` dev slice of 100 gRefCOCO no-target
+items under `--non-kill` -- so it is measured rather than guessed, and no design
+change is needed. **Still blocks B8's primary-protocol Molmo2 rows.**
+
+Worth noting against Q-1: Molmo2's native instruction offers no rejection
+channel, so P12's secondary cue genuinely introduces the first one here. The
+primary-versus-secondary contrast is real on the Molmo2 side and nearly absent
+on the Qwen3-VL side.
 
 ### Q-3. Qwen3-VL's coordinate convention (SPEC Section 1) -- STILL OPEN, and now load-bearing
 SPEC allows `relative_1000`, `absolute_resized`, `percent_float` or

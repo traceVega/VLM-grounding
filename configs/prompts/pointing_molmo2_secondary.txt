@@ -1,6 +1,11 @@
-# status: UNVERIFIED
-# source: design P12 -- "the same followed by 'If there is no such object, say none.'"
-# todo: same as pointing_molmo2_primary.txt; only the appended sentence is ours.
+# status: VERIFIED
+# source: design P12 -- "the same followed by 'If there is no such object, say
+#   none.'" The instruction is Molmo2's own, from the same pinned revision as
+#   pointing_molmo2_primary.txt; only the appended sentence is ours.
+# note: unlike the Qwen3-VL pair, this cue does introduce the first explicit
+#   rejection channel -- Molmo2's native instruction offers none. So P12's
+#   primary-versus-secondary contrast is a real contrast here, and is not on the
+#   Qwen side. See notes/OPEN-QUESTIONS.md Q-1 and Q-2.
 # role: Molmo2 secondary (rejection-cued) pointing prompt
 # fields: expr
 Point to the {expr}.

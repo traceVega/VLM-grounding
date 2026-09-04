@@ -174,11 +174,25 @@ def test_a_verified_prompt_loads_and_renders():
     assert len(p.version) == 64
 
 
-def test_an_unverified_prompt_is_refused_by_a_kill_run():
-    # Molmo2's pointing instruction still needs its card read (Q-2).
+def test_an_unverified_prompt_is_refused_by_a_kill_run(tmp_path):
+    """Written against a fixture, not a real file: naming one here made the test
+    fail every time that prompt was legitimately verified."""
+    (tmp_path / "draft.txt").write_text(
+        "# status: UNVERIFIED\n# todo: copy the real wording\n# fields: expr\nFind {expr}.\n",
+        encoding="utf-8",
+    )
     with pytest.raises(PR.PromptError, match="UNVERIFIED"):
-        PR.load("pointing_molmo2_primary")
-    assert PR.load("pointing_molmo2_primary", non_kill=True).text  # smoke runs may
+        PR.load("draft", root=tmp_path)
+    assert PR.load("draft", root=tmp_path, non_kill=True).text  # smoke runs may
+
+
+def test_the_refusal_repeats_the_files_own_todo(tmp_path):
+    """The message has to say what to do, not only that it refused."""
+    (tmp_path / "draft.txt").write_text(
+        "# status: UNVERIFIED\n# todo: read it off the model card\nFind it.\n", encoding="utf-8"
+    )
+    with pytest.raises(PR.PromptError, match="read it off the model card"):
+        PR.load("draft", root=tmp_path)
 
 
 def test_a_prompt_missing_a_field_says_which():
