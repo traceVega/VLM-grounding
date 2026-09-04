@@ -195,10 +195,10 @@ def assert_null_1c(index: pa.Table, image_dir: Path, edits_root: Path, *, hole_t
     """
     import numpy as np
 
-    from idea91.edits.build import load_edited, read_image
+    from idea91.edits.build import hole_from_row, load_edited, read_image
     from idea91.edits.composite import assert_paired_crop_identical
     from idea91.gate.inputs import sample_paired_crop_box
-    from idea91.masks import bbox_xyxy, decode_rle
+    from idea91.masks import bbox_xyxy
 
     remove_op, control_op = _op("REMOVE", hole_type), _op(FIRST_CONTROL, hole_type)
     rng = np.random.default_rng(seed)
@@ -218,8 +218,16 @@ def assert_null_1c(index: pa.Table, image_dir: Path, edits_root: Path, *, hole_t
             original, {"window_xyxy_px": list(b.window_xyxy), "window_path": b.window_path},
             edits_root,
         )
-        ha = bbox_xyxy(decode_rle(a.mask_rle))
-        hb = bbox_xyxy(decode_rle(b.mask_rle))
+        # The *hole*, not the mask. `mask_rle` stores the undilated mask, while
+        # what the editor actually replaced is that mask dilated by 5 px (P2), or
+        # its bounding box for a rect hole. Taking the crop box off the mask let
+        # a crop land inside the dilation band, where the two images legitimately
+        # differ -- and check 1c then reported "in-mask compositing was violated"
+        # for a compositing that was perfectly correct. Since check 1c gates
+        # whether a K1 PASS counts as decisive, that false failure would have
+        # turned a good verdict into "NOT DECISIVE".
+        ha = bbox_xyxy(hole_from_row({"mask_rle": a.mask_rle, "hole_type": hole_type}))
+        hb = bbox_xyxy(hole_from_row({"mask_rle": b.mask_rle, "hole_type": hole_type}))
         height, width = original.shape[:2]
         box = sample_paired_crop_box((width, height), [ha, hb], rng=rng)
         if box is None:
