@@ -190,6 +190,19 @@ def train_one(
     return np.array(labels), np.array(scores), image_ids, sample_ids
 
 
+#: Contrasts whose positive class is a real referent removal.  P20's freeze sits
+#: before any classifier sees one.  Written as a positive list rather than an
+#: exclusion so a contrast added later is guarded by default and has to be
+#: deliberately named safe.
+REAL_REMOVAL_PREFIX = "REMOVE_vs_"
+
+
+def _contrast_has_real_removals(contrast: str) -> bool:
+    """The ladders ('global_q75', 'local_q50_1-2%') and the 1b null
+    ('CONTROL_OBJ_vs_CONTROL_OBJ_2') contain no REMOVE and may run pre-freeze."""
+    return contrast.startswith(REAL_REMOVAL_PREFIX)
+
+
 def run_row(
     samples: list[GateSample],
     row: I.GateRow,
@@ -202,8 +215,26 @@ def run_row(
     device: str = "cuda",
     workers: int = 4,
     cache: dict | None = None,
+    allow_unfrozen: bool = False,
 ) -> RowResult:
-    """P6 for one row: 3 seeds, mean AUROC, bootstrap CI over images."""
+    """P6 for one row: 3 seeds, mean AUROC, bootstrap CI over images.
+
+    Refuses to train on a contrast containing real removals unless the B0a
+    freeze is in force.  P20 puts the freeze "before the first classifier trains
+    on real removals", and until now the only thing enforcing that was the CLI
+    stage -- so a script calling this function directly walked straight past it.
+    One did, on 2026-09-03, while timing throughput (DEVIATIONS D-31).  The
+    guard belongs here, next to the training, not at the entry point that
+    happened to be used.
+
+    ``allow_unfrozen`` exists for the check-1a ladders and the 1b nulls, which
+    P20 explicitly permits before the freeze because they run on their own pairs
+    and see no real removal.
+    """
+    if not allow_unfrozen and _contrast_has_real_removals(contrast):
+        from idea91 import freeze as F
+
+        F.require(F.B0A, what=f"training on {contrast}")
     per_seed: list[float] = []
     pooled_labels: list[np.ndarray] = []
     pooled_scores: list[np.ndarray] = []

@@ -302,3 +302,42 @@ run, a stored window averages 0.78 MB, against the design's implied 0.4 MB
 (16 GB for 40,000). At roughly 7 edits per image over 10,000 images the bank is
 therefore about 54 GB rather than 16 GB. There is 870 GB free, so this is a
 budget correction, not a problem.
+
+### D-31. P20 was breached by a throughput probe, before the freeze existed
+
+**2026-09-03, ~20:20.** While pricing the remaining GPU work I ran a scratchpad
+script that called `idea91.gate.train.run_row` directly on the contrast
+`REMOVE_vs_CONTROL_OBJ`, for two rows at one seed each, on the edit bank as it
+stood at 17% (1,340 images, 268 in the held-out half). P20 places the K1 freeze
+"before the first classifier trains on real removals". No freeze existed. The
+run therefore breached P20.
+
+What was seen: AUROC 0.504 (`iii_resnet18_1024`) and 0.508
+(`i_resnet18_full_cap`).
+
+Why it happened: the guard was in the CLI stage (`run_k1 rows`), not in the
+function that trains. A script calling `run_row` walked past it. The intent was
+to measure seconds per training, and nothing about the sample contents was
+considered.
+
+Containment, in the order it matters:
+
+1. **The frozen values could not have been influenced.** Every P1 to P7 constant
+   was committed before the probe -- the freeze registry at `f823aed`, and the
+   last commit touching gate behaviour at `4c1d878` (20:16), against the
+   probe's result at roughly 20:22. `git log` is the evidence rather than an
+   assurance.
+2. **Nothing persisted.** The probe called `run_row`, not `train_cached`, so no
+   result reached `gate_cache/` and none can be reused by the real run. The
+   script itself is deleted.
+3. **The guard moved.** `run_row` now calls `freeze.require` itself for any
+   contrast beginning `REMOVE_vs_`, with an explicit `allow_unfrozen` for the
+   ladders and nulls P20 permits pre-freeze. Guarded by default: a contrast
+   added later is protected without anyone remembering to protect it.
+
+Residual risk: the two numbers are known before the freeze is signed. They come
+from a 17% bank at one seed and are not a K1 result, but the sign-off should
+discount them, and this entry exists so a reader knows they were seen. If that
+is judged insufficient, the remedy under P20 is to fork the document and report
+both versions; that call belongs to whoever signs B0a, not to the
+implementation.
