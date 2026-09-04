@@ -36,6 +36,24 @@ import numpy as np
 from idea91.edits.composite import composite_in_mask
 from idea91.masks import area_frac
 
+#: Images the check-1a ladders and the check-1b null are measured on.
+#:
+#: Not the whole pool, and deliberately so. The design budgets one GPU-hour for
+#: the ladders (Section 6, "ladders 1"); measured on this card the full 9,692
+#: images would take about 22 hours, because a ladder row is five epochs and up
+#: to three seeds over every edit. The design therefore cannot have meant the
+#: whole pool here.
+#:
+#: 2,000 images leaves about 400 held out per row, so an AUROC standard error
+#: near 0.018 -- ample to separate the 0.875 seen in the pilot from the 0.90
+#: check 1a requires, which is the only discrimination this instrument has to
+#: make. It is a sensitivity floor, not a headline statistic: P7's verdict is
+#: measured on the gate rows, which do use the whole bank.
+#:
+#: Frozen at B0a, so the choice is declared rather than tuned after seeing a
+#: ladder that failed.
+LADDER_IMAGES = 2_000
+
 GLOBAL_LADDER_QUALITIES = (75, 90, 92)  # check 1a, against q95
 LOCAL_LADDER_QUALITIES = (75, 50, 30)  # check 1a, in-hole only
 REFERENCE_QUALITY = 95

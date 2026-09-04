@@ -18,7 +18,7 @@ from __future__ import annotations
 
 import json
 import time
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, replace
 from pathlib import Path
 
 import numpy as np
@@ -130,8 +130,18 @@ def train_cached(
 
 
 def run_checks(cfg: GateRunConfig) -> dict:
-    """B4a: the ladders and the nulls, on the CONTROL_OBJ pairs only."""
+    """B4a: the ladders and the nulls, on the CONTROL_OBJ pairs only.
+
+    Measured on ``ladders.LADDER_IMAGES`` images rather than the whole bank; see
+    that constant for why, and note that it is frozen at B0a so the choice
+    cannot be made after seeing a ladder that failed.  An explicit ``--limit``
+    smaller than it still wins, so a smoke run stays a smoke run.
+    """
     out: dict = {"global_ladder": {}, "local_ladder": {}, "null_1b": {}, "null_1c": {}}
+    cfg = replace(
+        cfg,
+        limit_images=min(cfg.limit_images or L.LADDER_IMAGES, L.LADDER_IMAGES),
+    )
 
     for hole_type in cfg.hole_types:
         pairs = _trim(B.null_1b_samples(cfg.index, cfg.image_dir, hole_type=hole_type),

@@ -102,6 +102,7 @@ B0A_REGISTRY: tuple[tuple[str, str, str], ...] = (
     ("P7", "idea91.gate.ladders", "GLOBAL_REQUIRED_Q92_AUROC"),
     ("P7", "idea91.gate.ladders", "LOCAL_DETECTION_AUROC"),
     ("P7", "idea91.gate.ladders", "HOLE_AREA_BIN_EDGES"),
+    ("P7", "idea91.gate.ladders", "LADDER_IMAGES"),
 )
 
 REGISTRY: dict[str, tuple[tuple[str, str, str], ...]] = {

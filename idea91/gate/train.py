@@ -118,17 +118,71 @@ def _loader(dataset, row: I.GateRow, *, shuffle: bool, seed: int, workers: int =
     if row.input_kind in ("full_cap", "full_1024") and isinstance(dataset, GateDataset):
         shapes = [dataset.shape_of(i) for i in range(len(dataset))]
         sampler = ShapeBucketSampler(shapes, batch, shuffle=shuffle, seed=seed)
-        return DataLoader(dataset, batch_sampler=sampler, num_workers=workers), sampler
-    return (
-        DataLoader(
-            dataset,
-            batch_size=batch,
-            shuffle=shuffle,
-            num_workers=workers,
-            drop_last=False,
-        ),
-        None,
+        loader = DataLoader(dataset, batch_sampler=sampler, num_workers=workers)
+        return (loader if workers else ThreadPrefetcher(loader)), sampler
+    loader = DataLoader(
+        dataset,
+        batch_size=batch,
+        shuffle=shuffle,
+        num_workers=workers,
+        drop_last=False,
     )
+    return (loader if workers else ThreadPrefetcher(loader)), None
+
+
+class ThreadPrefetcher:
+    """Overlap the loader's reads with the model's compute, using threads.
+
+    The gate is I/O bound, not compute bound: one training is five epochs plus
+    an eval pass over about eleven thousand samples, and each sample reads its
+    original JPEG and its window PNG -- roughly 90 GB per training, which at the
+    114 MB/s this volume sustains is about thirteen minutes of pure reading.
+    Measured, the GPU sat between 0 and 19% throughout.
+
+    DataLoader workers would hide that, but they are processes, and forking them
+    after the model has initialised CUDA crashes this host (D-32). Threads do
+    not fork, so they inherit no CUDA context; and the work being overlapped --
+    file reads, JPEG and PNG decode in OpenCV, the numpy composite -- releases
+    the GIL, so a single background thread can keep the queue full while the
+    main thread runs the model.
+
+    Deliberately one thread and a shallow queue: the point is to overlap, not to
+    parallelise, and a deep queue would just hold more decoded images in a
+    process that has 23 GB to work with.
+    """
+
+    def __init__(self, loader, depth: int = 3) -> None:
+        self.loader = loader
+        self.depth = depth
+
+    def __len__(self) -> int:
+        return len(self.loader)
+
+    def __iter__(self):
+        import queue
+        import threading
+
+        done = object()
+        batches: queue.Queue = queue.Queue(maxsize=self.depth)
+
+        def fill():
+            try:
+                for batch in self.loader:
+                    batches.put(batch)
+            except Exception as exc:  # surface it on the consuming side
+                batches.put(exc)
+                return
+            batches.put(done)
+
+        thread = threading.Thread(target=fill, daemon=True)
+        thread.start()
+        while True:
+            item = batches.get()
+            if item is done:
+                return
+            if isinstance(item, Exception):
+                raise item
+            yield item
 
 
 def train_one(
