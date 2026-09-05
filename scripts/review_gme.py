@@ -191,7 +191,7 @@ PAGE = """<!doctype html><meta charset=utf-8><title>GroundingME 移除审核</ti
 <img src="/panel/{item_id}?v={done}">
 <footer>
   <span><kbd>1</kbd> 走了 &mdash; 琥珀框里那个东西干净移除了</span>
-  <span><kbd>2</kbd> 还在 &mdash; 没removed干净，或只是糊了</span>
+  <span><kbd>2</kbd> 还在 &mdash; 没移除干净，或只是糊了</span>
   <span><kbd>3</kbd> 另有匹配 &mdash; 它走了，但画面里还有别的东西满足这段描述</span>
   <span><kbd>0</kbd> 拿不准</span>
   <span><kbd>&larr;</kbd> 撤销</span>
