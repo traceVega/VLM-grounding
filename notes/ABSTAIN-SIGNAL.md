@@ -103,3 +103,44 @@ Residual, and smaller than what it closes: `clean` and `not_clean` are different
 pools, since a removal fails more often on a large or complex referent. The
 artifact leg is unaffected -- both of its conditions have the referent present
 -- so the decomposition holds even where the 0.911 would shift.
+
+## What p(null) does not do: tell a good answer from a guess
+
+The box review labels every answer the model gave instead of declining, so the
+obvious next question is whether p(null) knows when it is guessing. Split on
+those labels, among the 88 items where the model answered:
+
+| | n | median p(null) | log10 |
+|---|---:|---:|---:|
+| declined | 87 | 1.00 | -0.0 |
+| answered, the box held a real instance | 9 | 7.2e-9 | -8.1 |
+| answered, the box held nothing | 79 | 8.3e-7 | -6.1 |
+
+**AUROC 0.556, 95% CI 0.337 to 0.762.** With nine items on one side the question
+is not answered, it is unasked; the direction is what one would hope for and the
+interval contains its opposite.
+
+The comparison across all 175 gives 0.948 and is circular: "correct" is mostly
+the 87 declines, and declining *is* a high p(null). Recorded here so it is not
+run again by accident.
+
+## The two failure modes have different confidence signatures
+
+Splitting the 79 wrong answers by where the box landed does show something, and
+it is three orders of magnitude:
+
+| the wrong answers | n | median p(null) | log10 |
+|---|---:|---:|---:|
+| box still on the hole -- the prior | 28 | 6.5e-8 | -7.2 |
+| box moved elsewhere -- the threshold | 51 | 5.8e-5 | -4.2 |
+
+When the model boxes a plate where plates belong on a car, it is as certain as
+it ever gets. When it goes hunting and settles for a desk clock, it is a
+thousand times less sure, and its uncertainty is visible.
+
+This is the case against a confidence baseline standing in for the whole
+metric. A p(null) threshold would clear out much of the second group and none of
+the first, because the failure there is not low confidence in the evidence but
+high confidence in a prior -- and only an intervention on the image can catch
+that. K4 already requires `IC` to beat a two-seed disagreement predictor; this
+says where the margin has to come from.
