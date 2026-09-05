@@ -49,7 +49,18 @@ from PIL import Image
 
 HF = "Qwen/Qwen3-VL-8B-Instruct"
 REV = "0c351dd01ed87e9c1b53cbc748cba10e6187ff3b"
-OUT = Path("tables/pilot_abstain.json")
+
+#: Results are appended a line at a time rather than written once at the end.
+#: This host throws a transient `cudaErrorUnknown` often enough that a run of a
+#: few hundred items will not finish in one attempt -- the first try died in a
+#: layernorm at item 76 and took the other 75 with it -- and a poisoned CUDA
+#: context cannot be recovered inside the process, so the only cheap protection
+#: is to lose nothing and resume.  `run_all.sh` supervises on progress.
+OUT = Path("tables/pilot_abstain.jsonl")
+#: Items begun but never finished, so a crash that repeats on the same image
+#: does not stall the supervisor forever.
+ATTEMPTS = Path("tables/pilot_abstain.attempts")
+MAX_ATTEMPTS = 2
 
 #: `V` passes when a control edit leaves the box where it was.  The idea file's
 #: default is 0.7; the complement at 0.5 is reported too, since P15 measures box
@@ -139,6 +150,27 @@ def _decision(seq: list[int], scores, tokenizer, null_ids, box_ids) -> dict:
     return {"p_null": None, "p_box": None, "p_null_norm": None, "step": None}
 
 
+def done_ids() -> set[str]:
+    if not OUT.is_file():
+        return set()
+    ids = set()
+    for line in OUT.read_text(encoding="utf-8").splitlines():
+        if line.strip():
+            ids.add(json.loads(line)["image_id"])
+    return ids
+
+
+def poisoned_ids(done: set[str]) -> set[str]:
+    """Items begun `MAX_ATTEMPTS` times and never finished: skip them."""
+    if not ATTEMPTS.is_file():
+        return set()
+    counts: dict[str, int] = {}
+    for line in ATTEMPTS.read_text(encoding="utf-8").splitlines():
+        if line.strip():
+            counts[line.strip()] = counts.get(line.strip(), 0) + 1
+    return {k for k, v in counts.items() if v >= MAX_ATTEMPTS and k not in done}
+
+
 def run(limit: int | None) -> None:
     from transformers import AutoModelForImageTextToText
 
@@ -151,7 +183,13 @@ def run(limit: int | None) -> None:
     rows = pool()
     if limit:
         rows = rows[:limit]
-    print(f"{len(rows)} human-clean items x 3 conditions = {len(rows) * 3} prompts\n")
+    total = len(rows)
+    done, skip = done_ids(), poisoned_ids(done_ids())
+    rows = [r for r in rows if r["image_id"] not in done and r["image_id"] not in skip]
+    print(f"{total} human-clean items; {len(done)} already done, "
+          f"{len(skip)} skipped as repeatedly fatal, {len(rows)} to run\n")
+    if not rows:
+        return
 
     template = prompts.load("grounding_qwen3vl_primary")
     processor = T.load_capped_processor(HF, REV)
@@ -179,8 +217,11 @@ def run(limit: int | None) -> None:
         raw = processor.decode(seq, skip_special_tokens=True)
         return raw, _decision(seq, out.scores, tokenizer, null_ids, box_ids)
 
-    records, started = [], time.time()
+    OUT.parent.mkdir(parents=True, exist_ok=True)
+    started = time.time()
     for n, item in enumerate(rows, 1):
+        with open(ATTEMPTS, "a", encoding="utf-8") as fh:
+            fh.write(item["image_id"] + "\n")
         try:
             original = read_image(image_dir / f"{item['image_id']}.jpg")
             images = {
@@ -193,7 +234,8 @@ def run(limit: int | None) -> None:
             continue
 
         wh = (original.shape[1], original.shape[0])
-        rec = {"image_id": item["image_id"], "expr": item["expr"], "gt_box": item["gt_box"]}
+        rec = {"image_id": item["image_id"], "expr": item["expr"], "gt_box": item["gt_box"],
+               "model": HF, "revision": REV}
         for condition, image in images.items():
             raw, decision = ask(image, item["expr"])
             parsed = P.parse_qwen3vl(raw, convention=P.RELATIVE_1000,
@@ -203,17 +245,18 @@ def run(limit: int | None) -> None:
                 "box": list(parsed.box_xyxy_px) if parsed.box_xyxy_px else None,
                 **decision,
             }
-        records.append(rec)
+        # Written and flushed per item: the next fault costs this one only.
+        with open(OUT, "a", encoding="utf-8") as fh:
+            fh.write(json.dumps(rec) + "\n")
+            fh.flush()
 
         if n % 25 == 0:
+            torch.cuda.empty_cache()
             rate = (time.time() - started) / n
             print(f"  [{n}/{len(rows)}]  {rate:.1f}s/item, "
                   f"{(len(rows) - n) * rate / 60:.0f} min left", flush=True)
 
-    OUT.parent.mkdir(parents=True, exist_ok=True)
-    OUT.write_text(json.dumps({"n": len(records), "model": HF, "revision": REV,
-                               "records": records}, indent=2), encoding="utf-8")
-    print(f"\n-> {OUT}")
+    print(f"\n-> {OUT}  ({len(done_ids())} records)")
 
 
 # --- analysis ---------------------------------------------------------------
@@ -260,7 +303,8 @@ def report() -> None:
 
     from shared import paths
 
-    records = json.loads(OUT.read_text())["records"]
+    records = [json.loads(line) for line in
+               OUT.read_text(encoding="utf-8").splitlines() if line.strip()]
     ok = [r for r in records
           if r["ORIGINAL"]["box"] and iou(r["ORIGINAL"]["box"], r["gt_box"]) >= 0.5]
     print(f"{len(records)} items run, {len(ok)} with the ORIGINAL box correct\n")
@@ -320,11 +364,13 @@ def report() -> None:
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--report", action="store_true", help="skip inference, read the saved run")
+    ap.add_argument("--no-report", action="store_true", help="run only; the supervisor reports")
     ap.add_argument("--limit", type=int, default=None)
     args = ap.parse_args()
     if not args.report:
         run(args.limit)
-    report()
+    if not args.no_report:
+        report()
 
 
 if __name__ == "__main__":
