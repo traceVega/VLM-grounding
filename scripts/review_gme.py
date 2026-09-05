@@ -172,7 +172,10 @@ PAGE = """<!doctype html><meta charset=utf-8><title>GroundingME 移除审核</ti
  .bar i{{display:block;height:100%;background:#4c9;width:{pct}%}}
  .zh{{font-size:16px;color:#ffd479;max-height:4.6em;overflow-y:auto}}
  .en{{font-size:11.5px;color:#888;margin-top:3px;max-height:3.4em;overflow-y:auto}}
- img{{flex:1;min-height:0;object-fit:contain;background:#111}}
+ /* width must be pinned: a replaced element in a column flexbox takes its
+    intrinsic width on the cross axis, so the 1040 px panel overflows a
+    narrower window and `overflow:hidden` silently crops the right of it. */
+ img{{flex:1;min-height:0;width:100%;object-fit:contain;background:#111}}
  footer{{padding:7px 14px;background:#1b1b1b;display:flex;gap:18px;font-size:13px;
          flex-wrap:wrap;flex:0 0 auto}}
  kbd{{background:#333;border-radius:4px;padding:2px 8px;font-weight:700}}
