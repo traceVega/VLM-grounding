@@ -1,3 +1,5 @@
+> **Superseded in part by `CORRECTION-2026-09-05.md`** — the GroundingME abstention rate, the head-noun probe, and the false-abstain claim are corrected there.
+
 # GroundingME on unmodified images: what the removal experiment has to work with
 
 Run 2026-09-04, Qwen3-VL-8B-Instruct at `0c351dd0`, all 1,005 items, ORIGINAL

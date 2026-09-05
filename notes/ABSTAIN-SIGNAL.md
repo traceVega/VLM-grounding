@@ -1,3 +1,5 @@
+> **Superseded in part by `CORRECTION-2026-09-05.md`** — the GroundingME abstention rate, the head-noun probe, and the false-abstain claim are corrected there.
+
 # The model always knows; greedy decoding cannot act on it
 
 Run 2026-09-04, Qwen3-VL-8B-Instruct at `0c351dd0`, 332 human-clean removals
