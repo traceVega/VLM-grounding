@@ -29,6 +29,7 @@ PANEL = 420
 ORIGINAL_COLOUR = (60, 200, 60)   # BGR: the model's box on the original
 REMOVED_COLOUR = (60, 60, 235)    # its box after removal
 GHOST_COLOUR = (150, 150, 150)    # where the original box was
+HOLE_COLOUR = (0, 200, 255)       # what the editor actually removed
 
 
 def edit_rows() -> dict[str, dict]:
@@ -41,6 +42,7 @@ def edit_rows() -> dict[str, dict]:
         cols["image_id"][i]: {
             "window_xyxy_px": cols["window_xyxy_px"][i],
             "window_path": cols["window_path"][i],
+            "mask_rle": cols["mask_rle"][i],
         }
         for i in range(table.num_rows)
         if cols["operator"][i] == "REMOVE"
@@ -108,11 +110,19 @@ def main() -> None:
         try:
             original = read_image(image_dir / f"{rec['image_id']}.jpg")
             removed = load_edited(original, edit, paths.EDITS_ROOT)
+            from idea91.masks import bbox_xyxy, decode_rle
+
+            rec["hole_box"] = list(bbox_xyxy(decode_rle(edit["mask_rle"])))
         except Exception:
             continue
 
         left, scale = fit(cv2.cvtColor(original, cv2.COLOR_RGB2BGR))
         right, _ = fit(cv2.cvtColor(removed, cv2.COLOR_RGB2BGR))
+        # What was actually taken out.  Without it a reader is judging the
+        # removal through the model's box, which is a different rectangle: one
+        # is what the editor did, the other is what the model thinks it sees.
+        draw(left, rec.get("hole_box"), scale, HOLE_COLOUR)
+        draw(right, rec.get("hole_box"), scale, HOLE_COLOUR)
         draw(left, rec["original_box"], scale, ORIGINAL_COLOUR)
         draw(right, rec["original_box"], scale, GHOST_COLOUR, dashed=True)
         draw(right, rec["removed_box"], scale, REMOVED_COLOUR)
@@ -137,9 +147,10 @@ def main() -> None:
         sheet_no += 1
         _write(rows, args.out_dir / f"{args.category}_{sheet_no:02d}.jpg")
 
-    print(f"\nleft panel: original, solid green = the model's box")
-    print(f"right panel: object removed. dashed grey = where its box WAS, "
-          f"red = where it points now")
+    print("\n  amber   = what the editor actually removed (the hole)")
+    print("  green   = the model's box on the ORIGINAL")
+    print("  dashed  = that same box copied onto the removed image, for reference")
+    print("  red     = the model's box AFTER removal (absent if it declined)")
     print(f"-> {sheet_no} sheet(s) in {args.out_dir}")
 
 
