@@ -63,3 +63,65 @@ frozen (B0b unsigned), so this is the moment to encode it.
 `data/human/openimages_removal_labels.csv`, one row per `image_id`. Written by
 `scripts/review_removals.py --serve`, which renders the panel a judgement was
 made from and can re-render it from the edit index at any time.
+
+---
+
+# Second pass: where the box went
+
+The first review asked whether the object left the picture. This one asks, on
+the 182 clean removals whose ORIGINAL box was correct, whether the answer the
+model gave instead of `none` was acceptable -- a real instance inside the box,
+or nothing at all. Labels in `data/human/openimages_box_labels.csv`.
+
+The referent is verifiably gone and its class occurs once, so `none` is the only
+valid output. `N+` counts a box as a pass only when a new region genuinely
+satisfies the expression.
+
+| | n | |
+|---|---:|---|
+| denominator after the pass's own drops | 175 | 6 dropped, 1 unsure |
+| the model declined | 87 | 50% |
+| the model gave a box | 88 | 50% |
+| ...of which held a real instance | 9 | 10% of the boxes |
+| **`N+` failure** | **79** | **45%** |
+
+**When this model answers after a clean removal it is wrong nine times in ten.**
+
+## The failure has two mechanisms, and they are not the one that was assumed
+
+The author's own taxonomy over the 182, with the geometry attached:
+
+| | n | share of failures |
+|---|---:|---:|
+| box still covers the hole | 28 | 35% |
+| box moved elsewhere | 51 | 65% |
+| (of the failures, essentially the same box) | 20 | 25% |
+
+**No visual evidence at all** (the 35%): a licence plate boxed where plates
+belong on a car, a face boxed above the neck that is still there, or simply the
+same box again. A prior standing in for pixels.
+
+**Evidence that does not meet the bar** (the 65%): the model looks, finds
+something, and accepts it. A desk clock for a removed watch; an arm for a
+removed hand; a few dark pixels near a cloud for a kite. Not a wrong prior -- a
+threshold far below a person's.
+
+The original claim -- that the model re-predicts the same box -- is the 20
+cases, 11% of the denominator. The larger and better-evidenced claim is that the
+model cannot take `none` for an answer even when the prompt spells out how to
+give it.
+
+## Why this needs all four relations
+
+The two mechanisms are caught by different relations, which is why the two
+statistics measured on the same items differ by a factor of nearly three:
+
+| mechanism | caught by | rate |
+|---|---|---|
+| prior at the old place | `N` alone | 17% |
+| everything, including a wrong object accepted | `N+`, which needs `S` | 45% |
+
+`N` alone sees only a box that failed to move. Deciding that a desk clock is not
+a watch takes the judge, so the 28-point gap between the two numbers is the part
+of the phenomenon that `S` exists to measure. That is the case for `IC` being a
+conjunction of relations rather than any single one.
