@@ -45,20 +45,27 @@ ORIG_COLOUR = (60, 200, 60)     # green: the model's box on the ORIGINAL
 NEW_COLOUR = (60, 60, 235)      # red:   its box after the removal
 GHOST_COLOUR = (225, 225, 225)  # dashed: where the original box was
 
-#: The five outcomes, which are the ones the author drew by hand over 32 cases
-#: before this tool existed.  They are about the *meaning* of the new box; the
-#: geometry (same-box, IoU with the hole) is computed alongside rather than
-#: asked for.
+#: One question, because only one thing here needs eyes: **is there a real
+#: instance inside the red box?**
 #:
-#:   correct      the model declined, or its new box holds a real instance
-#:   nothing      the new box holds nothing matching the label -- confabulated
-#:   still_there  the box still covers the region the object was removed from
-#:   inferable    the box is near the old place and the remaining context fixes
-#:                it -- a neck under a removed head, a car around a removed
-#:                wheel.  Not the model's fault; the item cannot test necessity
+#:   correct   the model declined, or its new box holds a genuine instance
+#:   nothing   the new box holds nothing matching -- confabulated
+#:   drop      the item should not be in this set at all: the removal was not
+#:             clean after all, or the box never held the whole referent.  An
+#:             escape hatch for the earlier review, which judged the hole
+#:             rather than the answer and could not see this
 #:   unsure
-LABELS = {"1": "correct", "2": "nothing", "3": "still_there",
-          "4": "inferable", "0": "unsure"}
+#:
+#: Where the box landed is NOT asked.  A box still covering the hole and a box
+#: that jumped elsewhere are both `N+` failures, and IoU with R separates them
+#: exactly, so asking a person to do it only buys a second opinion to reconcile.
+#:
+#: There is no "the position was inferable" label, and that is deliberate.  When
+#: the head is gone and the neck remains, "is there a head" is still no; reading
+#: the head's place off the neck is a prior, which is the very thing this audit
+#: is about.  Those items are not defective, they are the subset where a
+#: pixel-driven model and a prior-driven model differ most.
+LABELS = {"1": "correct", "2": "nothing", "3": "drop", "0": "unsure"}
 
 
 def review_dir() -> Path:
@@ -272,8 +279,8 @@ PAGE = """<!doctype html><meta charset=utf-8><title>box review</title>
 <footer>
   <span><kbd>1</kbd> yes &mdash; declined, or the red box holds a real one</span>
   <span><kbd>2</kbd> no &mdash; nothing matching is in the red box</span>
-  <span><kbd>3</kbd> it still points at the hole</span>
-  <span><kbd>4</kbd> near the old place, but the context fixes it</span>
+  <span><kbd>3</kbd> drop it &mdash; not cleanly removed after all, or the box
+        never held the whole thing</span>
   <span><kbd>0</kbd> unsure</span>
   <span><kbd>&larr;</kbd> undo</span>
 </footer>
@@ -340,14 +347,24 @@ def serve(port: int) -> None:
             done = read_labels()
             todo = [i for i in index if i["image_id"] not in done]
             if not todo:
+                by_id = {i["image_id"]: i for i in index}
                 tally = {}
                 for value in done.values():
                     tally[value] = tally.get(value, 0) + 1
+                # The geometry the review deliberately did not ask for: of the
+                # failures, how many still cover the hole.
+                fails = [by_id[k] for k, v in done.items() if v == "nothing"]
+                on_hole = sum(1 for f in fails if f["on_hole"] >= 0.3)
+                kept = sum(tally.get(v, 0) for v in ("correct", "nothing"))
                 lines = "<br>".join(
                     f"<b>{tally.get(v, 0)}</b> &nbsp; {v}"
-                    for v in ("correct", "nothing", "still_there", "inferable", "unsure"))
+                    for v in ("correct", "nothing", "drop", "unsure"))
+                rate = (f"<br><br>N+ failure &nbsp; <b>{len(fails)}/{kept}</b> = "
+                        f"<b>{len(fails)/max(kept,1):.0%}</b><br>"
+                        f"of those, still on the hole {on_hole}, moved elsewhere "
+                        f"{len(fails)-on_hole}")
                 body = (f"<div class=done>All {len(index)} reviewed.<br><br>{lines}"
-                        f"<br><br>{labels_path}</div>").encode()
+                        f"{rate}<br><br>{labels_path}</div>").encode()
             else:
                 item = todo[0]
                 body = PAGE.format(
