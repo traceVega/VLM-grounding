@@ -68,8 +68,15 @@ MAX_ATTEMPTS = 2
 V_HIGH = 0.7
 
 
-def pool() -> list[dict]:
-    """Human-clean removals with their matched control, minus the box review's drops."""
+def pool(label: str = "clean") -> list[dict]:
+    """Removals carrying one human label, with their matched control.
+
+    `clean` is the measurement.  `not_clean` is the cell that decides what the
+    measurement means: the inpainting ran on the referent and the object
+    survived it anyway, so the artifact is present where REMOVE puts it while
+    the object is present as in CONTROL_OBJ.  If p(null) is high there, the
+    model is reading the artifact rather than the absence.
+    """
     import csv
 
     import pyarrow as pa
@@ -79,11 +86,11 @@ def pool() -> list[dict]:
 
     root = Path(__file__).resolve().parents[1]
     with open(root / "data/human/openimages_removal_labels.csv", encoding="utf-8") as fh:
-        clean = {r["image_id"] for r in csv.DictReader(fh) if r["label"].strip() == "clean"}
+        clean = {r["image_id"] for r in csv.DictReader(fh) if r["label"].strip() == label}
 
     dropped: set[str] = set()
     box_csv = paths.DATA_ROOT / "box_review" / "box_labels.csv"
-    if box_csv.is_file():
+    if label == "clean" and box_csv.is_file():
         with open(box_csv, encoding="utf-8") as fh:
             dropped = {r["image_id"] for r in csv.DictReader(fh)
                        if r["label"].strip() in ("drop", "unsure")}
@@ -171,7 +178,7 @@ def poisoned_ids(done: set[str]) -> set[str]:
     return {k for k, v in counts.items() if v >= MAX_ATTEMPTS and k not in done}
 
 
-def run(limit: int | None) -> None:
+def run(limit: int | None, label: str = "clean") -> None:
     from transformers import AutoModelForImageTextToText
 
     from idea91.edits.build import load_edited, read_image
@@ -180,7 +187,7 @@ def run(limit: int | None) -> None:
     from shared.harness import prompts
     from shared.harness import tokens as T
 
-    rows = pool()
+    rows = pool(label)
     if limit:
         rows = rows[:limit]
     total = len(rows)
@@ -361,16 +368,78 @@ def report() -> None:
         print("    (ground truth is the author's box review)")
 
 
+def report_artifact_cell() -> None:
+    """Is p(null) reading the object's absence, or the inpainting over it?
+
+    `not_clean` fills the missing cell: the editor ran on the referent, so the
+    artifact is where REMOVE puts it, and the object survived, so the referent
+    is present as in CONTROL_OBJ.  Whichever of the two this condition matches
+    is the thing p(null) was tracking all along.
+    """
+    def load(path: Path) -> list[dict]:
+        if not path.is_file():
+            return []
+        return [json.loads(x) for x in path.read_text(encoding="utf-8").splitlines() if x.strip()]
+
+    clean = [r for r in load(Path("tables/pilot_abstain.jsonl"))
+             if r["ORIGINAL"]["box"] and iou(r["ORIGINAL"]["box"], r["gt_box"]) >= 0.5]
+    dirty = [r for r in load(Path("tables/pilot_abstain_not_clean.jsonl"))
+             if r["ORIGINAL"]["box"] and iou(r["ORIGINAL"]["box"], r["gt_box"]) >= 0.5]
+    if not dirty:
+        print("no not_clean run found")
+        return
+
+    def col(rows, cond):
+        return [r[cond]["p_null_norm"] for r in rows if r[cond]["p_null_norm"] is not None]
+
+    rem_clean, ctl_clean = col(clean, "REMOVE"), col(clean, "CONTROL_OBJ")
+    rem_dirty = col(dirty, "REMOVE")
+
+    print(f"ORIGINAL-correct items:  clean {len(clean)}   not_clean {len(dirty)}\n")
+    print(f"{'condition':<44} {'n':>4}  {'median p(null)':>16}  {'log10':>7}  abstains")
+    for name, rows, cond, values in (
+            ("REMOVE, object GONE           (clean)", clean, "REMOVE", rem_clean),
+            ("REMOVE, object STILL THERE    (not_clean)", dirty, "REMOVE", rem_dirty),
+            ("CONTROL_OBJ, object untouched (clean)", clean, "CONTROL_OBJ", ctl_clean)):
+        med = float(np.median(values))
+        rate = sum(1 for r in rows if r[cond]["output_type"] == "none") / max(len(rows), 1)
+        print(f"  {name:<42} {len(values):4d}  {med:16.3e}  "
+              f"{np.log10(med) if med > 0 else float('-inf'):7.1f}  {rate:6.0%}")
+
+    a_absence = auroc(rem_clean, rem_dirty)
+    a_artifact = auroc(rem_dirty, ctl_clean)
+    print(f"\n  AUROC(gone vs still-there, both with the artifact ON the referent)"
+          f"  {a_absence:.3f}")
+    print(f"      high  -> p(null) tracks the OBJECT'S ABSENCE")
+    print(f"  AUROC(still-there-with-artifact vs untouched-control)             "
+          f"  {a_artifact:.3f}")
+    print(f"      high  -> p(null) also picks up the ARTIFACT itself")
+    if a_absence is not None and a_artifact is not None:
+        verdict = ("absence, cleanly -- the artifact adds little"
+                   if a_absence >= 0.85 and a_artifact <= 0.65 else
+                   "mostly the artifact -- the headline result needs restating"
+                   if a_absence < 0.7 else "both, and they need separating")
+        print(f"\n  reading: {verdict}")
+
+
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--report", action="store_true", help="skip inference, read the saved run")
     ap.add_argument("--no-report", action="store_true", help="run only; the supervisor reports")
+    ap.add_argument("--label", default="clean", choices=["clean", "not_clean"],
+                    help="which human label defines the pool")
     ap.add_argument("--limit", type=int, default=None)
     args = ap.parse_args()
+
+    global OUT, ATTEMPTS
+    if args.label != "clean":
+        OUT = Path(f"tables/pilot_abstain_{args.label}.jsonl")
+        ATTEMPTS = Path(f"tables/pilot_abstain_{args.label}.attempts")
+
     if not args.report:
-        run(args.limit)
+        run(args.limit, args.label)
     if not args.no_report:
-        report()
+        report() if args.label == "clean" else report_artifact_cell()
 
 
 if __name__ == "__main__":

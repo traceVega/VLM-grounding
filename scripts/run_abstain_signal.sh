@@ -13,12 +13,17 @@ set -u
 cd "$(dirname "$0")/.."
 . ~/vlmg-env/bin/activate
 
-FILE=tables/pilot_abstain.jsonl
 TARGET=${1:-332}
+LABEL=${2:-clean}
+if [ "$LABEL" = "clean" ]; then
+    FILE=tables/pilot_abstain.jsonl
+else
+    FILE=tables/pilot_abstain_${LABEL}.jsonl
+fi
 prev=0
 
 for attempt in $(seq 1 30); do
-    python scripts/pilot_abstain_signal.py --no-report
+    python scripts/pilot_abstain_signal.py --no-report --label "$LABEL"
     now=$(wc -l < "$FILE" 2>/dev/null || echo 0)
     echo "=== attempt ${attempt}: ${now}/${TARGET} records ==="
     if [ "$now" -ge "$TARGET" ]; then
@@ -33,4 +38,4 @@ for attempt in $(seq 1 30); do
 done
 
 echo
-python scripts/pilot_abstain_signal.py --report
+python scripts/pilot_abstain_signal.py --report --label "$LABEL"

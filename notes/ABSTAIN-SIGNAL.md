@@ -68,23 +68,38 @@ Consequences. P16(b') cannot fire: the edits do not confuse this model. And
 since the headline counts predictions that fail `N+` **or** `V`, and `V` never
 fails here, the 45% from the box review stands as the whole of it.
 
-## The open confound
+## The confound, closed
 
 Both conditions carry an inpainting artifact, so "was this edited" is
 uninformative -- but *where* the artifact sits is not. REMOVE puts it on the
-referent and CONTROL_OBJ puts it elsewhere, so the model could be detecting an
-artifact over the region it was asked about rather than the object's absence.
+referent and CONTROL_OBJ puts it elsewhere, so the model could have been
+detecting an artifact over the region it was asked about rather than the
+object's absence.
 
-The cell that separates them exists and is already labelled: the 127 removals
-the author marked `not_clean`, where the inpainting ran on the referent and the
-object survived anyway.
+The cell that separates them was already labelled: the 127 removals the author
+marked `not_clean`, where the inpainting ran on the referent and the object
+survived it anyway. Run 2026-09-04, same code path, 108 with the ORIGINAL box
+correct.
 
-| | referent present | referent gone |
-|---|---|---|
-| no artifact on it | ORIGINAL | -- |
-| **artifact on it** | **not_clean (unmeasured)** | REMOVE |
-| artifact elsewhere | CONTROL_OBJ | -- |
+| condition | artifact on the referent | referent | median p(null) | log10 |
+|---|---|---|---:|---:|
+| CONTROL_OBJ | no, elsewhere | present | 1.3e-18 | -17.9 |
+| REMOVE on `not_clean` | **yes** | **present** | 3.0e-17 | **-16.5** |
+| REMOVE on `clean` | **yes** | **gone** | 6.2e-01 | **-0.2** |
 
-High p(null) on `not_clean` means the artifact is the cue and this result is
-about edit detection. Low p(null) means the model is reading absence. 127
-prompts, about six minutes.
+Reading down the log10 column decomposes the signal:
+
+- putting the artifact on the referent moves p(null) by **1.4 orders**
+- the referent actually being gone moves it by a further **16.3**
+
+**AUROC 0.911** for gone against still-there when both carry the artifact on the
+referent; **0.583** -- near chance -- for the artifact alone. The model abstains
+on 4% of `not_clean` against 50% of `clean`.
+
+p(null) is reading the object's absence. The artifact contributes about a
+twelfth of the movement on a log scale and almost nothing to the ranking.
+
+Residual, and smaller than what it closes: `clean` and `not_clean` are different
+pools, since a removal fails more often on a large or complex referent. The
+artifact leg is unaffected -- both of its conditions have the referent present
+-- so the decomposition holds even where the 0.911 would shift.
