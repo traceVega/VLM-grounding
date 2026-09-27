@@ -1,0 +1,13 @@
+# Lane 1: the SFT paradigm. Each trainer is followed by the screening eval
+# (all 201 Rejection + 150 stratified positives, GME gray control, own val, gray, RefCOCO 60/set).
+~/vlmg-env/bin/python -m train.sft_lora --name sft_v1 --model 4b --drop-4b-refused
+~/vlmg-env/bin/python -m train.eval_suite --tag scr_sft_v1 --model 4b --adapter ~/vlmg-data/train/sft_v1/adapter --gme-pos-n 150 --gme-gray-pos-n 50 --refcoco-n 60
+~/vlmg-env/bin/python -m train.sft_lora --name sft_v2_cross_ul --model 4b --extra ~/vlmg-data/train/augment/cross_v1.jsonl --null-unlikelihood 1.0
+~/vlmg-env/bin/python -m train.eval_suite --tag scr_sft_v2_cross_ul --model 4b --adapter ~/vlmg-data/train/sft_v2_cross_ul/adapter --gme-pos-n 150 --gme-gray-pos-n 50 --refcoco-n 60
+# RC-GRPO on top of SFT v1: forced null only where a negative's group has none, alpha 0.5, -1 for refusing a positive
+~/vlmg-env/bin/python -m train.grpo_lora --name grpo_sft1_rc --init-adapter ~/vlmg-data/train/sft_v1/adapter --epochs 1 --group 8 --lr 2e-5 --prompts-per-step 4 --inject-gt neg --neg-adv-scale 0.5 --r-pos-null -1.0 --eval-every 15 --skip-eval0
+~/vlmg-env/bin/python -m train.eval_suite --tag scr_grpo_sft1_rc --model 4b --adapter ~/vlmg-data/train/grpo_sft1_rc/adapter --gme-pos-n 150 --gme-gray-pos-n 50 --refcoco-n 60
+~/vlmg-env/bin/python -m train.eval_suite --tag scr_grpo_base_visurf --model 4b --adapter ~/vlmg-data/train/grpo_base_visurf/adapter --gme-pos-n 150 --gme-gray-pos-n 50 --refcoco-n 60
+~/vlmg-env/bin/python -m train.eval_suite --tag probe_verify_base --model 4b --sets gme --gme-pos-n 150 --prompt grounding_qwen3vl_verify_first --max-new 320
+~/vlmg-env/bin/python -m train.eval_suite --tag full_grpo_sft1_rc --model 4b --adapter ~/vlmg-data/train/grpo_sft1_rc/adapter
+~/vlmg-env/bin/python -m train.eval_suite --tag probe_verify_8b --model 8b --sets gme --gme-pos-n 150 --prompt grounding_qwen3vl_verify_first --max-new 320

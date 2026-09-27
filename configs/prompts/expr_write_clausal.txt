@@ -1,0 +1,19 @@
+# status: UNVERIFIED
+# source: ours, drafted in notes/RL-DESIGN-CANDIDATE-VERIFICATION.md section 9.4 (1) and
+#   revised 2026-09-21 for the datagen pipeline. Not from a pinned external source, so it
+#   stays UNVERIFIED; the datagen run is non-kill.
+# role: clausal expression writer (arm A source expressions), Qwen3.5-9B with the target outlined in red
+# fields: category, n_siblings, n_clauses
+The image contains {n_siblings} objects of the category "{category}". One of them is outlined in red.
+
+Write one referring expression that identifies the outlined {category} and no other {category} in the image.
+
+Requirements:
+- Use the head noun "{category}" plus exactly {n_clauses} distinguishing details.
+- Every detail must be independently checkable by looking at one object and answering yes or no. Good: "has the number 2500 on its side", "is lying on its side", "has a chipped handle", "is to the left of the laptop". Bad: "looks elegant", "is the nicest one", "seems out of place".
+- At least two details must describe the object itself (its appearance, a part of it, text on it, or its state) rather than only its position.
+- Every detail must be true of the outlined object and false of at least one other {category} in the image.
+- Do not use counting position alone ("the third from the left") as the only distinguishing detail.
+- Do not mention the red outline.
+- Write it as one natural sentence starting with "the {category}".
+- Output the expression only, on one line, with no quotation marks and no explanation.

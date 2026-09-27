@@ -1,0 +1,16 @@
+# v2 protocol bundle, SFT-level probes (2026-09-26): two-turn tool-call zoom on the model's own candidates, rationale verdicts,
+# mosaic augmentation, scale augmentation.  Two SFTs: vision merger frozen / trainable.  Screening evals with the two-turn protocol.
+# smoke tests
+~/vlmg-env/bin/python -m train.sft_lora --name smoke_v2 --trace rat --order commit --turns 2 --limit 8 --epochs 1 --grad-accum 4 --eval-every 1000 --no-gray-eval
+~/vlmg-env/bin/python -m train.eval_suite --tag smoke_v2 --adapter ~/vlmg-data/train/smoke_v2/adapter --trace rat --turns 2 --max-new 512 --sets own --limit 8 --batch 4
+# SFT v2 (vision frozen)
+~/vlmg-env/bin/python -m train.sft_lora --name sft_v2 --trace rat --order commit --turns 2 --scale-aug 0.5 --scale-frac 0.02,0.10 --extra ~/vlmg-data/train/augment/cross_v1.jsonl@100,~/vlmg-data/train/alt_negatives.jsonl@120,~/vlmg-data/train/short_items.jsonl@170,~/vlmg-data/train/mosaic_items.jsonl@150 --epochs 2 --grad-accum 8 --eval-every 1000 --no-gray-eval
+~/vlmg-env/bin/python -m train.eval_suite --tag scr_sft_v2 --adapter ~/vlmg-data/train/sft_v2/adapter --trace rat --turns 2 --max-new 512 --sets gme,own,refcoco --gme-rej-n 100 --gme-pos-n 100 --refcoco-n 50 --batch 8
+# SFT v2 on half of the scenes (the RL base: the other half is unseen by SFT, so the RL reward has headroom)
+~/vlmg-env/bin/python -m train.sft_lora --name sft_v2_half --scene-frac 0.5 --trace rat --order commit --turns 2 --scale-aug 0.5 --scale-frac 0.02,0.10 --extra ~/vlmg-data/train/augment/cross_v1.jsonl@100,~/vlmg-data/train/alt_negatives.jsonl@120,~/vlmg-data/train/short_items.jsonl@170,~/vlmg-data/train/mosaic_items.jsonl@150 --epochs 2 --grad-accum 8 --eval-every 1000 --no-gray-eval
+~/vlmg-env/bin/python -m train.eval_suite --tag scr_sft_v2_half --adapter ~/vlmg-data/train/sft_v2_half/adapter --trace rat --turns 2 --max-new 512 --sets gme,own,refcoco --gme-rej-n 100 --gme-pos-n 100 --refcoco-n 50 --batch 8
+# SFT v2 with the vision merger trainable
+~/vlmg-env/bin/python -m train.sft_lora --name sft_v2_merger --train-merger --trace rat --order commit --turns 2 --scale-aug 0.5 --scale-frac 0.02,0.10 --extra ~/vlmg-data/train/augment/cross_v1.jsonl@100,~/vlmg-data/train/alt_negatives.jsonl@120,~/vlmg-data/train/short_items.jsonl@170,~/vlmg-data/train/mosaic_items.jsonl@150 --epochs 2 --grad-accum 8 --eval-every 1000 --no-gray-eval
+~/vlmg-env/bin/python -m train.eval_suite --tag scr_sft_v2_merger --adapter ~/vlmg-data/train/sft_v2_merger/adapter --trace rat --turns 2 --max-new 512 --sets gme,own,refcoco --gme-rej-n 100 --gme-pos-n 100 --refcoco-n 50 --batch 8
+# the same screening subset for the previous best SFT (single crop), for a paired comparison
+~/vlmg-env/bin/python -m train.eval_suite --tag scr_sft_hint_v3_s --adapter ~/vlmg-data/train/sft_hint_v3/adapter --trace yn --hint-crop --sets gme,own,refcoco --gme-rej-n 100 --gme-pos-n 100 --refcoco-n 50 --batch 8

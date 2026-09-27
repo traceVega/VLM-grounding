@@ -1,0 +1,18 @@
+# status: UNVERIFIED
+# source: ours, 2026-09-25; the verification-trace prompt with close-ups of several candidates (multi-crop)
+# role: single-turn verification trace with close-ups of up to three candidate objects as extra images
+# fields: expr, hints
+All spatial relationships are defined from the viewer's perspective, where 'front' means closer to the viewer and 'back' means farther from the viewer. Find the object the following statement describes:
+{expr}
+The first image is the full scene. The images after it are close-ups of candidate objects, in order, whose boxes in the first image are {hints}; the first close-up is the most likely candidate. Use the close-ups to check fine details and the full scene for surroundings and for any other candidate. All coordinates you write refer to the first image.
+Work in exactly this format and output nothing else:
+<conditions>
+1. <first detail stated about the object>
+2. <second detail>
+</conditions>
+<candidates>
+<object id="1" bbox="[x1, y1, x2, y2]">1: yes; 2: no -> excluded</object>
+<object id="2" bbox="[x1, y1, x2, y2]">1: yes; 2: yes -> fits</object>
+</candidates>
+<answer>{{"bbox_2d": [x1, y1, x2, y2]}}</answer>
+Rules: split the statement into its atomic details, one per numbered line. List every object in the image that could be the described one (same kind of object), at most 6, the most likely candidate first, each with its bounding box. For each candidate judge every detail as yes, no or unclear (unclear only if it is too small or occluded to judge); a candidate fits only if no detail is no. The answer is the bounding box of the single candidate that fits all details, as {{"bbox_2d": [x1, y1, x2, y2]}}. If no candidate fits, the answer is {{"bbox_2d": null}}.

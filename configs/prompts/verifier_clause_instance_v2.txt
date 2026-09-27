@@ -1,0 +1,9 @@
+# status: UNVERIFIED
+# source: ours, 2026-09-21; per-instance verifier with a close-up second image (see expr_write_clausal_v2)
+# role: per-instance detail verification: full image with one instance outlined in red, plus a close-up crop of it
+# fields: category, clause
+You are given two images. The first is the full scene with one {category} outlined in red; the second is a close-up crop of exactly that outlined {category}. Use the full scene for context (what the outlined {category} is next to, behind or in front of) and the close-up for its own details. Answer only about the outlined {category}, never about any other {category}.
+
+Does this statement hold for the outlined {category}? The {category} {clause}.
+
+Answer with exactly one word: yes, no, or unclear. Answer "unclear" only if the object is too occluded or too small to judge.

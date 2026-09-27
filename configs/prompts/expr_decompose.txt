@@ -1,0 +1,13 @@
+# status: UNVERIFIED
+# source: ours, drafted in notes/RL-DESIGN-CANDIDATE-VERIFICATION.md section 9.4 (3), revised 2026-09-21
+# role: atomic detail decomposition, text only; feeds the checker matrix and the load-bearing test
+# fields: expr
+Split this referring expression into its head noun and its atomic distinguishing details:
+{expr}
+
+Rules:
+- The head noun goes on the first line, prefixed "HEAD: ".
+- Then one detail per line, prefixed "CLAUSE: ". Each must be a single checkable predicate about the object, written so that it can follow the words "the object ..." (for example "CLAUSE: has a blue stripe", "CLAUSE: is lying on its side", "CLAUSE: is to the left of the laptop").
+- Keep the wording of each detail verbatim from the expression; do not paraphrase or add information.
+- A conjunction of two independent properties is two details.
+- Output nothing else.

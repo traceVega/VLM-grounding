@@ -1,0 +1,10 @@
+# status: UNVERIFIED
+# source: ours, 2026-09-21; the blind-detectability gate (SugarCrepe 2306.14610 style), text only, no image
+# role: text-only judge: can the altered description be told from the original without the picture
+# fields: a, b
+Two descriptions of an object are given. They are identical except that in ONE of them a single detail was replaced with a value that does not fit the described object. You cannot see the image.
+
+A: {a}
+B: {b}
+
+Which description is the altered one? Answer with exactly one letter: A or B.

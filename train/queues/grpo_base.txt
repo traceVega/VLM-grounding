@@ -1,0 +1,1 @@
+~/vlmg-env/bin/python -m train.grpo_lora --name grpo_base_visurf --epochs 2 --group 8 --lr 5e-5 --prompts-per-step 4 --inject-gt all --neg-adv-scale 0.5 --r-pos-null -0.5 --eval-every 15 --skip-eval0

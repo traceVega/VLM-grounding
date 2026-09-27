@@ -9,3 +9,5 @@ tables/*.jsonl
 tables/*.attempts
 !tables/.gitkeep
 tables/contact_sheets/
+# datagen human-review pages with CC-BY images: local only
+review/

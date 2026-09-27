@@ -1,0 +1,11 @@
+# status: UNVERIFIED
+# source: ours, 2026-09-24; single-image form of verifier_clauses_batched (no close-up): the resolution test of notes/DESIGN-FINAL-LIGHT-2026-09-24.md (H5)
+# role: per-instance detail verification from the full image only, one {category} outlined in red
+# fields: category, items
+You are given the full scene with one {category} outlined in red. Answer only about the outlined {category}, never about any other {category}.
+
+For each numbered statement below, decide whether it holds for the outlined {category}. Judge every statement on its own; they may contradict each other.
+
+{items}
+
+Answer with one line per statement, in order, in the form "<number>: yes", "<number>: no" or "<number>: unclear", and nothing else. Answer "unclear" only if the object is too occluded or too small to judge that statement.

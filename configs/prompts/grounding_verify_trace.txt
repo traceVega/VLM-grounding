@@ -1,0 +1,17 @@
+# status: UNVERIFIED
+# source: ours, 2026-09-24; GroundingME's primary instruction followed by the structured verification trace of notes/DESIGN-FINAL-LIGHT-2026-09-24.md
+# role: single-turn verification trace: conditions, per-candidate verdicts, derived answer
+# fields: expr
+All spatial relationships are defined from the viewer's perspective, where 'front' means closer to the viewer and 'back' means farther from the viewer. Find the object the following statement describes:
+{expr}
+Work in exactly this format and output nothing else:
+<conditions>
+1. <first detail stated about the object>
+2. <second detail>
+</conditions>
+<candidates>
+<object id="1" bbox="[x1, y1, x2, y2]">1: yes; 2: no -> excluded</object>
+<object id="2" bbox="[x1, y1, x2, y2]">1: yes; 2: yes -> fits</object>
+</candidates>
+<answer>{{"bbox_2d": [x1, y1, x2, y2]}}</answer>
+Rules: split the statement into its atomic details, one per numbered line. List every object in the image that could be the described one (same kind of object), at most 6, each with its bounding box. For each candidate judge every detail as yes, no or unclear (unclear only if it is too small or occluded to judge); a candidate fits only if no detail is no. The answer is the bounding box of the single candidate that fits all details, as {{"bbox_2d": [x1, y1, x2, y2]}}. If no candidate fits, the answer is {{"bbox_2d": null}}.

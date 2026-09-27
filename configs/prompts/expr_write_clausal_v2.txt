@@ -1,0 +1,19 @@
+# status: UNVERIFIED
+# source: ours, 2026-09-21; v1 plus a close-up second image, after the test50b review showed the
+#   writer describing a larger same-category object whose outline overlapped the target
+# role: clausal expression writer with two images: the full scene (target outlined in red) and a close-up crop of the target
+# fields: category, n_siblings, n_clauses
+You are given two images. The first is the full scene: it contains {n_siblings} objects of the category "{category}", and ONE of them is outlined in red. The second image is a close-up crop of exactly that outlined {category}, so you can see its details.
+
+Write one referring expression that identifies the outlined {category} and no other {category} in the full scene.
+
+Requirements:
+- Describe only the object shown in the close-up. If a larger or more prominent {category} overlaps the outline, that is NOT the target; describe the object in the close-up.
+- Use the head noun "{category}" plus exactly {n_clauses} distinguishing details.
+- Every detail must be independently checkable by looking at one object and answering yes or no. Good: "has the number 2500 on its side", "is lying on its side", "has a chipped handle", "is to the left of the laptop". Bad: "looks elegant", "is the nicest one", "seems out of place".
+- At least two details must describe the object itself (its appearance, a part of it, text on it, or its state) rather than only its position. Position details refer to the full scene.
+- Every detail must be true of the outlined object and false of at least one other {category} in the scene.
+- Do not use counting position alone ("the third from the left") as the only distinguishing detail.
+- Do not mention the red outline or the close-up.
+- Write it as one natural sentence starting with "the {category}".
+- Output the expression only, on one line, with no quotation marks and no explanation.

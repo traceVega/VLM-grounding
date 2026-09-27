@@ -1,0 +1,10 @@
+# status: UNVERIFIED
+# source: ours, 2026-09-26; third step of the propose -> audit protocol: the model's own final answer from its audits (text only)
+# role: final decision; the harness never overrides it (a rule-derived answer is kept only as a diagnostic and for training checks)
+# fields: expr, turn1, audits
+Statement: {expr}
+Your conditions and candidate boxes:
+{turn1}
+Your audits of the candidates, in the same order as the boxes:
+{audits}
+Decide the final answer from these audits: the bounding box of the single candidate that fits the statement, or null if no candidate fits. All coordinates refer to the full image. Output exactly one line, <answer>{{"bbox_2d": [x1, y1, x2, y2]}}</answer> or <answer>{{"bbox_2d": null}}</answer>, and nothing else.

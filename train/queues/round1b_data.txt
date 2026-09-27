@@ -1,0 +1,3 @@
+# Round 1b data: alternative negatives verified by the local 8B, then exported (no API)
+~/vlmg-env/bin/python -m train.alt_negatives check
+~/vlmg-env/bin/python -m train.alt_negatives export

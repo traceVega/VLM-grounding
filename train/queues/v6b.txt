@@ -1,0 +1,2 @@
+# v6b: the SFT-COA screening with the expandable-segments allocator (the first attempt spilled VRAM at 32 GB, 45 s/item) and RefCOCO 50x3
+PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True ~/vlmg-env/bin/python -m train.eval_suite --tag scr_sft_coa --adapter ~/vlmg-data/train/sft_coa/adapter --trace rat --turns 2 --audit coa --max-new 400 --max-new1 400 --sets gme,own,refcoco --gme-rej-n 100 --gme-pos-n 100 --refcoco-n 50 --batch 4

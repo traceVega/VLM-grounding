@@ -1,0 +1,6 @@
+# Night 3 (2026-09-25 22:20, resumed after a reboot during the multi-crop SFT): multi-crop SFT v4 + its evaluation,
+# then the full GME set and the gray controls for V3d (current candidate). round4c.sh then runs V3e on the best SFT.
+~/vlmg-env/bin/python -m train.sft_lora --name sft_multicrop_v4 --trace yn --order commit --hint-crop --n-crops 3 --hint-noise 0.2 --scale-aug 0.5 --scale-frac 0.02,0.10 --extra ~/vlmg-data/train/augment/cross_v1.jsonl@120,~/vlmg-data/train/alt_negatives.jsonl@120,~/vlmg-data/train/short_items.jsonl@170 --epochs 2 --grad-accum 8 --eval-every 1000 --no-gray-eval
+~/vlmg-env/bin/python -m train.eval_suite --tag scr_sft_multicrop_v4 --adapter ~/vlmg-data/train/sft_multicrop_v4/adapter --trace yn --hint-crop --n-crops 3 --sets gme,own,refcoco --gme-pos-n 150 --refcoco-n 100 --batch 6
+~/vlmg-env/bin/python -m train.eval_suite --tag full_grpo_v3d_hint --adapter ~/vlmg-data/train/grpo_v3d_hint/adapter --trace yn --hint-crop --sets gme --batch 8
+~/vlmg-env/bin/python -m train.eval_suite --tag scr_grpo_v3d_hint --adapter ~/vlmg-data/train/grpo_v3d_hint/adapter --trace yn --hint-crop --sets gmegray,gray --gme-gray-pos-n 100 --batch 8

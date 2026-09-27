@@ -1,0 +1,5 @@
+# Round 1a (2026-09-25): two zero-training probes on the V3b model to decide the crop route.
+# A. pixel-cap check: the same model/prompt at twice the pixel cap (4.9 MP) on the GME dev subset
+~/vlmg-env/bin/python -m train.eval_suite --tag scr_grpo_v3b_pair_5mp --adapter ~/vlmg-data/train/grpo_v3b_pair/adapter --trace yn --sets gme --gme-pos-n 150 --batch 4 --max-pixels 4915200
+# B. crop-audit probe: V3b's own decomposition + committed candidate, re-verified by the base 4B from the global view vs global + close-up
+~/vlmg-env/bin/python -m train.crop_probe --tag scr_grpo_v3b_pair --views global,crop

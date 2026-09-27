@@ -1,0 +1,8 @@
+# Lane 2: the single-stage GRPO paradigm.
+# The baseline's missing GME gray-control set (the other sets are done and resume by id).
+~/vlmg-env/bin/python -m train.eval_suite --tag base4b --model 4b --sets gmegray
+# Screen the from-base GRPO adapter saved at step 105 (negatives 60% null, positives 0.70 on own val).
+~/vlmg-env/bin/python -m train.eval_suite --tag scr_grpo_base_visurf --model 4b --adapter ~/vlmg-data/train/grpo_base_visurf/adapter --gme-pos-n 150 --gme-gray-pos-n 50 --refcoco-n 60
+# Same recipe with the cross-scene negatives and a full -1 penalty for refusing a positive.
+~/vlmg-env/bin/python -m train.grpo_lora --name grpo_base_cross --epochs 2 --group 8 --lr 5e-5 --prompts-per-step 6 --inject-gt all --neg-adv-scale 0.5 --r-pos-null -1.0 --eval-every 25 --skip-eval0 --extra ~/vlmg-data/train/augment/cross_v1.jsonl
+~/vlmg-env/bin/python -m train.eval_suite --tag scr_grpo_base_cross --model 4b --adapter ~/vlmg-data/train/grpo_base_cross/adapter --gme-pos-n 150 --gme-gray-pos-n 50 --refcoco-n 60

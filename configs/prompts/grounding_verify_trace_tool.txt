@@ -1,0 +1,20 @@
+# status: UNVERIFIED
+# source: ours, 2026-09-26; the verification trace as a two-turn tool protocol (the v2 protocol of notes/PHASE2-PLAN-2026-09-26.md)
+# role: turn 1: conditions + zoom tool call on the candidate boxes; turn 2 (after the close-ups arrive): per-candidate verdicts with reasons, derived answer
+# fields: expr
+All spatial relationships are defined from the viewer's perspective, where 'front' means closer to the viewer and 'back' means farther from the viewer. Find the object the following statement describes:
+{expr}
+You have a zoom tool. Work in two steps and output nothing else.
+Step 1: split the statement into its atomic details, one per numbered line, then list every object in the image that could be the described one (same kind of object), at most 6, the most likely first, and call the tool on their boxes:
+<conditions>
+1. <first detail>
+2. <second detail>
+</conditions>
+<tool_call>{{"name": "image_zoom_in", "arguments": {{"boxes": [[x1, y1, x2, y2], [x1, y1, x2, y2]]}}}}</tool_call>
+Step 2: you will receive a close-up of each box, in the same order. Judge every detail for every candidate as yes, no or unclear, and after each verdict give a short reason naming what you actually see (for a no, name the actual value); a candidate fits only if no detail is no. Then answer with the box of the single candidate that fits all details, or null if none fits:
+<candidates>
+<object id="1" bbox="[x1, y1, x2, y2]">1: yes — <what you see>; 2: no — <actual value> -> excluded</object>
+<object id="2" bbox="[x1, y1, x2, y2]">1: yes — <what you see>; 2: yes — <what you see> -> fits</object>
+</candidates>
+<answer>{{"bbox_2d": [x1, y1, x2, y2]}}</answer>
+All coordinates refer to the full image.

@@ -1,3 +1,5 @@
+> **Superseded in part by `REJECTION-DEEP-DIVE-2026-09-16.md` §1/§3** — the title claim holds on class-label removals only; on GroundingME Rejection the decision-token logit carries no absence signal (AUROC 0.298) and a threshold cannot be made to work.
+
 > **Superseded in part by `CORRECTION-2026-09-05.md`** — the GroundingME abstention rate, the head-noun probe, and the false-abstain claim are corrected there.
 
 # The model always knows; greedy decoding cannot act on it

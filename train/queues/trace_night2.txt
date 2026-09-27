@@ -1,0 +1,16 @@
+# Overnight 2026-09-24, second queue (launched by train/handoff_night2.sh when queue 1 reaches V5).
+# Finding behind it: V1's false rejections on GME positives are 45/85 candidate-recall failures (no listed
+# candidate matches the target) and 40/85 false "no" cells; commit-first traces list the described object first.
+# V1b: commit-first label traces
+~/vlmg-env/bin/python -m train.sft_lora --name sft_trace_commit --trace yn --order commit --extra ~/vlmg-data/train/augment/cross_v1.jsonl --extra-n 90 --epochs 2 --grad-accum 8 --eval-every 1000 --no-gray-eval
+~/vlmg-env/bin/python -m train.eval_suite --tag scr_sft_trace_commit --adapter ~/vlmg-data/train/sft_trace_commit/adapter --trace yn --sets gme,own,refcoco --gme-pos-n 150 --refcoco-n 100 --batch 8
+# V4b: the V4 reward on the commit-first SFT (only the candidate order differs from V4)
+~/vlmg-env/bin/python -m train.grpo_lora --name grpo_v4b_commit --trace yn --order commit --reward v4 --init-adapter ~/vlmg-data/train/sft_trace_commit/adapter --extra ~/vlmg-data/train/augment/cross_v1.jsonl --extra-n 90 --epochs 1 --group 8 --prompts-per-step 4 --max-scenes 60 --r-pos-null -1 --inject-gt neg --eval-every 1000 --skip-eval0 --no-gray-eval
+~/vlmg-env/bin/python -m train.eval_suite --tag scr_grpo_v4b_commit --adapter ~/vlmg-data/train/grpo_v4b_commit/adapter --trace yn --sets gme,own,refcoco --gme-pos-n 150 --refcoco-n 100 --batch 8
+# H5 resolution test (zero-shot 4B, held-out scenes): global view vs close-up at scales 1.0 and 0.5
+~/vlmg-env/bin/python -m train.res_test --scales 1.0,0.5
+# V5 observed-value format on commit-first traces: SFT then GRPO v4 (the null credit needs an accusation with a seen value)
+~/vlmg-env/bin/python -m train.sft_lora --name sft_trace_obs --trace obs --order commit --extra ~/vlmg-data/train/augment/cross_v1.jsonl --extra-n 90 --epochs 2 --grad-accum 8 --eval-every 1000 --no-gray-eval
+~/vlmg-env/bin/python -m train.grpo_lora --name grpo_v5_obs --trace obs --order commit --reward v4 --init-adapter ~/vlmg-data/train/sft_trace_obs/adapter --extra ~/vlmg-data/train/augment/cross_v1.jsonl --extra-n 90 --epochs 1 --group 8 --prompts-per-step 4 --max-scenes 60 --r-pos-null -1 --inject-gt neg --eval-every 1000 --skip-eval0 --no-gray-eval
+~/vlmg-env/bin/python -m train.eval_suite --tag scr_grpo_v5_obs --adapter ~/vlmg-data/train/grpo_v5_obs/adapter --trace obs --sets gme,own,refcoco --gme-pos-n 150 --refcoco-n 100 --batch 8
+~/vlmg-env/bin/python -m train.eval_suite --tag scr_sft_trace_obs --adapter ~/vlmg-data/train/sft_trace_obs/adapter --trace obs --sets own --batch 8

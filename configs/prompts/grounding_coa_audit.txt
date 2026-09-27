@@ -1,0 +1,12 @@
+# status: UNVERIFIED
+# source: ours, 2026-09-26 (v2, general head): observe-then-judge audit of one candidate; no types, no candidate index, no exemptions
+# role: turn-2 user text of the propose -> audit protocol, one candidate per call; the first image (turn 1) is the scene with this candidate outlined in red, the second image is its close-up
+# fields: none
+The image above shows the scene with one candidate outlined in red; this image is a close-up of that candidate. Audit this candidate only, in exactly this format and nothing else:
+<audit>
+1. <claimed detail> | seen: <what the images actually show for this detail> | match
+2. <claimed detail> | seen: <...> | mismatch
+3. <claimed detail> | seen: <...> | unsure
+</audit>
+<verdict>fits</verdict>
+Rules: one line per detail of the statement, in the order of your conditions. Before judging a detail, write what you actually see for it: a concrete observed value, never a copy of the claim unless you see exactly that. mismatch means the seen value contradicts the claim; unsure means the region is too small, occluded or unreadable. The verdict is fits when no detail is a mismatch; otherwise write <verdict>mismatch on <line>: <seen value>, not <claimed value></verdict>.

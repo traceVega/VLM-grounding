@@ -1,0 +1,6 @@
+# Round 1: the cross-scene negatives (193 verified) in both paradigms, each followed by the screening eval
+# (all 201 Rejection + 150 stratified positives, GME gray control, own val, gray, RefCOCO 60/set).
+~/vlmg-env/bin/python -m train.sft_lora --name sft_v2_cross_ul --model 4b --extra ~/vlmg-data/train/augment/cross_v1.jsonl --null-unlikelihood 1.0
+~/vlmg-env/bin/python -m train.eval_suite --tag scr_sft_v2_cross_ul --model 4b --adapter ~/vlmg-data/train/sft_v2_cross_ul/adapter --gme-pos-n 150 --gme-gray-pos-n 50 --refcoco-n 60
+~/vlmg-env/bin/python -m train.grpo_lora --name grpo_base_cross --epochs 2 --group 8 --lr 5e-5 --prompts-per-step 4 --inject-gt all --neg-adv-scale 0.5 --r-pos-null -0.5 --eval-every 15 --skip-eval0 --extra ~/vlmg-data/train/augment/cross_v1.jsonl
+~/vlmg-env/bin/python -m train.eval_suite --tag scr_grpo_base_cross --model 4b --adapter ~/vlmg-data/train/grpo_base_cross/adapter --gme-pos-n 150 --gme-gray-pos-n 50 --refcoco-n 60

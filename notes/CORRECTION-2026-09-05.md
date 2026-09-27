@@ -1,3 +1,5 @@
+> **Superseded in part by `REJECTION-DEEP-DIVE-2026-09-16.md` §3/§5** — the "expression length" variable in §1 is confounded with the Discriminative/Text sub-axis (the 28 short items are exactly the 28 Text items); sub-axis vs dilution is open pending probes P1/P10.
+
 # Correction, 2026-09-05: three claims in the two notes below were wrong
 
 Found by an adversarial panel (16 agents) over the results and confirmed from

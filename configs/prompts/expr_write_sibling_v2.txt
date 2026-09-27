@@ -1,0 +1,19 @@
+# status: UNVERIFIED
+# source: ours, 2026-09-21; sibling writer with a close-up second image (see expr_write_clausal_v2)
+# role: sibling expression writer: same template of details, refilled for the outlined instance; two images
+# fields: category, n_siblings, n_clauses, expr_target
+You are given two images. The first is the full scene: it contains {n_siblings} objects of the category "{category}", and ONE of them is outlined in red. The second image is a close-up crop of exactly that outlined {category}.
+
+Here is a referring expression that describes a DIFFERENT {category} in this scene (not the outlined one):
+{expr_target}
+
+Write a new referring expression for the outlined {category} that follows the same structure and mentions the same kinds of details (for example, if the given expression mentions colour, a part, text and position, yours should mention the outlined object's colour, part, text and position), with the values changed to what is true of the outlined object.
+
+Requirements:
+- Describe only the object shown in the close-up.
+- Use the head noun "{category}" plus exactly {n_clauses} details.
+- Every detail must be true of the outlined object and false of at least one other {category} in the scene, including the object the given expression describes.
+- Every detail must be independently checkable by looking at one object.
+- Do not mention the red outline or the close-up. Do not copy any detail that is not true of the outlined object.
+- Write it as one natural sentence starting with "the {category}".
+- Output the expression only, on one line, with no quotation marks and no explanation.

@@ -1,0 +1,22 @@
+# status: UNVERIFIED
+# source: ours, drafted in notes/RL-DESIGN-CANDIDATE-VERIFICATION.md section 9.4 (2), revised 2026-09-21
+# role: single-detail substitution producing a zero-satisfier negative; the image is shown so the
+#   replacement can be chosen to be false of every instance, plausibility is judged from the scene
+# fields: expr, category, n_siblings, clauses
+This expression describes one object in the image:
+{expr}
+
+Its details, one per line:
+{clauses}
+
+The image contains {n_siblings} objects of the category "{category}".
+
+Rewrite the expression so that it describes NO {category} in the image, by changing exactly one detail and nothing else.
+
+Requirements:
+- Change exactly one detail. Every other word must be identical, including punctuation and word order.
+- The replacement must be PLAUSIBLE for this category and this kind of scene: a property such an object could easily have, but that none of the {category} objects in this image actually has. Change "blue" to "red", not to "invisible".
+- Prefer changing a detail about the object itself (colour, part, text, state) over a position detail.
+- The result must be a grammatical, natural sentence that a person could have written in good faith.
+- Do not negate with "not", "no" or "without". Substitute a different value.
+- Output exactly two lines. Line 1: the rewritten expression. Line 2: CHANGED: <original detail> -> <new detail>

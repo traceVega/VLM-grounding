@@ -1,0 +1,11 @@
+# status: UNVERIFIED
+# source: ours, 2026-09-26; observation rationales for verdict cells (train.rationales): given each statement's verdict, name what is seen
+# role: per-instance rationale writing: full image with one instance outlined in red, plus a close-up crop of it; the verdicts are given
+# fields: category, items
+You are given two images. The first is the full scene with one {category} outlined in red; the second is a close-up crop of exactly that outlined {category}. Use the full scene for context (what the outlined {category} is next to, behind or in front of) and the close-up for its own details. Answer only about the outlined {category}.
+
+For each numbered statement below, the verdict has already been decided and is given after the statement. Write one short clause (at most 10 words) describing what you actually see on the outlined {category} that supports that verdict: for "yes" name the matching detail you see; for "no" name the actual value instead (for example "the cap is gray, not red"); for "unclear" say what blocks the view.
+
+{items}
+
+Answer with one line per statement, in order, in the form "<number>: <clause>", and nothing else.

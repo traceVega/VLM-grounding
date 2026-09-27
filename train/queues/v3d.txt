@@ -1,0 +1,5 @@
+# v3d: ceiling probe — the same two-turn SFT on Qwen3-VL-8B (commit-first rows, 8B rationales, half scenes). Question: is the
+# per-cell verdict noise (object row false 'no' 34% on 4B) a capacity limit of the 4B or a property of the protocol?
+~/vlmg-env/bin/python -m train.sft_lora --model 8b --name smoke_8b --trace rat --order commit --turns 2 --limit 8 --epochs 1 --grad-accum 4 --eval-every 1000 --no-gray-eval --val-loss-every 0
+~/vlmg-env/bin/python -m train.sft_lora --model 8b --name sft_v2h_8b --scene-frac 0.5 --trace rat --order commit --turns 2 --scale-aug 0.5 --scale-frac 0.02,0.10 --extra ~/vlmg-data/train/augment/cross_v1.jsonl@100,~/vlmg-data/train/alt_negatives.jsonl@120,~/vlmg-data/train/short_items.jsonl@170,~/vlmg-data/train/mosaic_items.jsonl@150 --epochs 2 --grad-accum 8 --eval-every 1000 --no-gray-eval
+~/vlmg-env/bin/python -m train.eval_suite --model 8b --tag scr_sft_v2h_8b --adapter ~/vlmg-data/train/sft_v2h_8b/adapter --trace rat --turns 2 --max-new 512 --max-new1 400 --sets gme,own,refcoco --gme-rej-n 100 --gme-pos-n 100 --refcoco-n 30 --batch 2

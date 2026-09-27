@@ -1,0 +1,11 @@
+# status: UNVERIFIED
+# source: ours, 2026-09-22; batched form of verifier_clause_instance_v2 (one call per instance, all details at once)
+# role: per-instance detail verification, all details in one call: full image with one instance outlined in red, plus a close-up crop of it
+# fields: category, items
+You are given two images. The first is the full scene with one {category} outlined in red; the second is a close-up crop of exactly that outlined {category}. Use the full scene for context (what the outlined {category} is next to, behind or in front of) and the close-up for its own details. Answer only about the outlined {category}, never about any other {category}.
+
+For each numbered statement below, decide whether it holds for the outlined {category}. Judge every statement on its own; they may contradict each other.
+
+{items}
+
+Answer with one line per statement, in order, in the form "<number>: yes", "<number>: no" or "<number>: unclear", and nothing else. Answer "unclear" only if the object is too occluded or too small to judge that statement.

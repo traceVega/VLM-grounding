@@ -1,0 +1,18 @@
+# status: UNVERIFIED
+# source: ours, 2026-09-21, for the sibling-triplet data (notes/HARD-SAMPLE-METHODS-2026-09-16.md section 3.1)
+# role: sibling expression writer: the same template of details, refilled for a different instance of the same category
+# fields: category, n_siblings, n_clauses, expr_target
+The image contains {n_siblings} objects of the category "{category}". One of them is outlined in red.
+
+Here is a referring expression that describes a DIFFERENT {category} in this image (not the outlined one):
+{expr_target}
+
+Write a new referring expression for the outlined {category} that follows the same structure and mentions the same kinds of details (for example, if the given expression mentions colour, a part, text and position, yours should mention the outlined object's colour, part, text and position), with the values changed to what is true of the outlined object.
+
+Requirements:
+- Use the head noun "{category}" plus exactly {n_clauses} details.
+- Every detail must be true of the outlined object and false of at least one other {category} in the image, including the object the given expression describes.
+- Every detail must be independently checkable by looking at one object.
+- Do not mention the red outline. Do not copy any detail that is not true of the outlined object.
+- Write it as one natural sentence starting with "the {category}".
+- Output the expression only, on one line, with no quotation marks and no explanation.

@@ -1,0 +1,2 @@
+# 8B observation rationales for every verdict cell (prerequisite of the v2 protocol bundle)
+~/vlmg-env/bin/python -m train.rationales

@@ -1,0 +1,9 @@
+# status: UNVERIFIED
+# source: ours, drafted in notes/RL-DESIGN-CANDIDATE-VERIFICATION.md section 9.4 (4), revised 2026-09-21
+# role: per-instance detail verification on the full image with one instance outlined in red (Gemma4-12B, judge_b)
+# fields: category, clause
+One {category} in this image is outlined in red. You may use the whole image for context (for example to judge what the outlined {category} is next to or behind), but answer only about the outlined {category}, not about any other {category}.
+
+Does this statement hold for the outlined {category}? The {category} {clause}.
+
+Answer with exactly one word: yes, no, or unclear. Answer "unclear" only if the outlined object is too occluded or too small to judge.

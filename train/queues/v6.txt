@@ -1,0 +1,4 @@
+# v6 (after the probe passes): SFT-COA on half the scenes: turn-1 examples + per-candidate audit examples + answer examples from the
+# label matrices, plus recomposed single/two-error audit rows and the longer recomposed items; then screening with the same head.
+~/vlmg-env/bin/python -m train.sft_lora --name sft_coa --scene-frac 0.5 --trace rat --order commit --turns 2 --audit coa --scale-aug 0.5 --scale-frac 0.02,0.10 --extra ~/vlmg-data/train/augment/cross_v1.jsonl@60,~/vlmg-data/train/alt_negatives.jsonl@120,~/vlmg-data/train/short_items.jsonl@120,~/vlmg-data/train/long_items.jsonl@124,~/vlmg-data/train/audit_rows.jsonl@618 --epochs 1 --grad-accum 8 --eval-every 1000 --no-gray-eval --val-loss-every 0
+~/vlmg-env/bin/python -m train.eval_suite --tag scr_sft_coa --adapter ~/vlmg-data/train/sft_coa/adapter --trace rat --turns 2 --audit coa --max-new 400 --max-new1 400 --sets gme,own,refcoco --gme-rej-n 100 --gme-pos-n 100 --refcoco-n 100 --batch 4

@@ -1,0 +1,4 @@
+# 2026-09-25 01:30 re-plan: V2 left GME positives at 18.0 (recall failure dominates), so test the commit-first
+# traces (V1b) before spending the rest of the night on V3/V4 from V1.
+~/vlmg-env/bin/python -m train.sft_lora --name sft_trace_commit --trace yn --order commit --extra ~/vlmg-data/train/augment/cross_v1.jsonl --extra-n 90 --epochs 2 --grad-accum 8 --eval-every 1000 --no-gray-eval
+~/vlmg-env/bin/python -m train.eval_suite --tag scr_sft_trace_commit --adapter ~/vlmg-data/train/sft_trace_commit/adapter --trace yn --sets gme,own,refcoco --gme-pos-n 150 --refcoco-n 100 --batch 8

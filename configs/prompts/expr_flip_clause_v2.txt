@@ -1,0 +1,27 @@
+# status: UNVERIFIED
+# source: ours, 2026-09-21. Replaces the free rewrite of v1, which returned the sentence unchanged
+#   in 15 of 50 test50c items: the model now names the exact words to replace and the code does
+#   the substitution, so the negative always differs from the target in exactly one span.
+# role: single-detail substitution for zero-satisfier negatives; sees the plain image
+# fields: expr, category, n_siblings, clauses
+This expression describes one particular {category} in the image:
+{expr}
+
+Its details, one per line:
+{clauses}
+
+The image contains {n_siblings} objects of the category "{category}".
+
+Choose ONE detail about the object itself (its colour, a part, text on it, its state; prefer these over position details) and propose a replacement value that makes the expression describe NO {category} in this image.
+
+Requirements:
+- The replacement must be PLAUSIBLE for this category and this scene: a property such an object could easily have, but that none of the {category} objects in this image actually has. Change "blue" to "red", not to "invisible".
+- Do not negate with "not", "no" or "without". Substitute a different value.
+- Give three different candidate replacements, most plausible first, each false of every {category} in the image.
+- OLD must be copied exactly, character for character, from the expression above (a short span of a few words).
+
+Output exactly four lines and nothing else:
+OLD: <exact words from the expression>
+NEW1: <replacement words>
+NEW2: <replacement words>
+NEW3: <replacement words>

@@ -1,0 +1,3 @@
+# v5: zero-training probe of the observe-then-judge head (general version): turn 1 = sft_v2 proposals; per-candidate audits and the
+# final answer step by the same adapter zero-shot on the new prompts; all audits stored for the K curve and rank split.
+~/vlmg-env/bin/python -m train.eval_suite --tag k1_coa --adapter ~/vlmg-data/train/sft_v2/adapter --trace rat --turns 2 --audit coa --max-new 400 --max-new1 400 --sets gme --gme-rej-n 100 --gme-pos-n 100 --batch 4

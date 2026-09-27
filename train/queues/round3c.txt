@@ -1,0 +1,6 @@
+# Round 3c (2026-09-25 evening): multi-crop — close-ups of up to three candidates (base box first, then the base's zero-shot
+# trace candidates at inference; the described object then the largest instances in training) with hint noise 0.2.
+~/vlmg-env/bin/python -m train.sft_lora --name smoke_multicrop --trace yn --order commit --hint-crop --n-crops 3 --hint-noise 0.2 --limit 8 --epochs 1 --grad-accum 4 --eval-every 1000 --no-gray-eval
+~/vlmg-env/bin/python -m train.eval_suite --tag smoke_multicrop --adapter ~/vlmg-data/train/smoke_multicrop/adapter --trace yn --hint-crop --n-crops 3 --sets own --limit 8 --batch 4
+~/vlmg-env/bin/python -m train.sft_lora --name sft_multicrop_v4 --trace yn --order commit --hint-crop --n-crops 3 --hint-noise 0.2 --scale-aug 0.5 --scale-frac 0.02,0.10 --extra ~/vlmg-data/train/augment/cross_v1.jsonl@120,~/vlmg-data/train/alt_negatives.jsonl@120,~/vlmg-data/train/short_items.jsonl@170 --epochs 2 --grad-accum 8 --eval-every 1000 --no-gray-eval
+~/vlmg-env/bin/python -m train.eval_suite --tag scr_sft_multicrop_v4 --adapter ~/vlmg-data/train/sft_multicrop_v4/adapter --trace yn --hint-crop --n-crops 3 --sets gme,own,refcoco --gme-pos-n 150 --refcoco-n 100 --batch 6

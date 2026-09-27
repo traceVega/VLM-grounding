@@ -1,0 +1,11 @@
+# status: DRAFT
+# source: the primary GroundingME prompt (grounding_qwen3vl_primary.txt, verbatim) plus one
+#   verify-first paragraph.  Probe only (P3 in notes/REJECTION-DEEP-DIVE-2026-09-16.md): does
+#   the base model reject more, and over-refuse less, when told to check each detail before
+#   answering?  Not the benchmark protocol; numbers under it are labelled as such.
+# role: Qwen3-VL grounding prompt with per-detail verification before the answer
+# fields: expr
+All spatial relationships are defined from the viewer's perspective, where 'front' means closer to the viewer and 'back' means farther from the viewer. Please provide the bounding box coordinate of the object the following statement describes:
+{expr}
+Ensure that all details mentioned about the object are accurate. Provide at most one bounding box. If a matching object is found, provide its bounding box as a JSON in the format {{"bbox_2d": [x1, y1, x2, y2]}}. If no matching object is found, output {{"bbox_2d": null}}.
+Before the final answer, reason briefly: name the most likely candidate object, then check every attribute, part, written text and relationship stated in the description against it, one per line, marking each "true" or "false". If some stated detail is false for every candidate in the image, there is no matching object. Finish with the final answer alone on the last line, in the JSON format above.
