@@ -1,0 +1,21 @@
+# status: UNVERIFIED
+# source: ours, 2026-09-27 (data recipe A): a long, GME-style description of one verified instance from its checked facts plus visible details
+# role: Gemini writer, call A: full scene with the target outlined in red + a close-up of it; the facts are checker-verified clauses
+# fields: category, facts
+You are given two images. The first is the full scene with one {category} outlined in red; the second is a close-up crop of exactly that outlined {category}.
+
+Verified facts about the outlined {category} (each is true of it):
+{facts}
+
+Write a detailed description of the outlined {category} as a careful human annotator would, so that a reader could find exactly this {category} in the scene: 3 to 5 sentences, 6 to 10 concrete details in total. Use the verified facts, and add other details you can clearly see: exact colours and shades, materials, any text, numbers or logos with their exact wording, parts and their colours, pose or orientation, and what is directly next to, behind or in front of it. Never mention that it is outlined or marked. Do not guess what you cannot see.
+
+Then decompose the description into its atomic details: one line per detail, each a short predicate about the {category} starting with a verb such as "has", "is", "wears", "shows", "is next to" (for example "has a red frame", "is to the left of the blue car", "shows the text 'CIMB BANK' in red letters"). Every detail in the description must appear in the list and nothing else.
+
+Answer exactly in this form and nothing else:
+<description>
+...
+</description>
+<details>
+1. ...
+2. ...
+</details>

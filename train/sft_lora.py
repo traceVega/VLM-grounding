@@ -178,6 +178,14 @@ def _claim_prefix_weights(tok, ids, start: int, w_claim: float) -> torch.Tensor:
         for i, (s0, e0) in enumerate(spans):
             if e0 > a and s0 < b:
                 weights[i] = w_claim
+    # a seen value that merely repeats the claim (no observed value was available for that cell) must not be taught: it is the
+    # parroting we penalise in RL; its span gets weight 0 (the verdict token after it still counts)
+    for m in re.finditer(r"^\s*\d+\.\s*(.*?)\s*\|\s*seen:\s*(.*?)\s*\|", text, re.M):
+        if COA.norm(m.group(1)) == COA.norm(m.group(2)):
+            a, b = m.start(2), m.end(2)
+            for i, (s0, e0) in enumerate(spans):
+                if e0 > a and s0 < b:
+                    weights[i] = 0.0
     return torch.tensor(weights)
 
 

@@ -335,6 +335,7 @@ def main() -> None:
     ap.add_argument("--k-max", type=int, default=4, help="--audit coa: candidates audited per rollout (turn-1 boxes beyond this are dropped)")
     ap.add_argument("--norm-tokens", type=int, default=1024, help="--audit coa: fixed token normaliser of the policy loss")
     ap.add_argument("--r-false-acc", type=float, default=0.0, help="--audit coa: penalty on the true object's audit segment for a named false accusation (0 = priced by the forgone box reward)")
+    ap.add_argument("--r-echo", type=float, default=0.0, help="--audit coa: dense sycophancy penalty on the described instance's audit segment when the falsified clause's line is judged match (0 = off)")
     ap.add_argument("--r-recall", type=float, default=0.5, help="turn-1 reward when the described object is among the named boxes")
     ap.add_argument("--r-reason", type=float, default=0.0, help="negatives: bonus when the flipped cell is 'no' and its reason names the original value (keyword match)")
     ap.add_argument("--iou-soft", action="store_true", help="positive box reward 0.5+0.5*IoU above the 0.5 threshold instead of a flat 1")
@@ -343,6 +344,7 @@ def main() -> None:
     ap.add_argument("--order", default="iid", choices=TR.ORDERS, help="candidate order of the injected label traces")
     ap.add_argument("--max-scenes", type=int, default=None, help="cap the scenes per epoch (paired scenes first)")
     ap.add_argument("--eval-every", type=int, default=10)
+    ap.add_argument("--save-every", type=int, default=0, help="also save the adapter to <name>/adapter_step<N> every N steps (0 = off)")
     ap.add_argument("--mini-gme", type=int, default=0, help="N Rejection + N positives of GME evaluated at every --eval-every (curve of the number that matters)")
     ap.add_argument("--seed", type=int, default=0)
     ap.add_argument("--n-val-scenes", type=int, default=18)
@@ -549,6 +551,7 @@ def main() -> None:
                                "kk": (sum(i["k"] for i in infos if "k" in i) / max(1, sum(1 for i in infos if "k" in i))) if any("k" in i for i in infos) else None,
                                "cons": (sum(1 for i in infos if i.get("consistent")) / len(infos)) if rollouts is not None else None,
                                "acc": (sum(1 for i in infos if i.get("accusation_correct")) / len(infos)) if rollouts is not None else None,
+                               "syc": (sum(1 for i in infos if i.get("sycophantic")) / len(infos)) if rollouts is not None else None,
                                "uns": (sum(i["unsure_frac"] for i in infos if i.get("unsure_frac") is not None) / max(1, sum(1 for i in infos if i.get("unsure_frac") is not None))) if rollouts is not None else None,
                                "echo": (sum(i["echo_frac"] for i in infos if i.get("echo_frac") is not None) / max(1, sum(1 for i in infos if i.get("echo_frac") is not None))) if rollouts is not None else None,
                                "cell": (sum(i["cell_acc"] for i in infos if i.get("cell_acc") is not None) / max(1, sum(1 for i in infos if i.get("cell_acc") is not None))) if any(i.get("cell_acc") is not None for i in infos) else None})
@@ -633,7 +636,7 @@ def main() -> None:
                                      "pos_fa": mean(by("positive") + by("sibling_positive"), "fa"), "neg_r": mean(by("negative"), "mean_r"), "neg_null": mean(by("negative"), "null_frac"),
                                      "neg_ev": mean(by("negative"), "ev"), "cross_r": mean(by("cross"), "mean_r"), "cross_null": mean(by("cross"), "null_frac"),
                                      "bad": mean(recent, "bad_frac"), "inc": mean(recent, "inc"), "cand_recall": mean(recent, "rec"), "reason_named": mean(by("negative"), "rsn"), "cell_acc": mean(recent, "cell"),
-                                     "k": mean(recent, "kk"), "consistent": mean(recent, "cons"), "acc_correct": mean(by("negative"), "acc"), "unsure": mean(recent, "uns"), "echo": mean(recent, "echo"),
+                                     "k": mean(recent, "kk"), "consistent": mean(recent, "cons"), "acc_correct": mean(by("negative"), "acc"), "sycophantic": mean(by("negative"), "syc"), "unsure": mean(recent, "uns"), "echo": mean(recent, "echo"),
                                      "entropy": (sum(step_ent) / len(step_ent)) if step_ent else None, "comp_len": (sum(step_len) / len(step_len)) if step_len else None,
                                      "min": round((time.time() - t0) / 60, 2)}) + "\n")
             if step % args.log_every == 0:
@@ -646,6 +649,9 @@ def main() -> None:
                       f"pos: r {f(pos, 'mean_r'):.2f} null {f(pos, 'null_frac'):.2f} fa {f(pos, 'fa'):.2f} used {f(pos, 'used'):.2f} | "
                       f"bad {f(pos + neg + crs, 'bad_frac'):.2f} inc {f(pos + neg + crs, 'inc'):.2f} | {(time.time() - t0) / 60:.1f} min", flush=True)
                 window = []
+            if args.save_every and step % args.save_every == 0 and step < total_steps:
+                model.save_pretrained(out / f"adapter_step{step}", selected_adapters=["default"])  # screen mid-run checkpoints (50 vs 100 steps) without a second run
+                print(f"  checkpoint saved: {out / f'adapter_step{step}'}", flush=True)
             if step % args.eval_every == 0:
                 log_eval(step, {})
                 model.save_pretrained(out / "adapter", selected_adapters=["default"])
