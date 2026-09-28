@@ -116,7 +116,7 @@ def render_audit(m: dict, row: dict, rationale_of) -> str:
     first_mis = None
     for j, (cond, v) in enumerate(zip(m["conditions"], row["verdicts"])):
         typ = clause_type(cond)
-        pre = (m.get("seen_pre") or {}).get(str(j))
+        pre = (m.get("seen_pre") or {}).get(str(j)) or (row.get("seen") or {}).get(str(j))  # matrix-level, then per-row observed values (GME-style data)
         if pre:
             seen = pre
         elif m.get("flipped_idx") == j and row["iid"] == m.get("first_iid") and m.get("flip_from") and v == "no":

@@ -1,0 +1,25 @@
+# status: UNVERIFIED
+# source: ours, 2026-09-27 (data recipe A): three one-detail falsifications of a verified description, each false of every object in the image
+# role: Gemini writer, call B: the plain full scene (no outline); the description and its detail list come from call A
+# fields: category, description, details
+You are given the full scene. Below is a description of one {category} in it, followed by its list of atomic details.
+
+Description:
+{description}
+
+Details:
+{details}
+
+Create three falsified versions of this description. Each version changes exactly one detail to a plausible value that is false for every {category} and every other object in this image, keeps every other word unchanged, and stays natural. Pick three different details of three different kinds:
+- kind A (attribute): a colour shade, material, pattern, size or part description;
+- kind B (count or text): a number of items, or the exact wording of text, a number or a logo;
+- kind C (relation or pose): a spatial relation to another object, an orientation, a pose or an action.
+If a kind is impossible for this description, pick another detail of a different kind instead. The change must be subtle (for example "dark red" to "dark blue", "two" to "three", "to the left of" to "to the right of"), never a change that makes the sentence contradict another detail in the description.
+
+Answer exactly in this form and nothing else, one block per version:
+<version kind="A" detail="<number of the changed detail>">
+old: <the original value, a few words>
+new: <the new value, a few words>
+detail: <the changed detail line, same form as the list>
+description: <the full description with only this change>
+</version>
