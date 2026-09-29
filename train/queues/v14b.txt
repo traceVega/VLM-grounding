@@ -1,0 +1,6 @@
+# v14b (after v14, before the RL-only run): the gray-image control that every COA screening skipped (own scenes, 48 items, ~5 min
+# each) for the checkpoints that matter, so the rejection numbers can be read against the project's gray-gap rule (> 5 = stop).
+PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True ~/vlmg-env/bin/python -m train.eval_suite --tag gray_grpo_coa2 --adapter ~/vlmg-data/train/grpo_coa2/adapter --trace rat --turns 2 --audit coa --max-new 400 --max-new1 400 --sets gray --batch 4
+PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True ~/vlmg-env/bin/python -m train.eval_suite --tag gray_grpo_coa3_s50 --adapter ~/vlmg-data/train/grpo_coa3/adapter_step50 --trace rat --turns 2 --audit coa --max-new 400 --max-new1 400 --sets gray --batch 4
+PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True ~/vlmg-env/bin/python -m train.eval_suite --tag gray_sft_coa4 --adapter ~/vlmg-data/train/sft_coa4/adapter --trace rat --turns 2 --audit coa --max-new 400 --max-new1 400 --sets gray --batch 4
+PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True ~/vlmg-env/bin/python -m train.eval_suite --tag gray_grpo_coa4 --adapter ~/vlmg-data/train/grpo_coa4/adapter --trace rat --turns 2 --audit coa --max-new 400 --max-new1 400 --sets gray --batch 4

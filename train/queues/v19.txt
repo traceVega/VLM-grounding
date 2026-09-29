@@ -1,0 +1,2 @@
+# v19 (GPU filler after v18, decision-independent): cross-family recheck of the recipe-A data with the local Gemma4 checker.
+~/vlmg-env/bin/python -m train.gme_recheck
