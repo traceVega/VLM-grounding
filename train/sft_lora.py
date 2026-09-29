@@ -279,7 +279,14 @@ def expand_coa(items: list[dict], order: str) -> list[dict]:
         out.append({**it, "_coa_k": -1})
     if dropped:
         print(f"  coa: {dropped} items dropped (label audits inconsistent with the rule)", flush=True)
+    if COA_PARTS != {"turn1", "audit", "answer"}:  # --coa-parts: e.g. a proposer-only SFT teaches turn 1 and leaves the audits to RL
+        kind = lambda k: "turn1" if k == 0 else ("answer" if k == -1 else "audit")
+        out = [it for it in out if "_coa_k" not in it or kind(it["_coa_k"]) in COA_PARTS]
+        print(f"  coa: parts {sorted(COA_PARTS)} -> {len(out)} examples", flush=True)
     return out
+
+
+COA_PARTS = {"turn1", "audit", "answer"}
 
 
 def null_unlikelihood(logits: torch.Tensor, dec_pos: int, null_ids: list[int]) -> torch.Tensor:
@@ -388,6 +395,7 @@ def main() -> None:
     ap.add_argument("--null-unlikelihood", type=float, default=0.0, help="weight of -log(1-p(null)) on positives")
     ap.add_argument("--neg-repeat", type=int, default=1)
     ap.add_argument("--extra", default=None, help="comma-separated item files appended to the training set")
+    ap.add_argument("--coa-parts", default="turn1,audit,answer", help="--audit coa: which example kinds to train (turn1,audit,answer); 'turn1' alone = proposer-only SFT")
     ap.add_argument("--extra-n", type=int, default=None, help="seeded cap on the items taken from each --extra file")
     ap.add_argument("--init-adapter", default=None, help="warm-start from this LoRA adapter")
     ap.add_argument("--no-gray-eval", action="store_true")
@@ -407,6 +415,8 @@ def main() -> None:
                     help="target area fraction range of the described object under --scale-aug")
     ap.add_argument("--eval-max-new", type=int, default=None)
     args = ap.parse_args()
+    global COA_PARTS
+    COA_PARTS = {x.strip() for x in args.coa_parts.split(",") if x.strip()}  # before the step count, which expands the examples
 
     from peft import LoraConfig, PeftModel, get_peft_model
     from transformers import AutoModelForImageTextToText, get_cosine_schedule_with_warmup
@@ -454,7 +464,9 @@ def main() -> None:
         train_items, trace_drops = TR.build_all(train_items, args.trace, args.order)
         if args.audit == "coa":  # answer-only positives (RefCOCO train) are kept: expand_coa gives them a one-clause label table
             kept = {id(it) for it in train_items}
-            extra_ao = [it for it in raw_items if id(it) not in kept and it.get("answer", {}).get("bbox_2d") is not None and it.get("kind") == "positive" and not it.get("matrix")]
+            kept_ids = {it["id"] for it in train_items}  # build_all returns new dicts: compare by id, not identity (179 labelled positives were duplicated as answer-only items in sft_coa4)
+            extra_ao = [it for it in raw_items if it["id"] not in kept_ids and id(it) not in kept and it.get("answer", {}).get("bbox_2d") is not None and it.get("kind") == "positive"
+                        and not it.get("matrix") and not it.get("matrix_pre") and TR.label_matrix(it)[0] is None]
             train_items = train_items + extra_ao
             print(f"  coa: {len(extra_ao)} answer-only positives kept for turn-1/audit/answer supervision", flush=True)
     (out / "split.json").write_text(json.dumps({"train": [i["id"] for i in train_items], "val": [i["id"] for i in val_items],
