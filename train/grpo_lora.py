@@ -268,14 +268,29 @@ def sample_two_turn(model, processor, template, item: dict, image, inputs1, args
 RANK = {"positive": 0, "sibling_positive": 1, "negative": 2}
 
 
-def scene_batches(items: list[dict], per_step: int, seed: int, max_scenes: int | None) -> list[list[dict]]:
+def scene_batches(items: list[dict], per_step: int, seed: int, max_scenes: int | None, replay_per_step: int = 0,
+                  side: dict[str, int] | None = None) -> list[list[dict]]:
     """Scenes shuffled (those with a positive+negative pair first when capped); every item of a
     scene lands in the same step with the positive first, so its rollouts are scored before
-    the negative's."""
+    the negative's.  replay_per_step > 0: answer-only replay items (RefCOCO) are kept out of the
+    scene stream and exactly that many ride along in every step, so adding replay does not thin
+    out the negatives per step (RL10 with replay mixed in drifted toward acceptance).  side
+    {group prefix: k}: further side streams handled the same way (e.g. {"spatial:": 2}), so new
+    data rides along at a fixed rate and the --max-scenes core scenes stay the same."""
+    rng = random.Random(seed)
+    streams: list[tuple[list[dict], int]] = []
+    quotas = dict(side or {})
+    if replay_per_step > 0:
+        quotas["refcoco:"] = replay_per_step
+    srng = random.Random(seed + 7)  # own generator: the core scene selection below depends on the seed only, not on the side streams
+    for prefix, k in quotas.items():
+        sel = [it for it in items if str(it["group"]).startswith(prefix)]
+        items = [it for it in items if not str(it["group"]).startswith(prefix)]
+        srng.shuffle(sel)
+        streams.append((sel, k))
     by_group: dict[str, list[dict]] = {}
     for it in items:
         by_group.setdefault(it["group"], []).append(it)
-    rng = random.Random(seed)
     groups = list(by_group)
     rng.shuffle(groups)
     if max_scenes:
@@ -295,7 +310,19 @@ def scene_batches(items: list[dict], per_step: int, seed: int, max_scenes: int |
         cur.extend(scene)
     if cur:
         batches.append(cur)
+    for sel, k in streams:
+        for i, b in enumerate(batches):
+            b.extend(sel[i * k: (i + 1) * k])
     return batches
+
+
+def side_quotas(spec: str | None) -> dict[str, int]:
+    """'spatial:=2,foo:=1' -> {'spatial:': 2, 'foo:': 1}."""
+    out = {}
+    for part in [x for x in (spec or "").split(",") if x.strip()]:
+        prefix, _, k = part.partition("=")
+        out[prefix.strip()] = int(k)
+    return out
 
 
 def main() -> None:
@@ -336,6 +363,17 @@ def main() -> None:
     ap.add_argument("--norm-tokens", type=int, default=1024, help="--audit coa: fixed token normaliser of the policy loss")
     ap.add_argument("--r-false-acc", type=float, default=0.0, help="--audit coa: penalty on the true object's audit segment for a named false accusation (0 = priced by the forgone box reward)")
     ap.add_argument("--r-echo", type=float, default=0.0, help="--audit coa: dense sycophancy penalty on the described instance's audit segment when the falsified clause's line is judged match (0 = off)")
+    ap.add_argument("--c1-from", default=None, help="--audit coa: eval tags whose answers (by item id) become candidate 1 of every rollout "
+                    "(answer-first; e.g. base_rlpool = the base model's direct answers, train.aav)")
+    ap.add_argument("--c1-direct", action="store_true", help="--audit coa: two-step proposal - candidate 1 of every rollout is the model's own direct "
+                    "answer under the plain grounding prompt (greedy, adapter on; train.grpo_coa.direct_c1)")
+    ap.add_argument("--audit-replay", type=int, default=0, help="--audit coa: contrastive audit-pair items per step (train.refcoco_pairs): audit-only "
+                    "rollouts on the target's box (every line true) and a sibling's box (has to be vetoed)")
+    ap.add_argument("--audit-replay-file", default=str(D.TRAIN_ROOT / "refcoco_pairs.jsonl"))
+    ap.add_argument("--r-audit", type=float, default=0.5, help="weight of the audit-pair rewards")
+    ap.add_argument("--r-c1", type=float, default=0.0, help="--audit coa: turn-1 reward when the model's own first candidate is the target / described instance")
+    ap.add_argument("--r-line", type=float, default=0.0, help="--audit coa: weight of the per-line three-valued audit reward (train.aav.line_rewards), "
+                    "credited to each audit segment against the group mean of the same labelled instance")
     ap.add_argument("--r-recall", type=float, default=0.5, help="turn-1 reward when the described object is among the named boxes")
     ap.add_argument("--r-reason", type=float, default=0.0, help="negatives: bonus when the flipped cell is 'no' and its reason names the original value (keyword match)")
     ap.add_argument("--iou-soft", action="store_true", help="positive box reward 0.5+0.5*IoU above the 0.5 threshold instead of a flat 1")
@@ -343,6 +381,10 @@ def main() -> None:
     ap.add_argument("--token-level", action="store_true", help="policy loss on summed token log-probs / max_new (DAPO) instead of the per-sequence mean")
     ap.add_argument("--order", default="iid", choices=TR.ORDERS, help="candidate order of the injected label traces")
     ap.add_argument("--max-scenes", type=int, default=None, help="cap the scenes per epoch (paired scenes first)")
+    ap.add_argument("--side", default=None, help="side streams by group prefix with a fixed count per step, e.g. 'spatial:=2' "
+                    "(kept out of the --max-scenes scene stream like --replay-per-step)")
+    ap.add_argument("--replay-per-step", type=int, default=0, help="answer-only replay items (RefCOCO) added to every step on top of "
+                    "--prompts-per-step, kept out of the scene stream (0 = mixed in as scenes, the old behaviour)")
     ap.add_argument("--eval-every", type=int, default=10)
     ap.add_argument("--save-every", type=int, default=0, help="also save the adapter to <name>/adapter_step<N> every N steps (0 = off)")
     ap.add_argument("--mini-gme", type=int, default=0, help="N Rejection + N positives of GME evaluated at every --eval-every (curve of the number that matters)")
@@ -366,6 +408,13 @@ def main() -> None:
     out.mkdir(parents=True, exist_ok=True)
     (out / "args.json").write_text(json.dumps(vars(args), indent=1), encoding="utf-8")
     max_new = args.max_new = args.max_new or (384 if args.trace else 48)  # written back: the two-turn sampler and the token-level normalizer read args.max_new
+    args.primary_tmpl = prompts.load("grounding_qwen3vl_primary") if args.c1_direct else None  # set after args.json is written (not serialisable)
+    pair_items = D.load_items(Path(args.audit_replay_file).expanduser()) if args.audit_replay else []
+    args.c1_map = None
+    if args.c1_from:
+        from train import aav as AAV
+
+        args.c1_map = AAV.load_c1(args.c1_from)  # set after args.json is written (not a run setting)
 
     train_items, val_items = D.split(D.load_items(), args.n_val_scenes, args.seed)
     val_groups = {it["group"] for it in val_items}
@@ -389,6 +438,8 @@ def main() -> None:
         train_items = train_items[: args.limit]
     kinds = lambda xs: {k: sum(1 for i in xs if i["kind"] == k) for k in ("positive", "sibling_positive", "negative")}
     print(f"train {len(train_items)} {kinds(train_items)} (trace drops {trace_drops}) | val {len(val_items)} {kinds(val_items)}", flush=True)
+    if args.c1_map is not None:
+        print(f"candidate 1 injected from {args.c1_from}: {sum(it['id'] in args.c1_map for it in train_items)}/{len(train_items)} training items", flush=True)
 
     hf, rev = D.MODELS[args.model]
     coa_tmpl = ans_tmpl = None
@@ -435,7 +486,7 @@ def main() -> None:
     assert not [n for n, p in model.named_parameters() if p.requires_grad and "visual" in n]
     print(f"trainable {sum(p.numel() for p in params) / 1e6:.1f}M", flush=True)
     opt = torch.optim.AdamW(params, lr=args.lr, weight_decay=0.0)
-    batches0 = scene_batches(train_items, args.prompts_per_step, args.seed + 100, args.max_scenes)
+    batches0 = scene_batches(train_items, args.prompts_per_step, args.seed + 100, args.max_scenes, args.replay_per_step, side_quotas(args.side))
     total_steps = len(batches0) * args.epochs
     print(f"{len(batches0)} steps/epoch over {sum(len(b) for b in batches0)} prompts", flush=True)
     curve = open(out / "curve.jsonl", "a", encoding="utf-8")
@@ -478,9 +529,15 @@ def main() -> None:
     step, t0 = 0, time.time()
     window = []  # per-prompt stats since the last print
     for epoch in range(args.epochs):
-        batches = scene_batches(train_items, args.prompts_per_step, args.seed + 100 + epoch, args.max_scenes)
+        batches = scene_batches(train_items, args.prompts_per_step, args.seed + 100 + epoch, args.max_scenes, args.replay_per_step, side_quotas(args.side))
+        if pair_items:  # contrastive audit pairs ride along at a fixed count per step (own generator: the scene stream is unchanged)
+            pairs = list(pair_items)
+            random.Random(args.seed + 13 + epoch).shuffle(pairs)
+            for bi_, b_ in enumerate(batches):
+                b_.extend(pairs[bi_ * args.audit_replay: (bi_ + 1) * args.audit_replay])
         for batch in batches:
             n_used = 0
+            n_core = max(1, sum(1 for x in batch if x.get("source") != "rcpair"))  # the loss normaliser: pair items do not dilute the scene items
             s_pos: dict[str, float] = {}
             step_ent: list[float] = []
             step_len: list[int] = []
@@ -498,6 +555,28 @@ def main() -> None:
                 text = processor.apply_chat_template(msgs, tokenize=False, add_generation_prompt=True)
                 inputs = processor(images=views, text=text, return_tensors="pt").to(model.device)
                 n_prompt = inputs["input_ids"].shape[1]
+                if it.get("source") == "rcpair":  # contrastive audit pair: audit-only rollouts, one audit segment each
+                    model.eval()
+                    pr = GC.sample_audit_pair(model, processor, template, coa_tmpl, it, image, inputs, args, eos, tok)
+                    model.train()
+                    by_box: dict[int, list[float]] = {}
+                    for bi_, _, _, r_ in pr:
+                        by_box.setdefault(bi_, []).append(r_)
+                    means = {bi_: sum(v) / len(v) for bi_, v in by_box.items()}
+                    used = False
+                    for bi_, inp_, tk_, r_ in pr:
+                        adv_ = args.r_audit * (r_ - means[bi_])
+                        if abs(adv_) < 1e-12:
+                            continue
+                        with torch.autocast("cuda", dtype=torch.bfloat16):
+                            lp_, ent_ = completion_stats(model, inp_, tk_)
+                        step_ent.append(ent_)
+                        ((-adv_ * lp_.sum() / float(args.norm_tokens)) / (args.group * n_core)).backward()
+                        used = True
+                    n_used += int(used)
+                    window.append({"kind": "pair", "used": float(used), "pair_pos": ((means[0] + 1) / 2) if 0 in means else None,  # target passes / sibling vetoed (rates)
+                                   "pair_veto": ((means[1] + 1) / 2) if 1 in means else None})
+                    continue
                 model.eval()
                 rollouts = None
                 if args.turns == 2 and args.audit == "coa":
@@ -554,7 +633,9 @@ def main() -> None:
                                "syc": (sum(1 for i in infos if i.get("sycophantic")) / len(infos)) if rollouts is not None else None,
                                "uns": (sum(i["unsure_frac"] for i in infos if i.get("unsure_frac") is not None) / max(1, sum(1 for i in infos if i.get("unsure_frac") is not None))) if rollouts is not None else None,
                                "echo": (sum(i["echo_frac"] for i in infos if i.get("echo_frac") is not None) / max(1, sum(1 for i in infos if i.get("echo_frac") is not None))) if rollouts is not None else None,
-                               "cell": (sum(i["cell_acc"] for i in infos if i.get("cell_acc") is not None) / max(1, sum(1 for i in infos if i.get("cell_acc") is not None))) if any(i.get("cell_acc") is not None for i in infos) else None})
+                               "cell": (sum(i["cell_acc"] for i in infos if i.get("cell_acc") is not None) / max(1, sum(1 for i in infos if i.get("cell_acc") is not None))) if any(i.get("cell_acc") is not None for i in infos) else None,
+                               "c1": (lambda v: sum(v) / len(v) if v else None)([float(i["c1_hit"]) for i in infos if "c1_hit" in i]),
+                               "line": (lambda v: sum(v) / len(v) if v else None)([i["line_score"] for i in infos if "line_score" in i])})
                 need_neg = it["kind"] == "negative" and "null" not in types
                 need_pos = it["kind"] in ("positive", "sibling_positive") and it["answer"]["bbox_2d"] is not None and max(rewards) < 1.0 and bool(it.get("matrix"))  # answer-only items (RefCOCO) have no label trace
                 if args.inject_gt == "all" or (args.inject_gt in ("neg", "both") and need_neg) or (args.inject_gt == "both" and need_pos):
@@ -586,7 +667,15 @@ def main() -> None:
                         gt_r = sum(rewards) / len(rewards)  # ViSurf smoothing: no push when the policy already gets it
                     segs.append(gt_segs)
                     rewards.append(gt_r)
-                if max(rewards) - min(rewards) < 1e-6:
+                seg_base = {}  # per-segment terms (train.grpo_coa.coa_reward): baseline = mean of the key over the sampled rollouts
+                if rollouts is not None:
+                    vals: dict[str, list[float]] = {}
+                    for info_s in infos[: len(rollouts)]:
+                        for key, rv in (info_s.get("seg_r") or {}).values():
+                            vals.setdefault(key, []).append(rv)
+                    seg_base = {key: sum(v) / len(v) for key, v in vals.items() if len(v) >= 2 and max(v) - min(v) > 1e-6}
+                flat = max(rewards) - min(rewards) < 1e-6
+                if flat and not seg_base:
                     continue  # no signal in this group
                 mean_r = sum(rewards) / len(rewards)
                 std_r = statistics.pstdev(rewards) + 1e-4
@@ -598,20 +687,31 @@ def main() -> None:
                     mean_acc = sum(i["r_acc"] for i in infos) / len(infos)
                 for gi_, (seg_list, r) in enumerate(zip(segs, rewards)):
                     adv = scale * (r - mean_r) / (1.0 if args.no_std else std_r)
-                    with torch.autocast("cuda", dtype=torch.bfloat16):
-                        stats = [completion_stats(model, inp, comp) for inp, comp in seg_list]
-                        logp = torch.cat([lp for lp, _ in stats])
-                    step_ent.append(sum(e for _, e in stats) / len(stats))
-                    step_len.append(sum(len(comp) for _, comp in seg_list))
-                    if rollouts is not None:
+                    seg_adv = None
+                    if rollouts is not None:  # per-segment advantages first: segments with none are not forwarded (same gradient, less compute)
                         info_g = infos[gi_]
                         adv_b = scale * (info_g["r_base"] - mean_base)
                         adv_a = scale * (info_g["r_acc"] - mean_acc)
                         acc_seg = info_g.get("acc_seg")
+                        seg_adv = []
+                        for si in range(len(seg_list)):
+                            a_si = 0.0 if flat else adv_b + (adv_a if (acc_seg is not None and si == acc_seg) else 0.0)
+                            sr = (info_g.get("seg_r") or {}).get(si) if gi_ < len(rollouts) else None
+                            if sr is not None and sr[0] in seg_base:
+                                a_si += scale * (sr[1] - seg_base[sr[0]])
+                            seg_adv.append(a_si)
+                    keep = [si for si in range(len(seg_list)) if seg_adv is None or args.beta > 0 or abs(seg_adv[si]) > 1e-12]
+                    if not keep:
+                        continue
+                    with torch.autocast("cuda", dtype=torch.bfloat16):
+                        stats = {si: completion_stats(model, *seg_list[si]) for si in keep}
+                        logp = torch.cat([stats[si][0] for si in keep])
+                    step_ent.append(sum(e for _, e in stats.values()) / len(stats))
+                    step_len.append(sum(len(comp) for _, comp in seg_list))
+                    if rollouts is not None:
                         loss = torch.zeros((), device=logp.device)
-                        for si, (lp, _) in enumerate(stats):
-                            a_si = adv_b + (adv_a if (acc_seg is not None and si == acc_seg) else 0.0)
-                            loss = loss - a_si * lp.sum() / float(args.norm_tokens)
+                        for si in keep:
+                            loss = loss - seg_adv[si] * stats[si][0].sum() / float(args.norm_tokens)
                     else:
                         loss = -(adv * (logp.sum() / float(args.max_new) if args.token_level else logp.mean()))  # DAPO-style token-level vs sequence-mean
                     if args.beta > 0:
@@ -621,7 +721,7 @@ def main() -> None:
                         model.set_adapter("default")
                         d = ref - logp
                         loss = loss + args.beta * (torch.exp(d) - d - 1).mean()
-                    (loss / (len(segs) * len(batch))).backward()
+                    (loss / (len(segs) * n_core)).backward()
             if n_used:
                 torch.nn.utils.clip_grad_norm_(params, 1.0)
                 opt.step()
@@ -636,7 +736,7 @@ def main() -> None:
                                      "pos_fa": mean(by("positive") + by("sibling_positive"), "fa"), "neg_r": mean(by("negative"), "mean_r"), "neg_null": mean(by("negative"), "null_frac"),
                                      "neg_ev": mean(by("negative"), "ev"), "cross_r": mean(by("cross"), "mean_r"), "cross_null": mean(by("cross"), "null_frac"),
                                      "bad": mean(recent, "bad_frac"), "inc": mean(recent, "inc"), "cand_recall": mean(recent, "rec"), "reason_named": mean(by("negative"), "rsn"), "cell_acc": mean(recent, "cell"),
-                                     "k": mean(recent, "kk"), "consistent": mean(recent, "cons"), "acc_correct": mean(by("negative"), "acc"), "sycophantic": mean(by("negative"), "syc"), "unsure": mean(recent, "uns"), "echo": mean(recent, "echo"),
+                                     "k": mean(recent, "kk"), "consistent": mean(recent, "cons"), "c1_hit": mean(recent, "c1"), "line_score": mean(recent, "line"), "pair_pos": mean(by("pair"), "pair_pos"), "pair_veto": mean(by("pair"), "pair_veto"), "acc_correct": mean(by("negative"), "acc"), "sycophantic": mean(by("negative"), "syc"), "unsure": mean(recent, "uns"), "echo": mean(recent, "echo"),
                                      "entropy": (sum(step_ent) / len(step_ent)) if step_ent else None, "comp_len": (sum(step_len) / len(step_len)) if step_len else None,
                                      "min": round((time.time() - t0) / 60, 2)}) + "\n")
             if step % args.log_every == 0:

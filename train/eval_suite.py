@@ -13,6 +13,8 @@ Sets:
            positives (--gme-gray-pos-n), each with a gray image of the original size.  A model that
            refuses these as often as the real images is reading the words, not the picture.
   refcoco  --refcoco-n sampled boxes from each of RefCOCO / RefCOCO+ / RefCOCOg val (short expressions).
+  prbench_dev, prbench, finecops, grefcoco, humanref, openref, refadv
+           out-of-domain sets (train.ood_items): no-target accuracy and positive accuracy per subset.
 
 --gme-pos-n N keeps every Rejection item and a stratified (by dimension) sample of N positives:
 the screening configuration used between training variants.
@@ -118,6 +120,15 @@ def items_for(set_name: str, args) -> list[dict]:
         return [{**it, "gray": True} for it in own_items(args)]
     if set_name == "refcoco":
         return D.refcoco_items(args.refcoco_n, args.split_seed)
+    from train import ood_items as OOD
+    if set_name in OOD.SETS:  # out-of-domain sets (evaluation only; see train.ood_items)
+        return OOD.items(set_name)
+    if set_name == "trainprobe":  # training scenes with label matrices (train.line_errors: per-line errors on the model's own candidates)
+        from train import line_errors as LE
+        return LE.probe_items()
+    if set_name == "rlpool":  # every RL-pool item, for the base model's direct answers (train.aav: candidate 1 during training)
+        from train import aav as AAV
+        return AAV.pool_items()
     raise ValueError(set_name)
 
 
@@ -180,12 +191,27 @@ def generate_two_turn(model, processor, template, items: list[dict], max_new: in
     Returns (raw texts = turn1 + newline + turn2, token ids of turn 2, None scores); sets
     `_tool_boxes` (pixels) and `_turn1` on every item."""
     tok = processor.tokenizer
+    if C1_DIRECT:  # two-step proposal: the model's own direct answer under the plain grounding prompt becomes candidate 1
+        global _PRIMARY_T
+        if _PRIMARY_T is None:
+            _PRIMARY_T = prompts.load("grounding_qwen3vl_primary")
+        raws0, _, _ = generate_batch(model, processor, _PRIMARY_T, items, 64, want_scores=False)
+        for it, r0 in zip(items, raws0):
+            parsed0 = P.parse_qwen3vl(r0, convention=P.RELATIVE_1000, original_wh=it["_wh"], sent_wh=it["_wh"])
+            it["_c1_direct"] = list(parsed0.box_xyxy_px) if parsed0.output_type == "box" and parsed0.box_xyxy_px else None
     raws1, _, _ = generate_batch(model, processor, template, items, max_new1 or MAX_NEW1, want_scores=False, stop="</tool_call>")
     for it, r1 in zip(items, raws1):
         it["_turn1"] = r1
         it["_tool_boxes"] = TR.parse_tool_boxes(r1, it["_wh"])
+        first = FIRST_BOX.get(it["id"]) or it.get("_c1_direct")
+        if first:  # answer-first probe: a given box (e.g. the base model's own answer) becomes candidate 1
+            rest = [b for b in it["_tool_boxes"] if P.iou(tuple(b), tuple(first)) < 0.7]
+            it["_tool_boxes"] = ([list(first)] + rest)[:4]
+            it["_first_box"] = True
     if AUDIT == "coa":
         return _coa_turn2(model, processor, template, items, max_new)
+    if AUDIT == "holistic":
+        return _holistic_turn2(model, processor, items)
     if ISOLATE:
         return _isolated_turn2(model, processor, template, items, max_new)
     convs, images = [], []
@@ -224,12 +250,118 @@ def generate_two_turn(model, processor, template, items: list[dict], max_new: in
     return raws, seqs, [None] * len(items)
 
 
+C1_DIRECT = False  # --c1-direct: candidate 1 = the same model's direct answer under the plain grounding prompt (two-step proposal)
+_PRIMARY_T = None
+FIRST_BOX: dict[str, list] = {}  # --first-box-from: item id -> pixel box injected as candidate 1 (answer-first probe)
 ISOLATE = False  # --isolate: turn 2 once per candidate with only that crop, rows assembled afterwards (rows cannot copy each other)
 SAMPLES = 1  # --samples k: turn 2 sampled k times, verdict cells decided by majority vote (test-time self-consistency)
 AUDIT = None  # --audit coa: turn 2 = one COA audit per candidate (train.coa), decision by the harness rule
 AUDIT_BASE = False  # --audit-base: run the audit turn with the adapter disabled (zero-training probe)
+AUDIT_VOTES = 1  # --audit-votes k: k sampled audits per candidate, majority decides whether it fits (test-time self-consistency of the veto)
+EARLY_STOP = False  # --early-stop: audit candidate 1 first and the others only when it is vetoed (same rule-derived answer, fewer audits)
 _COA_TMPL = None
 _COA_ANS_TMPL = None
+
+
+_HOL_TMPL = None
+
+
+def holistic_conv(processor, tmpl, expr: str, image, box_px) -> tuple[str, list]:
+    """Chat text and the two views of one holistic verification call (scene with the candidate outlined + its close-up)."""
+    from datagen import common as C
+
+    msgs = [{"role": "user", "content": [{"type": "image"}, {"type": "image"}, {"type": "text", "text": tmpl.render(expr=expr)}]}]
+    return processor.apply_chat_template(msgs, tokenize=False, add_generation_prompt=True), [C.outline(image, box_px, "red"), TR.crop_view(image, box_px)]
+
+
+def yes_no_ids(tok) -> tuple[list[int], list[int]]:
+    return _first_ids(tok, ["yes", " yes", "Yes", " Yes"]), _first_ids(tok, ["no", " no", "No", " No"])
+
+
+@torch.no_grad()
+def _holistic_turn2(model, processor, items: list[dict], sub_batch: int = 8):
+    """Control for the claim-level audit (--audit holistic): one yes / no per candidate on the same two views.  p(yes) is the
+    candidate's pass probability; the recorded answer is the first candidate with p(yes) >= 0.5 (train.score_rules recomputes
+    other thresholds and selection by score from the stored probabilities)."""
+    global _HOL_TMPL
+    from train import coa as COA
+
+    if _HOL_TMPL is None:
+        _HOL_TMPL = prompts.load("grounding_holistic_verify", non_kill=True)
+    tok = processor.tokenizer
+    y_ids, n_ids = yes_no_ids(tok)
+    convs, images, owners = [], [], []
+    for i, it in enumerate(items):
+        image = _open(it)
+        for k, b in enumerate(it["_tool_boxes"]):
+            text, ims = holistic_conv(processor, _HOL_TMPL, it["expr"], image, b)
+            convs.append(text)
+            images.extend(ims)
+            owners.append((i, k))
+    p_yes: dict[tuple[int, int], float] = {}
+    processor.tokenizer.padding_side = "left"
+    for s0 in range(0, len(convs), sub_batch):
+        tx = convs[s0:s0 + sub_batch]
+        inputs = processor(images=images[2 * s0: 2 * (s0 + len(tx))], text=tx, padding=True, return_tensors="pt").to(model.device)
+        lp = torch.log_softmax(model(**inputs, logits_to_keep=1).logits[:, -1].float(), dim=-1)
+        ly, ln = torch.logsumexp(lp[:, y_ids], dim=-1), torch.logsumexp(lp[:, n_ids], dim=-1)
+        for j, key in enumerate(owners[s0:s0 + len(tx)]):
+            p_yes[key] = float(torch.sigmoid(ly[j] - ln[j]))
+    raws, seqs = [], []
+    for i, it in enumerate(items):
+        wh = it["_wh"]
+        boxes = it["_tool_boxes"]
+        py = [p_yes[(i, k)] for k in range(len(boxes))]
+        fits = [p >= 0.5 for p in py]
+        chosen = next((k for k, f in enumerate(fits) if f), None)
+        n_cond = len(re.findall(r"^\s*\d+\.", it["_turn1"].split("</conditions>")[0], re.M)) or 1
+        audits = [{"format_ok": False, "lines": []} for _ in boxes]
+        table = COA.synthetic_table(audits, [_rel(b, wh) for b in boxes], fits, n_cond) if boxes else "<candidates>\n</candidates>\n"
+        derived = json.dumps({"bbox_2d": _rel(boxes[chosen], wh)}) if chosen is not None else '{"bbox_2d": null}'
+        extra = json.dumps({"audits": ["yes" if f else "no" for f in fits], "fits": fits, "chosen": chosen, "derived": derived, "k0": not boxes,
+                            "probs": [[[round(p, 4), round(1 - p, 4), 0.0]] for p in py], "boxes": [[round(float(v), 1) for v in b] for b in boxes]}, ensure_ascii=False)
+        raws.append(it["_turn1"] + "\n" + table + f"<answer>{derived}</answer>" + f"\n<coa>{extra}</coa>")
+        seqs.append([])
+    return raws, seqs, [None] * len(items)
+
+
+VERDICT_PROBS = False  # --verdict-probs: store P(match / mismatch / unsure) at every audit line's verdict token (score-based decisions, train.score_rules)
+_VERDICT_IDS = None  # (ids of " match", " mismatch", " unsure", id of " |")
+
+
+def _verdict_ids(tok):
+    global _VERDICT_IDS
+    if _VERDICT_IDS is None:
+        one = lambda w: (lambda ids: ids[0] if len(ids) == 1 else None)(tok(w, add_special_tokens=False)["input_ids"])
+        ids = [one(" match"), one(" mismatch"), one(" unsure")]
+        _VERDICT_IDS = (ids, one(" |")) if all(i is not None for i in ids) and one(" |") is not None else ([], None)
+    return _VERDICT_IDS
+
+
+class _VerdictRecorder:
+    """Logits processor that keeps, for every generation step, the log-probabilities of the three verdict words (first tokens).
+    It never changes the scores; any error switches it off."""
+
+    def __init__(self, ids: list[int]):
+        self.ids, self.steps, self.ok = ids, [], bool(ids)
+
+    def __call__(self, input_ids, scores):
+        if self.ok:
+            try:
+                self.steps.append(torch.log_softmax(scores.float(), dim=-1)[:, self.ids].cpu())
+            except Exception:  # noqa: BLE001
+                self.ok = False
+        return scores
+
+
+def _line_probs(seq: list[int], steps: list, row: int, ids: list[int], bar: int) -> list[list[float]]:
+    """[p(match), p(mismatch), p(unsure)] (renormalised over the three) at each verdict token of one generated audit, in line order."""
+    out = []
+    vs = set(ids)
+    for t in range(1, min(len(seq), len(steps))):
+        if seq[t] in vs and seq[t - 1] == bar:
+            out.append([round(float(x), 4) for x in torch.softmax(steps[t][row], dim=-1)])
+    return out
 
 
 @torch.no_grad()
@@ -246,17 +378,21 @@ def _coa_turn2(model, processor, template, items: list[dict], max_new: int, sub_
         _COA_TMPL = prompts.load("grounding_coa_audit", non_kill=True)
     tok = processor.tokenizer
     eos = {t for t in (tok.eos_token_id, tok.pad_token_id, tok.convert_tokens_to_ids("<|im_end|>")) if t is not None}
-    convs, images, owners = [], [], []
-    for i, it in enumerate(items):
-        boxes = it["_tool_boxes"]
-        if not boxes:
-            continue
-        image = _open(it)
-        wh = it["_wh"]
-        u1 = {"role": "user", "content": [{"type": "image"}, {"type": "text", "text": template.render(expr=it["expr"])}]}
-        t1 = it["_turn1"]
-        a, z = t1.find("<tool_call>"), t1.find("</tool_call>")
-        for k, b in enumerate(boxes, 1):
+
+    def audit_calls(pairs: list[tuple[int, int]]) -> dict[tuple[int, int], str]:
+        """One isolated audit per (item index, 1-based candidate index)."""
+        convs, images, owners = [], [], []
+        opened: dict[int, object] = {}
+        for i, k in pairs:
+            it = items[i]
+            if i not in opened:
+                opened[i] = _open(it)
+            image = opened[i]
+            wh = it["_wh"]
+            b = it["_tool_boxes"][k - 1]
+            u1 = {"role": "user", "content": [{"type": "image"}, {"type": "text", "text": template.render(expr=it["expr"])}]}
+            t1 = it["_turn1"]
+            a, z = t1.find("<tool_call>"), t1.find("</tool_call>")
             call = "<tool_call>" + json.dumps({"name": "image_zoom_in", "arguments": {"boxes": [_rel(b, wh)]}}) + "</tool_call>"
             t1_k = (t1[:a] + call + t1[z + len("</tool_call>"):]) if 0 <= a < z else (t1 + "\n" + call)
             a1 = {"role": "assistant", "content": [{"type": "text", "text": t1_k}]}
@@ -264,22 +400,63 @@ def _coa_turn2(model, processor, template, items: list[dict], max_new: int, sub_
             convs.append(processor.apply_chat_template([u1, a1, u2], tokenize=False, add_generation_prompt=True))
             images.extend([C.outline(image, b, "red"), TR.crop_view(image, b)])  # two images: the outlined scene (turn 1) + the close-up (turn 2)
             owners.append((i, k))
-    texts: dict[tuple[int, int], str] = {}
-    processor.tokenizer.padding_side = "left"
-    ctx = model.disable_adapter() if (AUDIT_BASE and hasattr(model, "disable_adapter")) else None
-    if ctx is not None:
-        ctx.__enter__()
-    try:
-        for s0 in range(0, len(convs), sub_batch):
-            tx = convs[s0:s0 + sub_batch]
-            inputs = processor(images=images[2 * s0: 2 * (s0 + len(tx))], text=tx, padding=True, return_tensors="pt").to(model.device)
-            out = model.generate(**inputs, max_new_tokens=max_new, do_sample=False)
-            n_prompt = inputs["input_ids"].shape[1]
-            for j, key in enumerate(owners[s0:s0 + len(tx)]):
-                texts[key] = processor.decode(_trim(out[j][n_prompt:].tolist(), eos), skip_special_tokens=True)
-    finally:
+        out_texts: dict[tuple[int, int], str] = {}
+        processor.tokenizer.padding_side = "left"
+        ctx = model.disable_adapter() if (AUDIT_BASE and hasattr(model, "disable_adapter")) else None
         if ctx is not None:
-            ctx.__exit__(None, None, None)
+            ctx.__enter__()
+        kv = AUDIT_VOTES
+        sb = max(1, sub_batch // kv) if kv > 1 else sub_batch
+        try:
+            for s0 in range(0, len(convs), sb):
+                tx = convs[s0:s0 + sb]
+                inputs = processor(images=images[2 * s0: 2 * (s0 + len(tx))], text=tx, padding=True, return_tensors="pt").to(model.device)
+                rec = None
+                if kv > 1:  # --audit-votes: k sampled audits per candidate; the fit decision is the majority, a majority-side sample is kept
+                    out = model.generate(**inputs, max_new_tokens=max_new, do_sample=True, temperature=SAMPLE_TEMP, top_p=1.0, top_k=0, num_return_sequences=kv)
+                elif VERDICT_PROBS and v_ids:
+                    from transformers import LogitsProcessorList
+
+                    rec = _VerdictRecorder(v_ids)
+                    out = model.generate(**inputs, max_new_tokens=max_new, do_sample=False, logits_processor=LogitsProcessorList([rec]))
+                else:
+                    out = model.generate(**inputs, max_new_tokens=max_new, do_sample=False)
+                n_prompt = inputs["input_ids"].shape[1]
+                for j, key in enumerate(owners[s0:s0 + len(tx)]):
+                    if kv > 1:
+                        cands = [processor.decode(_trim(out[j * kv + v][n_prompt:].tolist(), eos), skip_special_tokens=True) for v in range(kv)]
+                        fit = [(lambda a: a["format_ok"] and not COA.named_mismatches(a["lines"]))(COA.parse_audit(t)) for t in cands]
+                        maj = sum(fit) * 2 > kv
+                        out_texts[key] = next(t for t, f in zip(cands, fit) if f == maj)
+                        votes[key] = sum(fit)
+                    else:
+                        seq_j = _trim(out[j][n_prompt:].tolist(), eos)
+                        out_texts[key] = processor.decode(seq_j, skip_special_tokens=True)
+                        if rec is not None and rec.ok:
+                            try:
+                                line_probs[key] = _line_probs(seq_j, rec.steps, j, v_ids, v_bar)
+                            except Exception:  # noqa: BLE001
+                                pass
+        finally:
+            if ctx is not None:
+                ctx.__exit__(None, None, None)
+        return out_texts
+
+    votes: dict[tuple[int, int], int] = {}  # --audit-votes: passing samples per candidate
+    line_probs: dict[tuple[int, int], list] = {}  # --verdict-probs: per audit, [p(match), p(mismatch), p(unsure)] per line
+    v_ids, v_bar = _verdict_ids(tok) if VERDICT_PROBS else ([], None)
+    pairs = [(i, k) for i, it in enumerate(items) for k in range(1, len(it["_tool_boxes"]) + 1)]
+    stopped: set[int] = set()  # --early-stop: items whose candidate 1 passed (the others were not audited)
+    if EARLY_STOP:
+        firsts = [p for p in pairs if p[1] == 1]
+        texts = audit_calls(firsts)
+        for i, _ in firsts:
+            a = COA.parse_audit(texts[(i, 1)])
+            if a["format_ok"] and not COA.named_mismatches(a["lines"]):
+                stopped.add(i)
+        texts.update(audit_calls([p for p in pairs if p[1] > 1 and p[0] not in stopped]))
+    else:
+        texts = audit_calls(pairs)
     # third step: the model's own answer from its audits (text only, batched); the rule-derived answer is kept as a diagnostic
     global _COA_ANS_TMPL
     if _COA_ANS_TMPL is None:
@@ -293,7 +470,12 @@ def _coa_turn2(model, processor, template, items: list[dict], max_new: int, sub_
         audits = [COA.parse_audit(t) for t in raw_audits]
         per_item.append((raw_audits, audits))
         if boxes:
-            body = _COA_ANS_TMPL.render(expr=it["expr"], turn1=it["_turn1"], audits=COA.audits_text(raw_audits, [_rel(b, wh) for b in boxes]))
+            n_shown = 1 if i in stopped else len(boxes)  # early stop: the answer step sees the audited candidate only
+            t1_shown = it["_turn1"]
+            if it.get("_first_box"):  # injected candidate 1: the turn-1 text shown names the audited list (as in training, train.grpo_coa)
+                from train.grpo_coa import rewrite_t1_boxes
+                t1_shown = rewrite_t1_boxes(t1_shown, [_rel(b, wh) for b in boxes[:n_shown]])
+            body = _COA_ANS_TMPL.render(expr=it["expr"], turn1=t1_shown, audits=COA.audits_text(raw_audits[:n_shown], [_rel(b, wh) for b in boxes[:n_shown]]))
             ans_texts.append(processor.apply_chat_template([{"role": "user", "content": [{"type": "text", "text": body}]}], tokenize=False, add_generation_prompt=True))
         else:
             ans_texts.append(None)
@@ -319,7 +501,10 @@ def _coa_turn2(model, processor, template, items: list[dict], max_new: int, sub_
         am = re.search(r"<answer>(.*?)</answer>", ma, re.S)
         model_answer = ("<answer>" + am.group(1).strip() + "</answer>") if am else '<answer>{"bbox_2d": null}</answer>'
         extra = json.dumps({"audits": raw_audits, "fits": fits, "chosen": chosen, "derived": derived, "model_answer_raw": ma,
-                            "k0": not boxes, "unparsable": sum(1 for a in audits if not a["format_ok"])}, ensure_ascii=False)
+                            "k0": not boxes, "unparsable": sum(1 for a in audits if not a["format_ok"]), "early_stop": i in stopped,
+                            "votes": [votes.get((i, k)) for k in range(1, len(boxes) + 1)] if votes else None,
+                            "probs": [line_probs.get((i, k)) for k in range(1, len(boxes) + 1)] if line_probs else None,
+                            "boxes": [[round(float(v), 1) for v in b] for b in boxes]}, ensure_ascii=False)
         # the <candidates> table encodes the rule-derived answer (scorer: rejection_acc / positive_acc); <answer> is the model's own
         # decision (scorer: free_* metrics); consistent_rate = agreement between the two
         raws.append(it["_turn1"] + "\n" + table + model_answer + f"\n<coa>{extra}</coa>")
@@ -557,6 +742,8 @@ def score_item(it: dict, raw: str, seq, scores, processor, null_ids, box_ids, tr
     for k in ("dimension", "size_bin", "kind", "set", "group"):
         if k in it:
             rec[k] = it[k]
+    if it.get("_first_box"):
+        rec["first_box"] = True
     return rec
 
 
@@ -666,6 +853,11 @@ def summarize(tag_dir: Path) -> dict:
                         for sub in sorted({x.get("set") for x in r})}
         if "format_ok" in r[0]:
             s["refcoco"]["trace"] = trace_stats(r)
+    from train import ood_items as OOD
+    for name in OOD.SETS:
+        o = rows(name)
+        if o:
+            s[name] = OOD.summary(o)
     (tag_dir / "summary.json").write_text(json.dumps(s, indent=1), encoding="utf-8")
     return s
 
@@ -689,8 +881,15 @@ def main() -> None:
     ap.add_argument("--max-new1", type=int, default=400, help="turn-1 token budget under --turns 2 (conditions + tool call)")
     ap.add_argument("--isolate", action="store_true", help="--turns 2: verify each candidate in its own turn-2 call (one close-up), rows assembled afterwards")
     ap.add_argument("--samples", type=int, default=1, help="--turns 2: sample turn 2 k times and decide every verdict cell by majority vote")
-    ap.add_argument("--audit", default=None, choices=[None, "coa"], help="--turns 2: per-candidate COA audit head instead of the joint table")
+    ap.add_argument("--audit", default=None, choices=[None, "coa", "holistic"], help="--turns 2: per-candidate COA audit head instead of the joint "
+                    "table; holistic = one yes / no per candidate (control for the claim-level audit)")
     ap.add_argument("--audit-base", action="store_true", help="run the audit turn with the adapter disabled (zero-training probe of the head)")
+    ap.add_argument("--audit-votes", type=int, default=1, help="--audit coa: sample k audits per candidate (temperature --sample-temp) and "
+                    "decide fit by majority (a majority-side sample is stored)")
+    ap.add_argument("--verdict-probs", action="store_true", help="--audit coa: store the probabilities of match / mismatch / unsure at every audit "
+                    "line (greedy audits only); the answer is unchanged")
+    ap.add_argument("--early-stop", action="store_true", help="--audit coa: audit candidate 1 first, the others only when it is vetoed "
+                    "(the rule-derived answer is unchanged; skipped audits are stored as empty strings)")
     ap.add_argument("--sample-temp", type=float, default=0.7)
     ap.add_argument("--batch", type=int, default=1)
     ap.add_argument("--max-pixels", type=int, default=None, help="override the P21 pixel cap (resolution check)")
@@ -700,14 +899,31 @@ def main() -> None:
     ap.add_argument("--n-crops", type=int, default=1, help="close-ups per prompt under --hint-crop (>1: base zero-shot trace candidates add crops)")
     ap.add_argument("--turns", type=int, default=1, choices=[1, 2], help="2 = the v2 protocol (tool-call zoom on the model's own candidates)")
     ap.add_argument("--gme-rej-n", type=int, default=None, help="screening: sample this many Rejection items (default all 201)")
+    ap.add_argument("--c1-direct", action="store_true", help="--turns 2: two-step proposal - the model first answers the plain grounding prompt "
+                    "and that box is candidate 1 (alternates from turn 1); no second model, no stored answers")
+    ap.add_argument("--first-box-from", default=None, help="comma-separated eval tags: their predicted boxes (by item id) are injected as "
+                    "candidate 1 under --turns 2 (answer-first probe: e.g. base4b = the base model's own answers)")
     args = ap.parse_args()
+    if args.first_box_from:
+        for src in [t for t in args.first_box_from.split(",") if t]:
+            for f in sorted((D.TRAIN_ROOT / "eval" / src).glob("*.jsonl")):
+                if f.stem in ("gmegray", "gray"):  # gray-image controls share ids with the real sets
+                    continue
+                for l in open(f, encoding="utf-8"):
+                    r = json.loads(l)
+                    if r.get("output_type") == "box" and r.get("box"):
+                        FIRST_BOX.setdefault(r["id"], r["box"])
+        print(f"first-box injection: {len(FIRST_BOX)} boxes from {args.first_box_from}", flush=True)
     tag_dir = D.TRAIN_ROOT / "eval" / args.tag
     tag_dir.mkdir(parents=True, exist_ok=True)
     max_new = args.max_new or (384 if args.trace else 64)
-    global MAX_NEW1, ISOLATE, SAMPLES, SAMPLE_TEMP, AUDIT, AUDIT_BASE
+    global MAX_NEW1, ISOLATE, SAMPLES, SAMPLE_TEMP, AUDIT, AUDIT_BASE, EARLY_STOP, AUDIT_VOTES, C1_DIRECT
+    C1_DIRECT = bool(args.c1_direct)
+    global VERDICT_PROBS
+    VERDICT_PROBS = bool(args.verdict_probs)
     MAX_NEW1 = args.max_new1
     ISOLATE = bool(args.isolate)
-    AUDIT, AUDIT_BASE = args.audit, bool(args.audit_base)
+    AUDIT, AUDIT_BASE, EARLY_STOP, AUDIT_VOTES = args.audit, bool(args.audit_base), bool(args.early_stop), max(1, args.audit_votes)
     SAMPLES, SAMPLE_TEMP = args.samples, args.sample_temp
     prompt_name = args.prompt or ("grounding_verify_trace_tool" if args.turns == 2 else (("grounding_verify_trace_crops" if args.n_crops > 1 else "grounding_verify_trace_crop") if args.hint_crop else (TRACE_PROMPTS[args.trace] if args.trace else "grounding_qwen3vl_primary")))
     if not args.summary_only:
