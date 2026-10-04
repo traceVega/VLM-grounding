@@ -1,0 +1,4 @@
+# v29b (2026-10-02 00:35, replaces the rest of v28 and v29): RL11 eval reduced to what answers its question (PR-Bench dev relation /
+# position, RefCOCO 300x3 incl. RefCOCOg, own + gray safety); GME full set only if RL11 improves relational positives. Then K0 and K1.
+PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True ~/vlmg-env/bin/python -m train.eval_suite --tag full_grpo_coa11 --adapter ~/vlmg-data/train/grpo_coa11/adapter --trace rat --turns 2 --audit coa --max-new 400 --max-new1 400 --sets prbench_dev,refcoco,own,gray --refcoco-n 300 --batch 4
+PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True ~/vlmg-env/bin/python -m train.eval_suite --tag probe_grpo_coa10b --adapter ~/vlmg-data/train/grpo_coa10b/adapter --trace rat --turns 2 --audit coa --max-new 400 --max-new1 400 --sets trainprobe --batch 4

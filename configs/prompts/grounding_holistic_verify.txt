@@ -1,0 +1,7 @@
+# status: UNVERIFIED
+# source: ours, 2026-10-04: holistic per-candidate verification, the control for the claim-level audit (same views, one yes / no instead of one line per detail)
+# role: one candidate per call; the first image is the scene with this candidate outlined in red, the second image is its close-up
+# fields: expr
+The first image shows the scene with one candidate outlined in red; the second image is a close-up of that candidate. All spatial relationships are defined from the viewer's perspective. Statement:
+{expr}
+Does every detail of the statement hold for the outlined object? Answer with one word, yes or no.

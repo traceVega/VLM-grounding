@@ -1,0 +1,6 @@
+# v29 (after v28, 2026-10-02 01:00): design-doc probes on RL10b, inference only.
+# K0: per-line audit errors on 300 training scenes (train.line_errors) - does on-policy correction have a signal to learn.
+# K1: answer-first - the base model own answer box injected as candidate 1 (--first-box-from base4b,prdev_base4b), audits by RL10b,
+#     on GME, RefCOCO 300x3 and the PR-Bench dev split; first-fit with c1 first = the veto rule (tie-break variants computed offline).
+PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True ~/vlmg-env/bin/python -m train.eval_suite --tag probe_grpo_coa10b --adapter ~/vlmg-data/train/grpo_coa10b/adapter --trace rat --turns 2 --audit coa --max-new 400 --max-new1 400 --sets trainprobe --batch 4
+PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True ~/vlmg-env/bin/python -m train.eval_suite --tag k1_grpo_coa10b --adapter ~/vlmg-data/train/grpo_coa10b/adapter --trace rat --turns 2 --audit coa --max-new 400 --max-new1 400 --sets gme,refcoco,prbench_dev --refcoco-n 300 --first-box-from base4b,prdev_base4b --batch 4

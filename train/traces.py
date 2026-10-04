@@ -103,7 +103,7 @@ def label_matrix(item: dict) -> tuple[dict | None, str]:
     """The label table of an exported item: conditions, candidate rows, answer iid, flipped
     clause.  Returns (matrix, reason) with matrix None when the labels cannot support a
     consistent trace (the reason says why)."""
-    if item.get("source") in ("mosaic", "long", "audit", "gmestyle"):  # precomputed by train.mosaic_items / long_items / audit_rows / gme_export
+    if item.get("source") in ("mosaic", "long", "audit", "gmestyle", "spatial"):  # precomputed by train.mosaic_items / long_items / audit_rows / gme_export / spatial_items
         return item["matrix_pre"], "ok"
     rec = records().get((item["run"], item["group"]))
     if rec is None:

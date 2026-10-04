@@ -1,0 +1,15 @@
+# v30b (2026-10-03 15:15): the rest of v30 with the two-step proposal eval reordered (RefCOCO and PR-Bench dev first, GME last);
+# direct_grpo_coa12 (the RL12 adapter under the plain grounding prompt) is done: GME positives 38.4 (base 39.8), RefCOCO 87.7 / 83.3 / 87.0
+# (90.3 / 84.3 / 87.0), PR positives 76.0 (74.8).
+PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True ~/vlmg-env/bin/python -m train.eval_suite --tag full2_grpo_coa12 --adapter ~/vlmg-data/train/grpo_coa12/adapter --trace rat --turns 2 --audit coa --max-new 400 --max-new1 400 --sets refcoco,prbench_dev,gme --refcoco-n 300 --first-box-from direct_grpo_coa12 --early-stop --batch 4
+# general capability outside grounding (MMStar, 1,500 multiple-choice questions; adapter on for every question)
+PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True ~/vlmg-env/bin/python -m train.mmstar_eval --tag mmstar_base
+PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True ~/vlmg-env/bin/python -m train.mmstar_eval --tag mmstar_grpo_coa12 --adapter ~/vlmg-data/train/grpo_coa12/adapter
+PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True ~/vlmg-env/bin/python -m train.mmstar_eval --tag mmstar_grpo_coa11 --adapter ~/vlmg-data/train/grpo_coa11/adapter
+# baseline on the same data pool, standard recipe (direct answers, negatives mixed in as null; no audits, no RL): how much of the
+# rejection comes from the data alone, and at what cost on positives
+PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True ~/vlmg-env/bin/python -m train.sft_lora --name sft_negmix_pool --model 4b --extra ~/vlmg-data/train/augment/cross_v1.jsonl,~/vlmg-data/train/alt_negatives.jsonl,~/vlmg-data/train/long_items.jsonl,~/vlmg-data/train/gme_style_train.jsonl,~/vlmg-data/train/refcoco_train_v2.jsonl,~/vlmg-data/train/spatial_items.jsonl --epochs 2 --grad-accum 8 --eval-every 100000 --no-gray-eval --val-loss-every 0
+PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True ~/vlmg-env/bin/python -m train.eval_suite --tag full_sft_negmix_pool --adapter ~/vlmg-data/train/sft_negmix_pool/adapter --sets gme,gmegray,refcoco,prbench_dev,own,gray --refcoco-n 300 --batch 8
+PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True ~/vlmg-env/bin/python -m train.mmstar_eval --tag mmstar_sft_negmix_pool --adapter ~/vlmg-data/train/sft_negmix_pool/adapter
+# diagnostic only (not part of the method): RL11 with the base answer injected as candidate 1 at inference = proposer upper bound
+PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True ~/vlmg-env/bin/python -m train.eval_suite --tag k1_grpo_coa11 --adapter ~/vlmg-data/train/grpo_coa11/adapter --trace rat --turns 2 --audit coa --max-new 400 --max-new1 400 --sets gme,refcoco,prbench_dev --refcoco-n 300 --first-box-from base4b,prdev_base4b --early-stop --batch 4

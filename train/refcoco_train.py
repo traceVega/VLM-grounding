@@ -2,7 +2,7 @@
 repos (train split, boxes xyxy in pixels, several captions per box), images fetched one by
 one from images.cocodataset.org (COCO train2014) for the sampled items only.
 
-    python -m train.refcoco_train [--n-per-set 200] [--seed 0] -> $VLMG_DATA_ROOT/train/refcoco_train.jsonl (source "refcoco")
+    python -m train.refcoco_train [--n-per-set 200] [--seed 0] [--out <jsonl>] -> $VLMG_DATA_ROOT/train/refcoco_train.jsonl (source "refcoco")
 
 One item per sampled box with a random one of its captions; group "refcoco:<set>:<image id>".
 """
@@ -12,8 +12,10 @@ from __future__ import annotations
 import argparse
 import json
 import random
+import socket
 import time
 import urllib.request
+from pathlib import Path
 
 from PIL import Image
 
@@ -31,9 +33,11 @@ def fetch(file_name: str):
     path = IMG_DIR / file_name
     if path.is_file():
         return path
+    tmp = path.with_suffix(".part")
     for attempt in range(4):
         try:
-            urllib.request.urlretrieve(URL.format(file_name), path)
+            urllib.request.urlretrieve(URL.format(file_name), tmp)  # socket timeout set in main(); rename = no half-written cache hits
+            tmp.rename(path)
             return path
         except Exception:
             time.sleep(2 * (attempt + 1))
@@ -47,8 +51,11 @@ def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--n-per-set", type=int, default=200)
     ap.add_argument("--seed", type=int, default=0)
+    ap.add_argument("--out", default=str(OUT), help="output jsonl (default: refcoco_train.jsonl)")
     args = ap.parse_args()
+    out = Path(args.out).expanduser()
     IMG_DIR.mkdir(parents=True, exist_ok=True)
+    socket.setdefaulttimeout(30)  # a stalled connection hung the 1,200-item build for >10 min
     rng = random.Random(args.seed)
     items = []
     for sub, (repo, fname) in REPOS.items():
@@ -82,10 +89,10 @@ def main() -> None:
             if n % 50 == 0:
                 print(f"  {sub}: {n} items, {(time.time() - t0) / 60:.1f} min", flush=True)
         print(f"{sub}: {n} items", flush=True)
-    with open(OUT, "w", encoding="utf-8") as fh:
+    with open(out, "w", encoding="utf-8") as fh:
         for it in items:
             fh.write(json.dumps(it, ensure_ascii=False) + "\n")
-    print(f"{len(items)} items -> {OUT}")
+    print(f"{len(items)} items -> {out}")
 
 
 if __name__ == "__main__":
